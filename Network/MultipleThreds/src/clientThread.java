@@ -15,6 +15,13 @@ public class clientThread extends Thread{
 	private int maxClientCount;
 	private boolean running = false;
 	
+	private String data;
+	private float posX = 0;
+	private float posY = 0;
+	private float speedX = 0;
+	private float speedY = 0;
+	
+	
 	public clientThread(Socket clientSocket, clientThread[] threads) {
 		this.clientSocket= clientSocket;
 		this.threads = threads;
@@ -47,16 +54,26 @@ public class clientThread extends Thread{
 				if(message != null){
 					
 					System.out.println("Mobile says " + i +": "+ message);
-					sendMessage(message);
+					data = message;
+					String[] parts = data.split(" ");
+					posX = Float.parseFloat(parts[0]);
+					posY = Float.parseFloat(parts[1]);
+					speedX = Float.parseFloat(parts[2]);
+					speedY = Float.parseFloat(parts[3]);
 				}
 				}
 				}
+				update();
 			}
 			clientSocket.close();
 		} catch (Exception e) {
 			System.out.println("Error");
 			e.printStackTrace();
 		}
+	}
+	
+	private void update() {
+		sendMessage(posX + " " + posY);
 	}
 	
 }//END OF clientThread
