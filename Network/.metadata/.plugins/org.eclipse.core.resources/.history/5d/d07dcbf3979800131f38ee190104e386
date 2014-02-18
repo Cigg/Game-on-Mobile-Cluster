@@ -1,0 +1,6 @@
+
+public class clientThread extends Thread{
+	private String clientName = null;
+	PrintWiter out;
+	BufferedReader in,
+}
