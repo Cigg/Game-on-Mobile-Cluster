@@ -1,8 +1,0 @@
-
-public class MultiThreds {
-	private ServerSocket serverSocket = null;
-	private Socket clientSocket = null;
-	
-	private static final in maxClientCount = 10;
-	private static final clientThreds[] threads = new clientThread[maxClientCount];
-}
