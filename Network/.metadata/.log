@@ -4876,3 +4876,323 @@ This warning can be switched off on the Team > Git > Confirmations and Warnings 
 
 !ENTRY org.eclipse.e4.ui.css.swt 4 0 2014-02-18 16:10:25.711
 !MESSAGE Failed to get bundle for: bundleclass://net.jeeeyul.eclipse.themes/net.jeeeyul.eclipse.themes.rendering.ChromeTabRendering
+!SESSION 2014-02-18 16:33:17.719 -----------------------------------------------
+eclipse.buildId=v22.3.0-887826
+java.version=1.7.0_10
+java.vendor=Oracle Corporation
+BootLoader constants: OS=win32, ARCH=x86_64, WS=win32, NL=en_GB
+Framework arguments:  -product com.android.ide.eclipse.adt.package.product
+Command-line arguments:  -os win32 -ws win32 -arch x86_64 -product com.android.ide.eclipse.adt.package.product
+
+!ENTRY org.eclipse.e4.ui.css.swt 4 0 2014-02-18 16:33:27.398
+!MESSAGE Failed to get bundle for: bundleclass://net.jeeeyul.eclipse.themes/net.jeeeyul.eclipse.themes.rendering.ChromeTabRendering
+
+!ENTRY org.eclipse.e4.ui.css.swt 4 0 2014-02-18 16:33:27.413
+!MESSAGE Failed to get bundle for: bundleclass://net.jeeeyul.eclipse.themes/net.jeeeyul.eclipse.themes.rendering.ChromeTabRendering
+
+!ENTRY org.eclipse.e4.ui.css.swt 4 0 2014-02-18 16:33:27.425
+!MESSAGE Failed to get bundle for: bundleclass://net.jeeeyul.eclipse.themes/net.jeeeyul.eclipse.themes.rendering.ChromeTabRendering
+
+!ENTRY org.eclipse.e4.ui.css.swt 4 0 2014-02-18 16:33:27.426
+!MESSAGE Failed to get bundle for: bundleclass://net.jeeeyul.eclipse.themes/net.jeeeyul.eclipse.themes.rendering.ChromeTabRendering
+
+!ENTRY org.eclipse.e4.ui.css.swt 4 0 2014-02-18 16:33:27.433
+!MESSAGE Failed to get bundle for: bundleclass://net.jeeeyul.eclipse.themes/net.jeeeyul.eclipse.themes.rendering.ChromeTabRendering
+
+!ENTRY org.eclipse.e4.ui.css.swt 4 0 2014-02-18 16:33:27.434
+!MESSAGE Failed to get bundle for: bundleclass://net.jeeeyul.eclipse.themes/net.jeeeyul.eclipse.themes.rendering.ChromeTabRendering
+
+!ENTRY org.eclipse.e4.ui.css.swt 4 0 2014-02-18 16:33:31.048
+!MESSAGE Failed to get bundle for: bundleclass://net.jeeeyul.eclipse.themes/net.jeeeyul.eclipse.themes.rendering.ChromeTabRendering
+
+!ENTRY org.eclipse.e4.ui.css.swt 4 0 2014-02-18 16:33:31.060
+!MESSAGE Failed to get bundle for: bundleclass://net.jeeeyul.eclipse.themes/net.jeeeyul.eclipse.themes.rendering.ChromeTabRendering
+
+!ENTRY org.eclipse.e4.ui.css.swt 4 0 2014-02-18 16:33:31.071
+!MESSAGE Failed to get bundle for: bundleclass://net.jeeeyul.eclipse.themes/net.jeeeyul.eclipse.themes.rendering.ChromeTabRendering
+
+!ENTRY org.eclipse.e4.ui.css.swt 4 0 2014-02-18 16:33:31.076
+!MESSAGE Failed to get bundle for: bundleclass://net.jeeeyul.eclipse.themes/net.jeeeyul.eclipse.themes.rendering.ChromeTabRendering
+
+!ENTRY org.eclipse.e4.ui.css.swt 4 0 2014-02-18 16:33:32.961
+!MESSAGE Failed to get bundle for: bundleclass://net.jeeeyul.eclipse.themes/net.jeeeyul.eclipse.themes.rendering.ChromeTabRendering
+
+!ENTRY org.eclipse.e4.ui.css.swt 4 0 2014-02-18 16:33:32.963
+!MESSAGE Failed to get bundle for: bundleclass://net.jeeeyul.eclipse.themes/net.jeeeyul.eclipse.themes.rendering.ChromeTabRendering
+
+!ENTRY org.eclipse.e4.ui.css.swt 4 0 2014-02-18 16:33:33.005
+!MESSAGE Failed to get bundle for: bundleclass://net.jeeeyul.eclipse.themes/net.jeeeyul.eclipse.themes.rendering.ChromeTabRendering
+
+!ENTRY org.eclipse.e4.ui.css.swt 4 0 2014-02-18 16:33:33.006
+!MESSAGE Failed to get bundle for: bundleclass://net.jeeeyul.eclipse.themes/net.jeeeyul.eclipse.themes.rendering.ChromeTabRendering
+
+!ENTRY org.eclipse.e4.ui.css.swt 4 0 2014-02-18 16:33:33.016
+!MESSAGE Failed to get bundle for: bundleclass://net.jeeeyul.eclipse.themes/net.jeeeyul.eclipse.themes.rendering.ChromeTabRendering
+
+!ENTRY org.eclipse.e4.ui.css.swt 4 0 2014-02-18 16:33:33.017
+!MESSAGE Failed to get bundle for: bundleclass://net.jeeeyul.eclipse.themes/net.jeeeyul.eclipse.themes.rendering.ChromeTabRendering
+
+!ENTRY org.eclipse.e4.ui.css.swt 4 0 2014-02-18 16:33:33.021
+!MESSAGE Failed to get bundle for: bundleclass://net.jeeeyul.eclipse.themes/net.jeeeyul.eclipse.themes.rendering.ChromeTabRendering
+
+!ENTRY org.eclipse.e4.ui.css.swt 4 0 2014-02-18 16:33:33.022
+!MESSAGE Failed to get bundle for: bundleclass://net.jeeeyul.eclipse.themes/net.jeeeyul.eclipse.themes.rendering.ChromeTabRendering
+
+!ENTRY org.eclipse.e4.ui.css.swt 4 0 2014-02-18 16:33:33.071
+!MESSAGE Failed to get bundle for: bundleclass://net.jeeeyul.eclipse.themes/net.jeeeyul.eclipse.themes.rendering.ChromeTabRendering
+
+!ENTRY org.eclipse.e4.ui.css.swt 4 0 2014-02-18 16:33:33.073
+!MESSAGE Failed to get bundle for: bundleclass://net.jeeeyul.eclipse.themes/net.jeeeyul.eclipse.themes.rendering.ChromeTabRendering
+
+!ENTRY org.eclipse.e4.ui.css.swt 4 0 2014-02-18 16:33:34.015
+!MESSAGE Failed to get bundle for: bundleclass://net.jeeeyul.eclipse.themes/net.jeeeyul.eclipse.themes.rendering.ChromeTabRendering
+
+!ENTRY org.eclipse.e4.ui.css.swt 4 0 2014-02-18 16:33:34.017
+!MESSAGE Failed to get bundle for: bundleclass://net.jeeeyul.eclipse.themes/net.jeeeyul.eclipse.themes.rendering.ChromeTabRendering
+
+!ENTRY org.eclipse.egit.ui 2 0 2014-02-18 16:33:34.966
+!MESSAGE Warning: EGit couldn't detect the installation path "gitPrefix" of native Git. Hence EGit can't respect system level
+Git settings which might be configured in ${gitPrefix}/etc/gitconfig under the native Git installation directory.
+The most important of these settings is core.autocrlf. Git for Windows by default sets this parameter to true in
+this system level configuration. The Git installation location can be configured on the
+Team > Git > Configuration preference page's 'System Settings' tab.
+This warning can be switched off on the Team > Git > Confirmations and Warnings preference page.
+
+!ENTRY org.eclipse.egit.ui 2 0 2014-02-18 16:33:34.970
+!MESSAGE Warning: The environment variable HOME is not set. The following directory will be used to store the Git
+user global configuration and to define the default location to store repositories: 'C:\Users\Sebastian'. If this is
+not correct please set the HOME environment variable and restart Eclipse. Otherwise Git for Windows and
+EGit might behave differently since they see different configuration options.
+This warning can be switched off on the Team > Git > Confirmations and Warnings preference page.
+
+!ENTRY org.eclipse.e4.ui.css.swt 4 0 2014-02-18 16:33:36.047
+!MESSAGE Failed to get bundle for: bundleclass://net.jeeeyul.eclipse.themes/net.jeeeyul.eclipse.themes.rendering.ChromeTabRendering
+
+!ENTRY org.eclipse.e4.ui.css.swt 4 0 2014-02-18 16:33:36.048
+!MESSAGE Failed to get bundle for: bundleclass://net.jeeeyul.eclipse.themes/net.jeeeyul.eclipse.themes.rendering.ChromeTabRendering
+
+!ENTRY org.eclipse.e4.ui.css.swt 4 0 2014-02-18 16:33:36.064
+!MESSAGE Failed to get bundle for: bundleclass://net.jeeeyul.eclipse.themes/net.jeeeyul.eclipse.themes.rendering.ChromeTabRendering
+
+!ENTRY org.eclipse.e4.ui.css.swt 4 0 2014-02-18 16:33:36.066
+!MESSAGE Failed to get bundle for: bundleclass://net.jeeeyul.eclipse.themes/net.jeeeyul.eclipse.themes.rendering.ChromeTabRendering
+
+!ENTRY org.eclipse.e4.ui.css.swt 4 0 2014-02-18 16:33:41.125
+!MESSAGE Failed to get bundle for: bundleclass://net.jeeeyul.eclipse.themes/net.jeeeyul.eclipse.themes.rendering.ChromeTabRendering
+
+!ENTRY org.eclipse.e4.ui.css.swt 4 0 2014-02-18 16:33:41.127
+!MESSAGE Failed to get bundle for: bundleclass://net.jeeeyul.eclipse.themes/net.jeeeyul.eclipse.themes.rendering.ChromeTabRendering
+
+!ENTRY org.eclipse.e4.ui.css.swt 4 0 2014-02-18 16:33:44.800
+!MESSAGE Failed to get bundle for: bundleclass://net.jeeeyul.eclipse.themes/net.jeeeyul.eclipse.themes.rendering.ChromeTabRendering
+
+!ENTRY org.eclipse.e4.ui.css.swt 4 0 2014-02-18 16:33:44.801
+!MESSAGE Failed to get bundle for: bundleclass://net.jeeeyul.eclipse.themes/net.jeeeyul.eclipse.themes.rendering.ChromeTabRendering
+
+!ENTRY org.eclipse.e4.ui.css.swt 4 0 2014-02-18 16:33:48.386
+!MESSAGE Failed to get bundle for: bundleclass://net.jeeeyul.eclipse.themes/net.jeeeyul.eclipse.themes.rendering.ChromeTabRendering
+
+!ENTRY org.eclipse.e4.ui.css.swt 4 0 2014-02-18 16:33:48.387
+!MESSAGE Failed to get bundle for: bundleclass://net.jeeeyul.eclipse.themes/net.jeeeyul.eclipse.themes.rendering.ChromeTabRendering
+
+!ENTRY org.eclipse.e4.ui.css.swt 4 0 2014-02-18 16:33:50.454
+!MESSAGE Failed to get bundle for: bundleclass://net.jeeeyul.eclipse.themes/net.jeeeyul.eclipse.themes.rendering.ChromeTabRendering
+
+!ENTRY org.eclipse.e4.ui.css.swt 4 0 2014-02-18 16:33:50.457
+!MESSAGE Failed to get bundle for: bundleclass://net.jeeeyul.eclipse.themes/net.jeeeyul.eclipse.themes.rendering.ChromeTabRendering
+
+!ENTRY org.eclipse.e4.ui.css.swt 4 0 2014-02-18 16:33:51.994
+!MESSAGE Failed to get bundle for: bundleclass://net.jeeeyul.eclipse.themes/net.jeeeyul.eclipse.themes.rendering.ChromeTabRendering
+
+!ENTRY org.eclipse.e4.ui.css.swt 4 0 2014-02-18 16:33:51.996
+!MESSAGE Failed to get bundle for: bundleclass://net.jeeeyul.eclipse.themes/net.jeeeyul.eclipse.themes.rendering.ChromeTabRendering
+
+!ENTRY org.eclipse.e4.ui.css.swt 4 0 2014-02-18 16:33:59.857
+!MESSAGE Failed to get bundle for: bundleclass://net.jeeeyul.eclipse.themes/net.jeeeyul.eclipse.themes.rendering.ChromeTabRendering
+
+!ENTRY org.eclipse.e4.ui.css.swt 4 0 2014-02-18 16:33:59.859
+!MESSAGE Failed to get bundle for: bundleclass://net.jeeeyul.eclipse.themes/net.jeeeyul.eclipse.themes.rendering.ChromeTabRendering
+
+!ENTRY org.eclipse.e4.ui.css.swt 4 0 2014-02-18 16:34:08.053
+!MESSAGE Failed to get bundle for: bundleclass://net.jeeeyul.eclipse.themes/net.jeeeyul.eclipse.themes.rendering.ChromeTabRendering
+
+!ENTRY org.eclipse.e4.ui.css.swt 4 0 2014-02-18 16:34:08.054
+!MESSAGE Failed to get bundle for: bundleclass://net.jeeeyul.eclipse.themes/net.jeeeyul.eclipse.themes.rendering.ChromeTabRendering
+
+!ENTRY org.eclipse.e4.ui.css.swt 4 0 2014-02-18 16:34:08.057
+!MESSAGE Failed to get bundle for: bundleclass://net.jeeeyul.eclipse.themes/net.jeeeyul.eclipse.themes.rendering.ChromeTabRendering
+
+!ENTRY org.eclipse.e4.ui.css.swt 4 0 2014-02-18 16:34:08.059
+!MESSAGE Failed to get bundle for: bundleclass://net.jeeeyul.eclipse.themes/net.jeeeyul.eclipse.themes.rendering.ChromeTabRendering
+
+!ENTRY org.eclipse.e4.ui.css.swt 4 0 2014-02-18 16:34:48.526
+!MESSAGE Failed to get bundle for: bundleclass://net.jeeeyul.eclipse.themes/net.jeeeyul.eclipse.themes.rendering.ChromeTabRendering
+
+!ENTRY org.eclipse.e4.ui.css.swt 4 0 2014-02-18 16:34:48.528
+!MESSAGE Failed to get bundle for: bundleclass://net.jeeeyul.eclipse.themes/net.jeeeyul.eclipse.themes.rendering.ChromeTabRendering
+
+!ENTRY org.eclipse.e4.ui.css.swt 4 0 2014-02-18 16:34:48.547
+!MESSAGE Failed to get bundle for: bundleclass://net.jeeeyul.eclipse.themes/net.jeeeyul.eclipse.themes.rendering.ChromeTabRendering
+
+!ENTRY org.eclipse.e4.ui.css.swt 4 0 2014-02-18 16:34:48.550
+!MESSAGE Failed to get bundle for: bundleclass://net.jeeeyul.eclipse.themes/net.jeeeyul.eclipse.themes.rendering.ChromeTabRendering
+
+!ENTRY org.eclipse.e4.ui.css.swt 4 0 2014-02-18 16:34:54.648
+!MESSAGE Failed to get bundle for: bundleclass://net.jeeeyul.eclipse.themes/net.jeeeyul.eclipse.themes.rendering.ChromeTabRendering
+
+!ENTRY org.eclipse.e4.ui.css.swt 4 0 2014-02-18 16:34:54.649
+!MESSAGE Failed to get bundle for: bundleclass://net.jeeeyul.eclipse.themes/net.jeeeyul.eclipse.themes.rendering.ChromeTabRendering
+
+!ENTRY org.eclipse.e4.ui.css.swt 4 0 2014-02-18 16:34:54.659
+!MESSAGE Failed to get bundle for: bundleclass://net.jeeeyul.eclipse.themes/net.jeeeyul.eclipse.themes.rendering.ChromeTabRendering
+
+!ENTRY org.eclipse.e4.ui.css.swt 4 0 2014-02-18 16:34:54.661
+!MESSAGE Failed to get bundle for: bundleclass://net.jeeeyul.eclipse.themes/net.jeeeyul.eclipse.themes.rendering.ChromeTabRendering
+
+!ENTRY org.eclipse.e4.ui.css.swt 4 0 2014-02-18 16:35:07.031
+!MESSAGE Failed to get bundle for: bundleclass://net.jeeeyul.eclipse.themes/net.jeeeyul.eclipse.themes.rendering.ChromeTabRendering
+
+!ENTRY org.eclipse.e4.ui.css.swt 4 0 2014-02-18 16:35:07.032
+!MESSAGE Failed to get bundle for: bundleclass://net.jeeeyul.eclipse.themes/net.jeeeyul.eclipse.themes.rendering.ChromeTabRendering
+
+!ENTRY org.eclipse.e4.ui.css.swt 4 0 2014-02-18 16:35:08.397
+!MESSAGE Failed to get bundle for: bundleclass://net.jeeeyul.eclipse.themes/net.jeeeyul.eclipse.themes.rendering.ChromeTabRendering
+
+!ENTRY org.eclipse.e4.ui.css.swt 4 0 2014-02-18 16:35:08.399
+!MESSAGE Failed to get bundle for: bundleclass://net.jeeeyul.eclipse.themes/net.jeeeyul.eclipse.themes.rendering.ChromeTabRendering
+
+!ENTRY org.eclipse.e4.ui.css.swt 4 0 2014-02-18 16:35:08.519
+!MESSAGE Failed to get bundle for: bundleclass://net.jeeeyul.eclipse.themes/net.jeeeyul.eclipse.themes.rendering.ChromeTabRendering
+
+!ENTRY org.eclipse.e4.ui.css.swt 4 0 2014-02-18 16:35:08.520
+!MESSAGE Failed to get bundle for: bundleclass://net.jeeeyul.eclipse.themes/net.jeeeyul.eclipse.themes.rendering.ChromeTabRendering
+!SESSION 2014-02-18 16:42:43.310 -----------------------------------------------
+eclipse.buildId=v22.3.0-887826
+java.version=1.7.0_10
+java.vendor=Oracle Corporation
+BootLoader constants: OS=win32, ARCH=x86_64, WS=win32, NL=en_GB
+Framework arguments:  -product com.android.ide.eclipse.adt.package.product
+Command-line arguments:  -os win32 -ws win32 -arch x86_64 -product com.android.ide.eclipse.adt.package.product
+
+!ENTRY org.eclipse.e4.ui.css.swt 4 0 2014-02-18 16:42:50.353
+!MESSAGE Failed to get bundle for: bundleclass://net.jeeeyul.eclipse.themes/net.jeeeyul.eclipse.themes.rendering.ChromeTabRendering
+
+!ENTRY org.eclipse.e4.ui.css.swt 4 0 2014-02-18 16:42:50.369
+!MESSAGE Failed to get bundle for: bundleclass://net.jeeeyul.eclipse.themes/net.jeeeyul.eclipse.themes.rendering.ChromeTabRendering
+
+!ENTRY org.eclipse.e4.ui.css.swt 4 0 2014-02-18 16:42:50.378
+!MESSAGE Failed to get bundle for: bundleclass://net.jeeeyul.eclipse.themes/net.jeeeyul.eclipse.themes.rendering.ChromeTabRendering
+
+!ENTRY org.eclipse.e4.ui.css.swt 4 0 2014-02-18 16:42:50.379
+!MESSAGE Failed to get bundle for: bundleclass://net.jeeeyul.eclipse.themes/net.jeeeyul.eclipse.themes.rendering.ChromeTabRendering
+
+!ENTRY org.eclipse.e4.ui.css.swt 4 0 2014-02-18 16:42:50.383
+!MESSAGE Failed to get bundle for: bundleclass://net.jeeeyul.eclipse.themes/net.jeeeyul.eclipse.themes.rendering.ChromeTabRendering
+
+!ENTRY org.eclipse.e4.ui.css.swt 4 0 2014-02-18 16:42:50.384
+!MESSAGE Failed to get bundle for: bundleclass://net.jeeeyul.eclipse.themes/net.jeeeyul.eclipse.themes.rendering.ChromeTabRendering
+
+!ENTRY org.eclipse.e4.ui.css.swt 4 0 2014-02-18 16:42:51.914
+!MESSAGE Failed to get bundle for: bundleclass://net.jeeeyul.eclipse.themes/net.jeeeyul.eclipse.themes.rendering.ChromeTabRendering
+
+!ENTRY org.eclipse.e4.ui.css.swt 4 0 2014-02-18 16:42:51.915
+!MESSAGE Failed to get bundle for: bundleclass://net.jeeeyul.eclipse.themes/net.jeeeyul.eclipse.themes.rendering.ChromeTabRendering
+
+!ENTRY org.eclipse.e4.ui.css.swt 4 0 2014-02-18 16:42:51.946
+!MESSAGE Failed to get bundle for: bundleclass://net.jeeeyul.eclipse.themes/net.jeeeyul.eclipse.themes.rendering.ChromeTabRendering
+
+!ENTRY org.eclipse.e4.ui.css.swt 4 0 2014-02-18 16:42:51.947
+!MESSAGE Failed to get bundle for: bundleclass://net.jeeeyul.eclipse.themes/net.jeeeyul.eclipse.themes.rendering.ChromeTabRendering
+
+!ENTRY org.eclipse.e4.ui.css.swt 4 0 2014-02-18 16:42:53.033
+!MESSAGE Failed to get bundle for: bundleclass://net.jeeeyul.eclipse.themes/net.jeeeyul.eclipse.themes.rendering.ChromeTabRendering
+
+!ENTRY org.eclipse.e4.ui.css.swt 4 0 2014-02-18 16:42:53.035
+!MESSAGE Failed to get bundle for: bundleclass://net.jeeeyul.eclipse.themes/net.jeeeyul.eclipse.themes.rendering.ChromeTabRendering
+
+!ENTRY org.eclipse.e4.ui.css.swt 4 0 2014-02-18 16:42:53.071
+!MESSAGE Failed to get bundle for: bundleclass://net.jeeeyul.eclipse.themes/net.jeeeyul.eclipse.themes.rendering.ChromeTabRendering
+
+!ENTRY org.eclipse.e4.ui.css.swt 4 0 2014-02-18 16:42:53.072
+!MESSAGE Failed to get bundle for: bundleclass://net.jeeeyul.eclipse.themes/net.jeeeyul.eclipse.themes.rendering.ChromeTabRendering
+
+!ENTRY org.eclipse.e4.ui.css.swt 4 0 2014-02-18 16:42:53.082
+!MESSAGE Failed to get bundle for: bundleclass://net.jeeeyul.eclipse.themes/net.jeeeyul.eclipse.themes.rendering.ChromeTabRendering
+
+!ENTRY org.eclipse.e4.ui.css.swt 4 0 2014-02-18 16:42:53.083
+!MESSAGE Failed to get bundle for: bundleclass://net.jeeeyul.eclipse.themes/net.jeeeyul.eclipse.themes.rendering.ChromeTabRendering
+
+!ENTRY org.eclipse.e4.ui.css.swt 4 0 2014-02-18 16:42:53.086
+!MESSAGE Failed to get bundle for: bundleclass://net.jeeeyul.eclipse.themes/net.jeeeyul.eclipse.themes.rendering.ChromeTabRendering
+
+!ENTRY org.eclipse.e4.ui.css.swt 4 0 2014-02-18 16:42:53.088
+!MESSAGE Failed to get bundle for: bundleclass://net.jeeeyul.eclipse.themes/net.jeeeyul.eclipse.themes.rendering.ChromeTabRendering
+
+!ENTRY org.eclipse.e4.ui.css.swt 4 0 2014-02-18 16:42:53.125
+!MESSAGE Failed to get bundle for: bundleclass://net.jeeeyul.eclipse.themes/net.jeeeyul.eclipse.themes.rendering.ChromeTabRendering
+
+!ENTRY org.eclipse.e4.ui.css.swt 4 0 2014-02-18 16:42:53.126
+!MESSAGE Failed to get bundle for: bundleclass://net.jeeeyul.eclipse.themes/net.jeeeyul.eclipse.themes.rendering.ChromeTabRendering
+
+!ENTRY org.eclipse.e4.ui.css.swt 4 0 2014-02-18 16:42:53.698
+!MESSAGE Failed to get bundle for: bundleclass://net.jeeeyul.eclipse.themes/net.jeeeyul.eclipse.themes.rendering.ChromeTabRendering
+
+!ENTRY org.eclipse.e4.ui.css.swt 4 0 2014-02-18 16:42:53.701
+!MESSAGE Failed to get bundle for: bundleclass://net.jeeeyul.eclipse.themes/net.jeeeyul.eclipse.themes.rendering.ChromeTabRendering
+
+!ENTRY org.eclipse.egit.ui 2 0 2014-02-18 16:42:54.680
+!MESSAGE Warning: EGit couldn't detect the installation path "gitPrefix" of native Git. Hence EGit can't respect system level
+Git settings which might be configured in ${gitPrefix}/etc/gitconfig under the native Git installation directory.
+The most important of these settings is core.autocrlf. Git for Windows by default sets this parameter to true in
+this system level configuration. The Git installation location can be configured on the
+Team > Git > Configuration preference page's 'System Settings' tab.
+This warning can be switched off on the Team > Git > Confirmations and Warnings preference page.
+
+!ENTRY org.eclipse.egit.ui 2 0 2014-02-18 16:42:54.682
+!MESSAGE Warning: The environment variable HOME is not set. The following directory will be used to store the Git
+user global configuration and to define the default location to store repositories: 'C:\Users\Sebastian'. If this is
+not correct please set the HOME environment variable and restart Eclipse. Otherwise Git for Windows and
+EGit might behave differently since they see different configuration options.
+This warning can be switched off on the Team > Git > Confirmations and Warnings preference page.
+
+!ENTRY org.eclipse.e4.ui.css.swt 4 0 2014-02-18 16:42:56.131
+!MESSAGE Failed to get bundle for: bundleclass://net.jeeeyul.eclipse.themes/net.jeeeyul.eclipse.themes.rendering.ChromeTabRendering
+
+!ENTRY org.eclipse.e4.ui.css.swt 4 0 2014-02-18 16:42:56.134
+!MESSAGE Failed to get bundle for: bundleclass://net.jeeeyul.eclipse.themes/net.jeeeyul.eclipse.themes.rendering.ChromeTabRendering
+
+!ENTRY org.eclipse.e4.ui.css.swt 4 0 2014-02-18 16:42:56.143
+!MESSAGE Failed to get bundle for: bundleclass://net.jeeeyul.eclipse.themes/net.jeeeyul.eclipse.themes.rendering.ChromeTabRendering
+
+!ENTRY org.eclipse.e4.ui.css.swt 4 0 2014-02-18 16:42:56.146
+!MESSAGE Failed to get bundle for: bundleclass://net.jeeeyul.eclipse.themes/net.jeeeyul.eclipse.themes.rendering.ChromeTabRendering
+
+!ENTRY org.eclipse.e4.ui.css.swt 4 0 2014-02-18 16:43:05.623
+!MESSAGE Failed to get bundle for: bundleclass://net.jeeeyul.eclipse.themes/net.jeeeyul.eclipse.themes.rendering.ChromeTabRendering
+
+!ENTRY org.eclipse.e4.ui.css.swt 4 0 2014-02-18 16:43:05.624
+!MESSAGE Failed to get bundle for: bundleclass://net.jeeeyul.eclipse.themes/net.jeeeyul.eclipse.themes.rendering.ChromeTabRendering
+
+!ENTRY org.eclipse.e4.ui.css.swt 4 0 2014-02-18 16:43:05.627
+!MESSAGE Failed to get bundle for: bundleclass://net.jeeeyul.eclipse.themes/net.jeeeyul.eclipse.themes.rendering.ChromeTabRendering
+
+!ENTRY org.eclipse.e4.ui.css.swt 4 0 2014-02-18 16:43:05.629
+!MESSAGE Failed to get bundle for: bundleclass://net.jeeeyul.eclipse.themes/net.jeeeyul.eclipse.themes.rendering.ChromeTabRendering
+
+!ENTRY org.eclipse.e4.ui.css.swt 4 0 2014-02-18 16:43:16.437
+!MESSAGE Failed to get bundle for: bundleclass://net.jeeeyul.eclipse.themes/net.jeeeyul.eclipse.themes.rendering.ChromeTabRendering
+
+!ENTRY org.eclipse.e4.ui.css.swt 4 0 2014-02-18 16:43:16.439
+!MESSAGE Failed to get bundle for: bundleclass://net.jeeeyul.eclipse.themes/net.jeeeyul.eclipse.themes.rendering.ChromeTabRendering
+
+!ENTRY org.eclipse.e4.ui.css.swt 4 0 2014-02-18 16:43:17.561
+!MESSAGE Failed to get bundle for: bundleclass://net.jeeeyul.eclipse.themes/net.jeeeyul.eclipse.themes.rendering.ChromeTabRendering
+
+!ENTRY org.eclipse.e4.ui.css.swt 4 0 2014-02-18 16:43:17.562
+!MESSAGE Failed to get bundle for: bundleclass://net.jeeeyul.eclipse.themes/net.jeeeyul.eclipse.themes.rendering.ChromeTabRendering
+
+!ENTRY org.eclipse.e4.ui.css.swt 4 0 2014-02-18 16:43:17.752
+!MESSAGE Failed to get bundle for: bundleclass://net.jeeeyul.eclipse.themes/net.jeeeyul.eclipse.themes.rendering.ChromeTabRendering
+
+!ENTRY org.eclipse.e4.ui.css.swt 4 0 2014-02-18 16:43:17.753
+!MESSAGE Failed to get bundle for: bundleclass://net.jeeeyul.eclipse.themes/net.jeeeyul.eclipse.themes.rendering.ChromeTabRendering
