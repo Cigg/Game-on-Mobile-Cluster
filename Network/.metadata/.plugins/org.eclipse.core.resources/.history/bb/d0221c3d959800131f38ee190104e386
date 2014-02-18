@@ -1,0 +1,4 @@
+
+public class MultiThreds {
+	private ServerSocket serverSocket = null;
+}
