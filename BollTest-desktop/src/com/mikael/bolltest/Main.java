@@ -10,7 +10,6 @@ public class Main {
         cfg.useGL20 = false;
         cfg.width = 272;
         cfg.height = 408;
-        
         new LwjglApplication(new BollGame(), cfg);
     }
 }
