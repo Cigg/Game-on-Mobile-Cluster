@@ -15,6 +15,13 @@ public class clientThread extends Thread{
 	private int maxClientCount;
 	private boolean running = false;
 	
+	private String data;
+	private float posX = 0;
+	private float posY = 0;
+	private float speedX = 0;
+	private float speedY = 0;
+	
+	
 	public clientThread(Socket clientSocket, clientThread[] threads) {
 		this.clientSocket= clientSocket;
 		this.threads = threads;
@@ -32,7 +39,6 @@ public class clientThread extends Thread{
 		running = true;
 		int maxClientsCount = this.maxClientCount;
 		clientThread[] thread = this.threads;
-		
 		try{
 			out = 	new PrintWriter(
 					new BufferedWriter(
@@ -43,20 +49,39 @@ public class clientThread extends Thread{
 			while(running) {
 				String message = in.readLine();
 				for(int i=0; i < maxClientsCount; i++){
-				if(thread[i] != null && threads[i] == this){
+				if(thread[i] != null){
 				if(message != null){
 					
-					System.out.println("Mobile says " + i +": "+ message);
-					sendMessage(message);
+					//System.out.println("Mobile says " + i +": "+ message);
+					if(!message.isEmpty()){
+					data = message;
+					String[] parts = data.split(" ");
+					posX = Float.parseFloat(parts[0]);
+					posY = Float.parseFloat(parts[1]);
+					speedX = Float.parseFloat(parts[2]);
+					speedY = Float.parseFloat(parts[3]);
+					}
 				}
 				}
 				}
+				update();
 			}
 			clientSocket.close();
 		} catch (Exception e) {
 			System.out.println("Error");
 			e.printStackTrace();
 		}
+	}
+	
+	private void update() {
+		System.out.println(posX + " " + posY + " " + speedX + " " + speedY);
+		posX += speedX;
+		posY += speedY;
+		sendMessage(posX + " " + posY + " " + speedX + " " + speedY);
+	}
+	
+	public void seeMessage(){
+		System.out.println(posX + " " + posY + " " + speedX + " " + speedY);
 	}
 	
 }//END OF clientThread

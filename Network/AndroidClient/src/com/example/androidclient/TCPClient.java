@@ -31,6 +31,13 @@ public class TCPClient {
 		}
 	}
 	
+	public void getData(){
+		if(out !=null && !out.checkError()) {
+			out.println("");
+			out.flush();
+		}
+	}
+	
 	public void stopClient() {
 		mRun = false;
 	}
@@ -51,7 +58,7 @@ public class TCPClient {
 				while(mRun) {
 					serverMessage = in.readLine();
 					if(serverMessage != null && messageListner != null) {
-						System.out.println("Server says: " + serverMessage);
+						//System.out.println("Server says: " + serverMessage);
 						messageListner.messageReceived(serverMessage);
 					}
 					serverMessage = null;

@@ -48,14 +48,11 @@ public class BouncingBallView  extends View {
 	public  boolean onTouchEvent(MotionEvent event) {
 		currentX = event.getX();
 		currentY = event.getY();
-		
-		switch (event.getAction()) {
-		case MotionEvent.ACTION_MOVE:
+		if(event.getAction() == MotionEvent.ACTION_MOVE) {
 			deltaX = currentX - previousX;
 			deltaY = currentY - previousY;
-		case MotionEvent.ACTION_UP:
-			//System.out.println(currentX + " " + currentY);
 			if(tcpClient != null) {
+				//System.out.println(currentX + " " + currentY);
 				tcpClient.sendMessage(currentX + " " + currentY + " " + deltaX + " " + deltaY);
 			}
 		}
@@ -76,10 +73,11 @@ public class BouncingBallView  extends View {
 	}
 	
 	private void update() {
+		tcpClient.getData();
 		if(data != null){
-		String[] parts = data.split(" ");
-		ballX = Float.parseFloat(parts[0]);
-		ballY = Float.parseFloat(parts[1]);
+			String[] parts = data.split(" ");
+			ballX = Float.parseFloat(parts[0]);
+			ballY = Float.parseFloat(parts[1]);
 		}
 	}
 	
@@ -109,7 +107,7 @@ public class BouncingBallView  extends View {
 		protected void onProgressUpdate(String... values) {
 			super.onProgressUpdate(values);
 			data = values[0];
-			System.out.println("Data is: " + data);
+			//System.out.println("Data is: " + data);
 		}
 	}
 
