@@ -20,8 +20,9 @@ public class LoadingScreen extends Screen {
         Graphics g = game.getGraphics();
         Assets.menu = g.newImage("background.jpg", ImageFormat.RGB565);
         Assets.click = game.getAudio().createSound("explosion.ogg");
+        Assets.ball = g.newImage("ball.png", ImageFormat.RGB565);
         
-        Log.d("Debug Fint", "LoadingScreen update");
+        Log.d("Debug Pussycat", "LoadingScreen update");
         
         game.setScreen(new MainMenuScreen(game));
     }

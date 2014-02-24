@@ -4,6 +4,7 @@ import java.util.List;
 
 import android.graphics.Color;
 import android.graphics.Paint;
+import android.util.Log;
 
 import com.pussycat.framework.Game;
 import com.pussycat.framework.Graphics;
@@ -28,7 +29,7 @@ public class GameScreen extends Screen {
         super(game);
 
         // Initialize game objects here
-
+        
         // Defining a paint object
         paint = new Paint();
         paint.setTextSize(30);
@@ -149,8 +150,11 @@ public class GameScreen extends Screen {
         // First draw the game elements.
 
         // Example:
-        // g.drawImage(Assets.background, 0, 0);
-        // g.drawImage(Assets.character, characterX, characterY);
+        //g.drawImage(Assets.menu, 0, 0);
+        int width = PussycatMinions.getWidth();
+        int height = PussycatMinions.getHeight();
+        Log.d("Debug Pussycat", "width: " + width);
+        g.drawImage(Assets.ball, width/2, height/2);
 
         // Secondly, draw the UI above the game elements.
         if (state == GameState.Ready)
