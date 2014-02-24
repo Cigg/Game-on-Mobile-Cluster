@@ -14,7 +14,7 @@ public class BallHandler {
 		screenWidth = PussycatMinions.getScreenWidth();
 		screenHeight = PussycatMinions.getScreenHeight();
 		
-		ballDistance = ballRadius;
+		ballDistance = ballRadius+10;
 		
 		int sum = 0;
 		

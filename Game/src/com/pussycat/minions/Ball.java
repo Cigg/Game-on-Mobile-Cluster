@@ -1,5 +1,7 @@
 package com.pussycat.minions;
 
+import android.graphics.Point;
+
 import com.pussycat.framework.Image;
 import com.pussycat.minions.GameScreen;
 
@@ -25,13 +27,20 @@ public class Ball {
 			visible = false;
 		}
 		if (visible){
-			checkCollision();
+			 //TO-DO: add arguments from BallHandler
+			if(checkCollision(null, 5, null, 5)){
+				//Delete the connected balls
+			}
 		}
 		
 	}
 
-	private void checkCollision() {
-		// Kod
+	private boolean checkCollision(Point p1, double r1, Point p2, double r2) {
+		// Code example from http://stackoverflow.com/questions/697188/fast-circle-collision-detection
+		final double a = r1 + r2;
+	    final double dx = p1.x - p2.x;
+	    final double dy = p1.y - p2.y;
+	    return a * a > (dx * dx + dy * dy);
 	}
 
 	public Image getImage(){
