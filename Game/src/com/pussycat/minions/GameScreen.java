@@ -21,21 +21,29 @@ public class GameScreen extends Screen {
 
     // Variable Setup
     // You would create game objects here.
-
+    private BallHandler ballHandler;
+    
+    int screenWidth;
+    int screenHeight;
     int livesLeft = 1;
     Paint paint;
 
     public GameScreen(Game game) {
         super(game);
+        
+        // Get screen dimensions
+        screenWidth = PussycatMinions.getScreenWidth();
+        screenHeight = PussycatMinions.getScreenHeight();
 
         // Initialize game objects here
+        ballHandler = new BallHandler(2, 128);
         
         // Defining a paint object
-        paint = new Paint();
-        paint.setTextSize(30);
-        paint.setTextAlign(Paint.Align.CENTER);
-        paint.setAntiAlias(true);
-        paint.setColor(Color.WHITE);
+		paint = new Paint();
+		paint.setTextSize(30);
+		paint.setTextAlign(Paint.Align.CENTER);
+		paint.setAntiAlias(true);
+		paint.setColor(Color.WHITE);
 
     }
 
@@ -147,15 +155,13 @@ public class GameScreen extends Screen {
     public void paint(float deltaTime) {
         Graphics g = game.getGraphics();
 
+        g.drawARGB(255,255,255,255);
         // First draw the game elements.
 
         // Example:
         //g.drawImage(Assets.menu, 0, 0);
-        int width = PussycatMinions.getWidth();
-        int height = PussycatMinions.getHeight();
-        Log.d("Debug Pussycat", "width: " + width);
-        g.drawImage(Assets.ball, width/2, height/2);
-
+        drawBalls();
+     
         // Secondly, draw the UI above the game elements.
         if (state == GameState.Ready)
             drawReadyUI();
@@ -177,10 +183,19 @@ public class GameScreen extends Screen {
         // Call garbage collector to clean up memory.
         System.gc();
     }
+    
+    private void drawBalls(){
+    	Graphics g = game.getGraphics();
+    	
+    	for(int i = 0; i < ballHandler.balls.length; i++){
+        	g.drawImage(ballHandler.balls[i].getImage(), ballHandler.balls[i].getX(), screenHeight - 64);
+    	}
+    }
 
     private void drawReadyUI() {
+		Log.d("Debug Pussycat", "drawReadyUI");
         Graphics g = game.getGraphics();
-
+        
         g.drawARGB(155, 0, 0, 0);
         g.drawString("Tap each side of the screen to move in that direction.",
                 640, 300, paint);
@@ -188,8 +203,9 @@ public class GameScreen extends Screen {
     }
 
     private void drawRunningUI() {
+    	Log.d("Debug Pussycat", "drawRunningUI");
         Graphics g = game.getGraphics();
-
+        
     }
 
     private void drawPausedUI() {

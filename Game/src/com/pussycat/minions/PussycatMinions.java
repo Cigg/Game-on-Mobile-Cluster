@@ -17,14 +17,21 @@ public class PussycatMinions extends AndroidGame {
     	width = metrics.widthPixels;
     	height = metrics.heightPixels;
         
+    	/*
+        int resourceId = getResources().getIdentifier("status_bar_height", "dimen", "android");
+        if (resourceId > 0) {
+            height += getResources().getDimensionPixelSize(resourceId);
+        }
+        */
+    	
         return new LoadingScreen(this);
     }
     
-    public static int getWidth(){
+    public static int getScreenWidth(){
     	return width;
     }
     
-    public static int getHeight(){
+    public static int getScreenHeight(){
     	return height;
     }
 }
