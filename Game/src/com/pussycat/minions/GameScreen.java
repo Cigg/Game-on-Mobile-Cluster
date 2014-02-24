@@ -188,7 +188,7 @@ public class GameScreen extends Screen {
     	Graphics g = game.getGraphics();
     	
     	for(int i = 0; i < ballHandler.balls.length; i++){
-        	g.drawImage(ballHandler.balls[i].getImage(), ballHandler.balls[i].getX(), screenHeight - 64);
+        	g.drawImage(ballHandler.balls[i].getImage(), ballHandler.balls[i].getX(), ballHandler.balls[i].getY());
     	}
     }
 
