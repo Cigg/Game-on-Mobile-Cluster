@@ -42,7 +42,6 @@ public class BouncingBall extends View{
 	public  boolean onTouchEvent(MotionEvent event) {
 		posX = event.getX();
 		posY = event.getY();
-		System.out.println("HEJHEJ");
 		if(event.getAction() == MotionEvent.ACTION_MOVE) {
 			deltaX = currentX - previousX;
 			deltaY = currentY - previousY;
