@@ -25,6 +25,7 @@ public class GameScreen extends Screen {
     
     int screenWidth;
     int screenHeight;
+    int livesLeft = 1;
     Paint paint;
 
     public GameScreen(Game game) {
@@ -35,7 +36,7 @@ public class GameScreen extends Screen {
         screenHeight = PussycatMinions.getScreenHeight();
 
         // Initialize game objects here
-        ballHandler = new BallHandler(1, 1.5f);
+        ballHandler = new BallHandler(2, 128);
         
         // Defining a paint object
 		paint = new Paint();
@@ -64,7 +65,7 @@ public class GameScreen extends Screen {
         if (state == GameState.GameOver)
             updateGameOver(touchEvents);
     }
-    
+
     private void updateReady(List<TouchEvent> touchEvents) {
         
         // This example starts with a "Ready" screen.
@@ -79,25 +80,49 @@ public class GameScreen extends Screen {
     private void updateRunning(List<TouchEvent> touchEvents, float deltaTime) {
         
         //This is identical to the update() method from our Unit 2/3 game.
-    	
-    	// Update balls
-    	ballHandler.update();
-    	
+        
         
         // 1. All touch input is handled here:
         int len = touchEvents.size();
         for (int i = 0; i < len; i++) {
             TouchEvent event = touchEvents.get(i);
 
+            if (event.type == TouchEvent.TOUCH_DOWN) {
+
+                if (event.x < 640) {
+                    // Move left.
+                }
+
+                else if (event.x > 640) {
+                    // Move right.
+                }
+
+            }
+
             if (event.type == TouchEvent.TOUCH_UP) {
-            	Log.d("Debug Pussycat", "touch event x: " + event.x + ": " + event.y);
-            	float speedX = (screenWidth/2 - event.x)/20;
-            	float speedY = (screenHeight/2 - event.y)/20;
-            	ballHandler.addBall(event.x, event.y, 1.5f, speedX, speedY);
+
+                if (event.x < 640) {
+                    // Stop moving left.
+                }
+
+                else if (event.x > 640) {
+                    // Stop moving right. }
+                }
             }
 
             
         }
+        
+        // 2. Check miscellaneous events like death:
+        
+        if (livesLeft == 0) {
+            state = GameState.GameOver;
+        }
+        
+        
+        // 3. Call individual update() methods here.
+        // This is where all the game updates happen.
+        // For example, robot.update();
     }
 
     private void updatePaused(List<TouchEvent> touchEvents) {
@@ -130,7 +155,7 @@ public class GameScreen extends Screen {
     public void paint(float deltaTime) {
         Graphics g = game.getGraphics();
 
-        g.drawARGB(255,100,100,100);
+        g.drawARGB(255,255,255,255);
         // First draw the game elements.
 
         // Example:
@@ -162,23 +187,23 @@ public class GameScreen extends Screen {
     private void drawBalls(){
     	Graphics g = game.getGraphics();
     	
-    	Log.d("Debug Pussycat", "balls.size(): " + ballHandler.balls.size());
-    	
-    	for(int i = 0; i < ballHandler.balls.size(); i++){
-        	g.drawScaledImage(ballHandler.balls.get(i).getImage(), (int)(ballHandler.balls.get(i).getX()-ballHandler.balls.get(i).getDiameter()/2), (int)(ballHandler.balls.get(i).getY()-ballHandler.balls.get(i).getDiameter()/2), (int)ballHandler.balls.get(i).getDiameter(), (int)ballHandler.balls.get(i).getDiameter(), 0, 0, 128, 128);
+    	for(int i = 0; i < ballHandler.balls.length; i++){
+        	g.drawImage(ballHandler.balls[i].getImage(), ballHandler.balls[i].getX(), ballHandler.balls[i].getY());
     	}
     }
 
     private void drawReadyUI() {
+		Log.d("Debug Pussycat", "drawReadyUI");
         Graphics g = game.getGraphics();
         
         g.drawARGB(155, 0, 0, 0);
-        g.drawString("Tap to create a ball",
+        g.drawString("Tap each side of the screen to move in that direction.",
                 640, 300, paint);
 
     }
 
     private void drawRunningUI() {
+    	//Log.d("Debug Pussycat", "drawRunningUI");
         Graphics g = game.getGraphics();
         
     }

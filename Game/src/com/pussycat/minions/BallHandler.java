@@ -1,13 +1,17 @@
 package com.pussycat.minions;
 
+import java.util.ArrayList;
+
+import android.graphics.PointF;
 import android.util.Log;
 
 public class BallHandler {
 	
-	Ball[] balls;
-	int ballDistance;
+	ArrayList<Ball> balls = new ArrayList<Ball>();
+	float ballDistance;
 	int screenWidth;
 	int screenHeight;
+	float ppi;
 	int numberOfBalls;
 	
 	/**
@@ -23,18 +27,19 @@ public class BallHandler {
 	 *		  o o o	
 	 *  
 	 * @param 	layers		number of layers (like an onion). Zero layers will generate one ball		
-	 * @param	ballRadius
+	 * @param	ballDiameter diameter of a ball given in centimeters
 	 */
-	public BallHandler(int layers, int ballRadius){		
+	public BallHandler(int layers, float diameterCentimeters){		
 		screenWidth = PussycatMinions.getScreenWidth();
 		screenHeight = PussycatMinions.getScreenHeight();
+		ppi = PussycatMinions.getPpi();
 		
-		// Distance between balls = ballRadius + padding
-		ballDistance = ballRadius+10;
+		float ballDiameter = ppi*(diameterCentimeters*0.3937f);
+		ballDistance = ballDiameter+10; //so that the balls have space between them
 		
 		numberOfBalls = calculateNumberOfBalls(layers);
 		
-		balls = new Ball[numberOfBalls];
+		balls = new ArrayList<Ball>();
 		
 		Log.d("Debug Pussycat", "NUmberOfBalls: " + numberOfBalls);
 		
@@ -42,7 +47,7 @@ public class BallHandler {
 		
 		if(numberOfBalls == 1){
 			// Create and position one ball in the middle of the screen
-			balls[0] = new Ball(screenWidth/2, screenHeight/2);
+			balls.add(new Ball(screenWidth/2, screenHeight/2, ballDiameter));
 		}
 		else{
 			
@@ -60,8 +65,7 @@ public class BallHandler {
 				// First row
 				if(row == 0){
 					for(int ballsOnRow = 0; ballsOnRow < (1+2*layers); ballsOnRow++){
-						balls[ballsOnRow] = new Ball(ballsOnRow*ballDistance + (screenWidth/2)-(ballDistance*(1+2*layers))/2, (screenHeight/2)-ballDistance/2);
-						ballCount++;
+						balls.add(new Ball(ballsOnRow*ballDistance + (screenWidth/2)-(ballDistance*(2*layers))/2, (screenHeight/2), ballDiameter));
 					}
 				}
 				// Row above and underneath the middle
@@ -70,32 +74,81 @@ public class BallHandler {
 					if(row%2 == 0){
 						for(int ballsOnRow = 0; ballsOnRow < (1+2*layers - row); ballsOnRow++){
 							// Create ball above the middle
-							balls[ballCount] = new Ball((int)((ballsOnRow+row*0.5)*ballDistance)+(screenWidth/2)-(ballDistance*(1+2*layers))/2, row*ballDistance+(screenHeight/2)-ballDistance/2);
-							ballCount++;
-							
+							balls.add(new Ball((int)((ballsOnRow+row*0.5)*ballDistance)+(screenWidth/2)-(ballDistance*(2*layers))/2, row*ballDistance+(screenHeight/2), ballDiameter));
+
 							// Create ball below the middle
-							balls[ballCount] = new Ball((int)((ballsOnRow+row*0.5)*ballDistance)+(screenWidth/2)-(ballDistance*(1+2*layers))/2, -row*ballDistance+(screenHeight/2)-ballDistance/2);
-							ballCount++;
+							balls.add(new Ball((int)((ballsOnRow+row*0.5)*ballDistance)+(screenWidth/2)-(ballDistance*(2*layers))/2, -row*ballDistance+(screenHeight/2), ballDiameter));
 						}
 					}
-					// Odd (offset 0.5*ballDistance in the x direction)
+					// Odd: offset 0.5*ballDistance in the x direction
 					else 
 					{
 						for(int ballsOnRow = 0; ballsOnRow < (1 + 2*layers - row); ballsOnRow++){
 							// Create ball above the middle
-							balls[ballCount] = new Ball((int)((ballsOnRow+row*0.5)*ballDistance)+(screenWidth/2)-(ballDistance*(1+2*layers))/2, row*ballDistance+(screenHeight/2)-ballDistance/2);
-							ballCount++;
+							balls.add(new Ball((int)((ballsOnRow+row*0.5)*ballDistance)+(screenWidth/2)-(ballDistance*(2*layers))/2, row*ballDistance+(screenHeight/2), ballDiameter));
 							
 							// Create ball below the middle
-							balls[ballCount] = new Ball((int)((ballsOnRow+row*0.5)*ballDistance)+(screenWidth/2)-(ballDistance*(1+2*layers))/2, -row*ballDistance+(screenHeight/2)-ballDistance/2);
-							ballCount++;
+							balls.add(new Ball((int)((ballsOnRow+row*0.5)*ballDistance)+(screenWidth/2)-(ballDistance*(2*layers))/2, -row*ballDistance+(screenHeight/2), ballDiameter));
 						}
 					}
 				}
 			}
 		}
 	}
+	
+	public void update(){
+		
+		// Collision detection
+		for(int i=0; i<balls.size(); i++) {
+			for (int j=i+1; j<balls.size(); j++) {
+				if (checkCollision(balls.get(i).getPoint(), balls.get(i).getRadius(), balls.get(j).getPoint(), balls.get(j).getRadius())) {
+					// your code here
+					balls.get(i).setLocked(true);
+					balls.get(j).setLocked(true);
+				}
+			}
+		}
+		
+		for(int i = 0; i < balls.size(); i++){
+			if (isBallOutside(i)){
+				removeBall(i);
+			}
+			else
+				balls.get(i).update();
+		}
+	}
 
+	public void addBall(float x, float y, float ballDiameterCentimeters){
+		float ballDiameter = ppi*(ballDiameterCentimeters*0.3937f);
+		balls.add(new Ball(x, y, ballDiameter));
+		Log.d("Debug Pussycat", "ball added");
+	}
+	
+	public void addBall(float x, float y, float ballDiameterCentimeters, float speedX, float speedY){
+		float ballDiameter = ppi*(ballDiameterCentimeters*0.3937f);
+		balls.add(new Ball(x, y, ballDiameter, speedX, speedY));
+		Log.d("Debug Pussycat", "ball added with speedX: " + speedX + "speedY: " + speedY);
+	}
+	
+	public void removeBall(int index){
+		balls.remove(index);
+		Log.d("Debug Pussycat", "ball removed");
+	}
+	
+	private boolean isBallOutside(int index){
+		return (	balls.get(index).getX() - balls.get(index).getDiameter()/2 > (screenWidth) || 
+					balls.get(index).getX() + balls.get(index).getDiameter()/2 < 0 ||
+					balls.get(index).getY() - balls.get(index).getDiameter()/2 > (screenHeight) ||
+					balls.get(index).getY() + balls.get(index).getDiameter()/2< (0));
+	}
+	
+	private boolean checkCollision(PointF p1, float r1, PointF p2, float r2) {
+		final float a = r1 + r2;
+	    final float dx = p1.x - p2.x;
+	    final float dy = p1.y - p2.y;
+	    return a * a > (dx * dx + dy * dy);
+	}
+	
 	/**
 	 * calculates the number of balls that will be created using the specified number of layers
 	 * mathematically: 6*(0 + 1 + 2 + .. + n), n = number of layers
