@@ -65,8 +65,12 @@ public class SetDeviceCoordinates  extends View {
 		int xdpi = (int) displayMetrics.xdpi;
 		int ydpi = (int) displayMetrics.ydpi;
 				
-		Log.d("AndroidClient", "Height: " + height + "\nWidth: "+ width + "\nDpi: "+ densityDpi + "\nDensty: "+ density + "\nxdpi: "+ xdpi + "\nydpi: "+ ydpi);
+		Log.d("PussycatAndroidClient", "Height: " + height + "\nWidth: "+ width + "\nDpi: "+ densityDpi + "\nDensty: "+ density + "\nxdpi: "+ xdpi + "\nydpi: "+ ydpi);
 		
+		if(tcpClient != null) {
+			// 0 = ADD_DEVICE on the server 
+			tcpClient.sendMessage(0 + " " + xdpi + " " + width + " " + height);
+		}		
 	}
 	
 	@Override
@@ -81,7 +85,8 @@ public class SetDeviceCoordinates  extends View {
 			
 			float deltaT = timeStop - timeStart;
 			if(tcpClient != null) {
-				tcpClient.sendMessage(downX + " " + downY + " " + upX + " " + upY + " " + deltaT);
+				// 1 = MAP_DEVICE on the server 
+				tcpClient.sendMessage(1 + " " + downX + " " + downY + " " + upX + " " + upY + " " + deltaT);
 			}
 			break;
 		case MotionEvent.ACTION_DOWN:
@@ -89,31 +94,46 @@ public class SetDeviceCoordinates  extends View {
 			downY = event.getY();
 			timeStart = SystemClock.uptimeMillis();
 			break;
-		}
-		
+		}		
 		
 		return true;
 	}
 	
+	/**
+	 * Draws how the devices are positioned compared to each other.
+	 * The main device (tablet) is drawn with one corner in (0,0) while
+	 * the other devices are translated and rotated based on global coordinates. 
+	 * @param canvas
+	 */
 	@Override
-	protected void onDraw (Canvas canvas) {
-		ballBounds.set( ballX-ballRadius, ballY-ballRadius,
-						ballX+ballRadius, ballY+ballRadius);
-		paint.setColor(Color.GREEN);
-		canvas.drawOval(ballBounds,paint);
-		
-		update();
-		invalidate();
-	}
-	
-	private void update() {
+	public void onDraw(Canvas canvas)
+	{
 		if(data != null){
-		String[] parts = data.split(" ");
-		ballX = Float.parseFloat(parts[0]);
-		ballY = Float.parseFloat(parts[1]);
+			// x0, y0, height, width, alpha
+			String[] parts = data.split(" ");
+			
+			// For the first test we only need two screens.  
+			// parts must contain 10 arguments = two devices for this to work
+			int SCREENS = 2;
+			
+			paint.setColor(Color.BLUE);
+			for(int i = 0; i < (parts.length)/SCREENS; i += 5 ){
+						
+				float X1 = Float.parseFloat(parts[i]);
+				float Y1 = Float.parseFloat(parts[i + 1]);
+				float X2 = Float.parseFloat(parts[i] + parts[i + 2]);
+				float Y2 = Float.parseFloat(parts[i] + parts[i + 3]);			
+				float alpha = Float.parseFloat(parts[i + 4]);
+				
+				canvas.rotate(alpha);
+				canvas.drawRect(X1, Y1, X2, Y2, paint);
+				canvas.restore();			
+			}
+			
+			//update();
+			invalidate();			
 		}
 	}
-	
 	
 	@Override
 	public void onSizeChanged(int w, int h, int oldW, int oldH) {
