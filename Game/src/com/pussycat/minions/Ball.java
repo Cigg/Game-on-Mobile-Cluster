@@ -8,15 +8,17 @@ import com.pussycat.minions.GameScreen;
 public class Ball {
 
 	Image image;
-	private int x, y, speedX, speedY;
+	private float x, y, speedX, speedY, diameter;
 	private boolean visible;
+	private int color;
 	
-	public Ball(int startX, int startY){
+	public Ball(float startX, float startY, float diameter){
 		image = Assets.ball;
 		x = startX;
 		y = startY;
-		speedX = 7;
+		speedX = 0;
 		speedY = 0;
+		this.diameter = diameter;
 		visible = true;
 	}
 	
@@ -46,15 +48,19 @@ public class Ball {
 		return image;
 	}
 	
-	public int getX() {
+	public float getX() {
 		return x;
 	}
 
-	public int getY() {
+	public float getY() {
 		return y;
 	}
+	
+	public float getDiameter(){
+		return diameter;
+	}
 
-	public int getSpeedX() {
+	public float getSpeedX() {
 		return speedX;
 	}
 

@@ -36,7 +36,7 @@ public class GameScreen extends Screen {
         screenHeight = PussycatMinions.getScreenHeight();
 
         // Initialize game objects here
-        ballHandler = new BallHandler(2, 1.5f);
+        ballHandler = new BallHandler(2, 128);
         
         // Defining a paint object
 		paint = new Paint();
@@ -155,7 +155,7 @@ public class GameScreen extends Screen {
     public void paint(float deltaTime) {
         Graphics g = game.getGraphics();
 
-        g.drawARGB(255,100,100,100);
+        g.drawARGB(255,255,255,255);
         // First draw the game elements.
 
         // Example:
@@ -188,7 +188,7 @@ public class GameScreen extends Screen {
     	Graphics g = game.getGraphics();
     	
     	for(int i = 0; i < ballHandler.balls.length; i++){
-        	g.drawScaledImage(ballHandler.balls[i].getImage(), (int)ballHandler.balls[i].getX(), (int)ballHandler.balls[i].getY(), (int)ballHandler.balls[i].getDiameter(), (int)ballHandler.balls[i].getDiameter(), 0, 0, 128, 128);
+        	g.drawImage(ballHandler.balls[i].getImage(), ballHandler.balls[i].getX(), ballHandler.balls[i].getY());
     	}
     }
 
@@ -203,7 +203,7 @@ public class GameScreen extends Screen {
     }
 
     private void drawRunningUI() {
-    	Log.d("Debug Pussycat", "drawRunningUI");
+    	//Log.d("Debug Pussycat", "drawRunningUI");
         Graphics g = game.getGraphics();
         
     }
