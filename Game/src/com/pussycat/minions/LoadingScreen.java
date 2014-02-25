@@ -18,7 +18,6 @@ public class LoadingScreen extends Screen {
     @Override
     public void update(float deltaTime) {
         Graphics g = game.getGraphics();
-        Assets.menu = g.newImage("background.jpg", ImageFormat.RGB565);
         Assets.click = game.getAudio().createSound("explosion.ogg");
         Assets.ball = g.newImage("ball.png", ImageFormat.RGB565);
         

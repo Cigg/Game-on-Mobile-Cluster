@@ -16,14 +16,7 @@ public class BallHandler {
 		
 		ballDistance = ballRadius+10;
 		
-		int sum = 0;
-		
-		for(int i = 0; i < (layers+1); i++){
-			sum += i;
-			Log.d("Debug Pussycat", "Sum: " + sum);
-		}
-		
-		numberOfBalls = (6*sum) + 1;
+		numberOfBalls = calculateNumberOfBalls(layers);
 		
 		balls = new Ball[numberOfBalls];
 		
@@ -36,59 +29,52 @@ public class BallHandler {
 		}
 		else{
 			for(int row = 0; row < (1+layers); row++){
-				if(row == 0){ //Första raden
-					for(int j = 0; j < (1+2*layers); j++){
-						balls[j] = new Ball(j*ballDistance + (screenWidth/2)-(ballDistance*(1+2*layers))/2, (screenHeight/2)-ballDistance/2);
+				if(row == 0){ //Fšrsta raden
+					for(int ballsOnRow = 0; ballsOnRow < (1+2*layers); ballsOnRow++){
+						balls[ballsOnRow] = new Ball(ballsOnRow*ballDistance + (screenWidth/2)-(ballDistance*(1+2*layers))/2, (screenHeight/2)-ballDistance/2);
 						ballCount++;
 						Log.d("Debug Pussycat", "Ballhandler första raden: " + ballCount);
 					}
 				}
 				else{ // Rad ovan och under
-					// Jämn
+					// JŠmn
 					if(row%2 == 0){
-						for(int j = 0; j < (1+2*layers - row); j++){
-							balls[ballCount] = new Ball((int)((j+row*0.5)*ballDistance)+(screenWidth/2)-(ballDistance*(1+2*layers))/2, row*ballDistance+(screenHeight/2)-ballDistance/2);
+						for(int ballsOnRow = 0; ballsOnRow < (1+2*layers - row); ballsOnRow++){
+							balls[ballCount] = new Ball((int)((ballsOnRow+row*0.5)*ballDistance)+(screenWidth/2)-(ballDistance*(1+2*layers))/2, row*ballDistance+(screenHeight/2)-ballDistance/2);
 							ballCount++;
 							Log.d("Debug Pussycat", "Ballhandler jämn ovan: " + ballCount);
 							
-							balls[ballCount] = new Ball((int)((j+row*0.5)*ballDistance)+(screenWidth/2)-(ballDistance*(1+2*layers))/2, -row*ballDistance+(screenHeight/2)-ballDistance/2);
+							balls[ballCount] = new Ball((int)((ballsOnRow+row*0.5)*ballDistance)+(screenWidth/2)-(ballDistance*(1+2*layers))/2, -row*ballDistance+(screenHeight/2)-ballDistance/2);
 							ballCount++;
 							
 							Log.d("Debug Pussycat", "Ballhandler jämn under: " + ballCount);
 						}
 					}
-					else // Ojämn
+					else // OjŠmn
 					{
-						for(int j = 0; j < (1 + 2*layers - row); j++){
-							balls[ballCount] = new Ball((int)((j+row*0.5)*ballDistance)+(screenWidth/2)-(ballDistance*(1+2*layers))/2, row*ballDistance+(screenHeight/2)-ballDistance/2);
+						for(int ballsOnRow = 0; ballsOnRow < (1 + 2*layers - row); ballsOnRow++){
+							balls[ballCount] = new Ball((int)((ballsOnRow+row*0.5)*ballDistance)+(screenWidth/2)-(ballDistance*(1+2*layers))/2, row*ballDistance+(screenHeight/2)-ballDistance/2);
 							ballCount++;
 							
 							Log.d("Debug Pussycat", "Ballhandler ojämn ovan: " + ballCount);
 							
-							balls[ballCount] = new Ball((int)((j+row*0.5)*ballDistance)+(screenWidth/2)-(ballDistance*(1+2*layers))/2, -row*ballDistance+(screenHeight/2)-ballDistance/2);
+							balls[ballCount] = new Ball((int)((ballsOnRow+row*0.5)*ballDistance)+(screenWidth/2)-(ballDistance*(1+2*layers))/2, -row*ballDistance+(screenHeight/2)-ballDistance/2);
 							ballCount++;
 							Log.d("Debug Pussycat", "Ballhandler ojämn under: " + ballCount);
 						}
 					}
 				}
 			}
-			/*
-			for(int i=0; i<numberOfBalls; i++){
-				int slots = screenWidth*1/((1+2*i)*2);
-				
-				//if even number
-				if(i % 2 == 0){
-					balls[i] = new Ball(slots*i, screenHeight/2); //villkor 2 ska vara row istället
-				}
-				
-				//if uneven number
-				else{
-					
-				}
-			}
-			*/
+		}
+	}
+
+	private int calculateNumberOfBalls(int layers) {
+		int sum = 0;
+		
+		for(int i = 0; i < (layers+1); i++){
+			sum += i;
 		}
 		
-        Log.d("Debug Pussycat", "Ballhandler constructor end");
+		return (6*sum) + 1;
 	}
 }

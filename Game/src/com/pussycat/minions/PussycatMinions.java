@@ -17,6 +17,7 @@ public class PussycatMinions extends AndroidGame {
     	width = metrics.widthPixels;
     	height = metrics.heightPixels;
         
+    	//TO-DO: calculate the correct height of display
     	/*
         int resourceId = getResources().getIdentifier("status_bar_height", "dimen", "android");
         if (resourceId > 0) {

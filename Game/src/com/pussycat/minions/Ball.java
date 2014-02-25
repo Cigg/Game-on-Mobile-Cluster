@@ -11,7 +11,6 @@ public class Ball {
 	private int x, y, speedX, speedY;
 	private boolean visible;
 	
-	
 	public Ball(int startX, int startY){
 		image = Assets.ball;
 		x = startX;
