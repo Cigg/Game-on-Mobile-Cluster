@@ -8,4 +8,3 @@ public class Assets {
     public static Image ball;
     public static Sound click;
 }
- 

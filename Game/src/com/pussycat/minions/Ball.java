@@ -1,6 +1,6 @@
 package com.pussycat.minions;
 
-import android.graphics.Point;
+import android.graphics.PointF;
 
 import com.pussycat.framework.Image;
 import com.pussycat.minions.GameScreen;
@@ -8,79 +8,90 @@ import com.pussycat.minions.GameScreen;
 public class Ball {
 
 	Image image;
-	private float x, y, speedX, speedY, diameter;
-	private boolean visible;
+	private PointF pos;
+	private float speedX, speedY, diameter;
+	//private boolean visible;
+	private boolean locked;
 	private int color;
+	
 	
 	public Ball(float startX, float startY, float diameter){
 		image = Assets.ball;
-		x = startX;
-		y = startY;
+		pos = new PointF(startX, startY);
 		speedX = 0;
 		speedY = 0;
 		this.diameter = diameter;
-		visible = true;
+		locked = true;
+	}
+	
+	public Ball(float startX, float startY, float diameter, float speedX, float speedY){
+		image = Assets.ball;
+		pos = new PointF(startX, startY);
+		(this).speedX = speedX;
+		(this).speedY = speedY;
+		this.diameter = diameter;
+		locked = false;
 	}
 	
 	public void update(){
-		x += speedX;
-		if (x > 800){
-			visible = false;
+		if(!locked){
+			pos.x += speedX;
+			pos.y += speedY;
 		}
-		if (visible){
-			 //TO-DO: add arguments from BallHandler
-			if(checkCollision(null, 5, null, 5)){
-				//Delete the connected balls
-			}
-		}
-		
-	}
-
-	private boolean checkCollision(Point p1, double r1, Point p2, double r2) {
-		// Code example from http://stackoverflow.com/questions/697188/fast-circle-collision-detection
-		final double a = r1 + r2;
-	    final double dx = p1.x - p2.x;
-	    final double dy = p1.y - p2.y;
-	    return a * a > (dx * dx + dy * dy);
 	}
 
 	public Image getImage(){
 		return image;
 	}
 	
+	public PointF getPoint(){
+		return pos;
+	}
+	
 	public float getX() {
-		return x;
+		return pos.x;
 	}
 
 	public float getY() {
-		return y;
+		return pos.y;
 	}
 	
 	public float getDiameter(){
 		return diameter;
+	}
+	
+	public float getRadius(){
+		return diameter/2;
 	}
 
 	public float getSpeedX() {
 		return speedX;
 	}
 
+	/*
 	public boolean isVisible() {
 		return visible;
 	}
+	*/
 
 	public void setX(int x) {
-		this.x = x;
+		this.pos.x = x;
 	}
 
 	public void setY(int y) {
-		this.y = y;
+		this.pos.y = y;
 	}
 
 	public void setSpeedX(int speedX) {
 		this.speedX = speedX;
 	}
 
+	public void setLocked(boolean locked) {
+		this.locked = locked;
+	}
+	/*
 	public void setVisible(boolean visible) {
 		this.visible = visible;
 	}
+	*/
 }
