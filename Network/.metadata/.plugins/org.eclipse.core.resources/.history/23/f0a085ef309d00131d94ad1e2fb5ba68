@@ -1,0 +1,46 @@
+package com.example.androidclient;
+
+import android.content.Context;
+import android.graphics.Canvas;
+import android.graphics.Color;
+import android.graphics.Paint;
+import android.graphics.RectF;
+import android.view.View;
+
+public class BouncingBall extends View{
+	private int id;
+	
+	private float posX;
+	private float posY;
+	private float speedX;
+	private float speedY;
+	
+	private float ballRadius = 80;
+	public RectF ballBounds;
+	public Paint paint;
+	
+
+	public BouncingBall(Context context) {
+		super(context);
+		ballBounds = new RectF();
+		paint = new Paint();
+		this.setFocusableInTouchMode(true);
+	}
+	
+	@Override
+	protected void onDraw (Canvas canvas) {
+		ballBounds.set( posX-ballRadius, posY-ballRadius,
+						posX+ballRadius, posY+ballRadius);
+		paint.setColor(Color.GREEN);
+		canvas.drawOval(ballBounds, paint)
+		invalidate();
+	}
+	
+	public void update(float x, float y, float dx, float dy) {
+		posX = x;
+		posY = y;
+		speedX = dx; 
+		speedY = dx;
+	}
+
+}
