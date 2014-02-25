@@ -23,6 +23,7 @@ public class AndroidGraphics implements Graphics {
     Paint paint;
     Rect srcRect = new Rect();
     Rect dstRect = new Rect();
+    Bitmap bitmap;
 
     public AndroidGraphics(AssetManager assets, Bitmap frameBuffer) {
         this.assets = assets;
@@ -133,8 +134,7 @@ public class AndroidGraphics implements Graphics {
     
     public void drawScaledImage(Image Image, int x, int y, int width, int height, int srcX, int srcY, int srcWidth, int srcHeight){
     	
-    	
-   	 srcRect.left = srcX;
+   	 	srcRect.left = srcX;
         srcRect.top = srcY;
         srcRect.right = srcX + srcWidth;
         srcRect.bottom = srcY + srcHeight;
@@ -145,9 +145,17 @@ public class AndroidGraphics implements Graphics {
         dstRect.right = x + width;
         dstRect.bottom = y + height;
         
-   
+        bitmap = ((AndroidImage) Image).bitmap;
         
-        canvas.drawBitmap(((AndroidImage) Image).bitmap, srcRect, dstRect, null);
+        /**
+         * Improves resizing quality of bitmaps a lot, but possibly much heavier to calculate
+         */
+        Paint paint = new Paint();
+        paint.setAntiAlias(true);
+        paint.setFilterBitmap(true);
+        paint.setDither(true);
+        
+        canvas.drawBitmap(bitmap, srcRect, dstRect, paint);
         
     }
    
