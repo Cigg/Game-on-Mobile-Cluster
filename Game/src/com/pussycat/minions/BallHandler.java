@@ -24,16 +24,15 @@ public class BallHandler {
 	 *		  o o o	
 	 *  
 	 * @param 	layers		number of layers (like an onion). Zero layers will generate one ball		
-	 * @param	ballRadius
+	 * @param	ballDiameter diameter of a ball given in centimeters
 	 */
 	public BallHandler(int layers, float diameterCentimeters){		
 		screenWidth = PussycatMinions.getScreenWidth();
 		screenHeight = PussycatMinions.getScreenHeight();
 		ppi = PussycatMinions.getPpi();
 		
-		// Distance between balls = ballRadius + padding
 		float ballDiameter = ppi*(diameterCentimeters*0.3937f);
-		ballDistance = ballDiameter+10;
+		ballDistance = ballDiameter+10; //so that the balls have space between them
 		
 		numberOfBalls = calculateNumberOfBalls(layers);
 		
@@ -81,7 +80,7 @@ public class BallHandler {
 							ballCount++;
 						}
 					}
-					// Odd (offset 0.5*ballDistance in the x direction)
+					// Odd: offset 0.5*ballDistance in the x direction
 					else 
 					{
 						for(int ballsOnRow = 0; ballsOnRow < (1 + 2*layers - row); ballsOnRow++){
