@@ -40,7 +40,7 @@ public class MainMenuScreen extends Screen {
             }
         }
     }
-
+    
     private boolean inBounds(TouchEvent event, int x, int y, int width,
             int height) {
         if (event.x > x && event.x < x + width - 1 && event.y > y

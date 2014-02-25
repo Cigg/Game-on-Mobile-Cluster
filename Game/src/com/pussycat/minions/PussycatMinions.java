@@ -10,7 +10,8 @@ import com.pussycat.framework.implementation.AndroidGame;
 public class PussycatMinions extends AndroidGame {
 	static int width;
 	static int height;
-    @Override
+    
+	@Override
     public Screen getInitScreen() {
     	
     	DisplayMetrics metrics = getResources().getDisplayMetrics();

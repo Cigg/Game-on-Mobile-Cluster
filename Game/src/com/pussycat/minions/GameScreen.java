@@ -65,7 +65,7 @@ public class GameScreen extends Screen {
         if (state == GameState.GameOver)
             updateGameOver(touchEvents);
     }
-
+    
     private void updateReady(List<TouchEvent> touchEvents) {
         
         // This example starts with a "Ready" screen.
