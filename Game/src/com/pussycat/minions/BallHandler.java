@@ -144,7 +144,6 @@ public class BallHandler {
 	}
 	
 	private boolean checkCollision(PointF p1, float r1, PointF p2, float r2) {
-		// Code example from http://stackoverflow.com/questions/697188/fast-circle-collision-detection
 		final float a = r1 + r2;
 	    final float dx = p1.x - p2.x;
 	    final float dy = p1.y - p2.y;
