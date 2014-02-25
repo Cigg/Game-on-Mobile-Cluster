@@ -23,6 +23,7 @@ public class GameScreen extends Screen {
     // You would create game objects here.
     private BallHandler ballHandler;
     
+    float ballSpeed = 20.0f;
     int screenWidth;
     int screenHeight;
     Paint paint;
@@ -91,8 +92,11 @@ public class GameScreen extends Screen {
 
             if (event.type == TouchEvent.TOUCH_UP) {
             	Log.d("Debug Pussycat", "touch event x: " + event.x + ": " + event.y);
-            	float speedX = (screenWidth/2 - event.x)/20;
-            	float speedY = (screenHeight/2 - event.y)/20;
+            	float speedX = (screenWidth/2 - event.x);
+            	float speedY = (screenHeight/2 - event.y);
+            	float tempDist = (float)Math.sqrt(speedX*speedX + speedY*speedY);
+            	speedX = ballSpeed*speedX/tempDist;
+            	speedY = ballSpeed*speedY/tempDist;
             	ballHandler.addBall(event.x, event.y, 1.5f, speedX, speedY);
             }
 
