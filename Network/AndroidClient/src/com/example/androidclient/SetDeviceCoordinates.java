@@ -7,6 +7,7 @@ import android.graphics.Paint;
 import android.graphics.Point;
 import android.graphics.RectF;
 import android.os.AsyncTask;
+import android.os.Handler;
 import android.os.SystemClock;
 import android.util.DisplayMetrics;
 import android.util.Log;
@@ -35,6 +36,9 @@ public class SetDeviceCoordinates  extends View {
 	private float deltaX;
 	private float deltaY;
 	
+	private static boolean FLAG_FIRST_TOUCH = true;
+	private static boolean FLAG_READY_FOR_INPUT = false;
+	
 	private float timeStart;
 	private float timeStop;
 	
@@ -42,6 +46,10 @@ public class SetDeviceCoordinates  extends View {
 	private float downY;
 	private float upX;
 	private float upY;
+	
+	private int width;
+	private int height;
+	private int xdpi;
 	
 	private String data;
 	
@@ -58,44 +66,58 @@ public class SetDeviceCoordinates  extends View {
 		Display display = wm.getDefaultDisplay();
 		DisplayMetrics displayMetrics = new DisplayMetrics();
 		display.getMetrics(displayMetrics);
-		int width = displayMetrics.widthPixels;
-		int height = displayMetrics.heightPixels;
-		int densityDpi = displayMetrics.densityDpi;
-		int density = (int) displayMetrics.density;
-		int xdpi = (int) displayMetrics.xdpi;
-		int ydpi = (int) displayMetrics.ydpi;
+		width = displayMetrics.widthPixels;
+		height = displayMetrics.heightPixels;
+//		int densityDpi = displayMetrics.densityDpi;
+//		int density = (int) displayMetrics.density;
+		xdpi = (int) displayMetrics.xdpi;
+//		int ydpi = (int) displayMetrics.ydpi;
 				
-		Log.d("PussycatAndroidClient", "Height: " + height + "\nWidth: "+ width + "\nDpi: "+ densityDpi + "\nDensty: "+ density + "\nxdpi: "+ xdpi + "\nydpi: "+ ydpi);
-		
-		if(tcpClient != null) {
-			// 0 = ADD_DEVICE on the server 
-			tcpClient.sendMessage(0 + " " + xdpi + " " + width + " " + height);
-		}		
+	//	Log.d("PussycatAndroidClient", "Height: " + height + "\nWidth: "+ width + "\nDpi: "+ densityDpi + "\nDensty: "+ density + "\nxdpi: "+ xdpi + "\nydpi: "+ ydpi);	
 	}
 	
 	@Override
 	public  boolean onTouchEvent(MotionEvent event) {
-		
-		switch (event.getAction()) {
-		case MotionEvent.ACTION_UP:
-			//System.out.println(currentX + " " + currentY);
-			upX = event.getX();
-			upY = event.getY();
-			timeStop = SystemClock.uptimeMillis();
+		if(FLAG_FIRST_TOUCH){
 			
-			float deltaT = timeStop - timeStart;
 			if(tcpClient != null) {
-				// 1 = MAP_DEVICE on the server 
-				tcpClient.sendMessage(1 + " " + downX + " " + downY + " " + upX + " " + upY + " " + deltaT);
-			}
-			break;
-		case MotionEvent.ACTION_DOWN:
-			downX = event.getX();
-			downY = event.getY();
-			timeStart = SystemClock.uptimeMillis();
-			break;
-		}		
-		
+				// 0 = ADD_DEVICE on the server 
+			
+				tcpClient.sendMessage(0 + " " + xdpi + " " + width + " " + height);
+				//Log.d("PussycatAndroidClient", 0 + " " + xdpi + " " + width + " " + height);
+			}	
+			
+ 			FLAG_FIRST_TOUCH = false; 
+			
+		    Handler handler = new Handler(); 
+		    handler.postDelayed(new Runnable() { 
+		         public void run() { 
+		        	 FLAG_READY_FOR_INPUT = true;
+		         } 
+		    }, 1000); 
+		    
+		}
+		if(FLAG_READY_FOR_INPUT){
+			switch (event.getAction()) {
+			case MotionEvent.ACTION_UP:
+				//System.out.println(currentX + " " + currentY);
+				upX = event.getX();
+				upY = event.getY();
+				timeStop = SystemClock.uptimeMillis();
+				
+				float deltaT = timeStop - timeStart;
+				if(tcpClient != null) {
+					// 1 = MAP_DEVICE on the server 
+					tcpClient.sendMessage(1 + " " + downX + " " + downY + " " + upX + " " + upY + " " + deltaT);
+				}
+				break;
+			case MotionEvent.ACTION_DOWN:
+				downX = event.getX();
+				downY = event.getY();
+				timeStart = SystemClock.uptimeMillis();
+				break;
+			}		
+		}
 		return true;
 	}
 	
@@ -108,6 +130,7 @@ public class SetDeviceCoordinates  extends View {
 	@Override
 	public void onDraw(Canvas canvas)
 	{
+		System.out.println("onDraw() is trying to draw");
 		if(data != null){
 			// x0, y0, height, width, alpha
 			String[] parts = data.split(" ");
@@ -117,7 +140,7 @@ public class SetDeviceCoordinates  extends View {
 			int SCREENS = 2;
 			
 			paint.setColor(Color.BLUE);
-			for(int i = 0; i < (parts.length)/SCREENS; i += 5 ){
+			for(int i = 0; i < 10; i += 5 ){
 						
 				float X1 = Float.parseFloat(parts[i]);
 				float Y1 = Float.parseFloat(parts[i + 1]);
