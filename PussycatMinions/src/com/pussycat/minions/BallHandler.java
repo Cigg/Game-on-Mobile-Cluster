@@ -129,7 +129,7 @@ public class BallHandler {
 		
 		if(tcpClient != null){
 			tcpClient.getData();
-			//balls.clear();
+			balls.clear();
 			balls.add(new Ball(screenWidth/2, screenHeight/2, 1.5f));
 			if(data != "" && data != null) {
 				System.out.println(data);
