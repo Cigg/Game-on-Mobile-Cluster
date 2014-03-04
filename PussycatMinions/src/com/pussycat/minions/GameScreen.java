@@ -36,7 +36,7 @@ public class GameScreen extends Screen {
         screenHeight = PussycatMinions.getScreenHeight();
 
         // Initialize game objects here
-        ballHandler = new BallHandler(1, 1.5f);
+        ballHandler = new BallHandler(1.5f);
         
         // Defining a paint object
 		paint = new Paint();
