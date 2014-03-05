@@ -6,6 +6,7 @@ import android.graphics.Color;
 import android.graphics.Paint;
 import android.util.Log;
 
+import com.pussycat.framework.FPSCounter;
 import com.pussycat.framework.Game;
 import com.pussycat.framework.Graphics;
 import com.pussycat.framework.Image;
@@ -27,7 +28,7 @@ public class GameScreenMiddle extends Screen {
     int screenWidth;
     int screenHeight;
     Paint paint;
-
+    FPSCounter fpsCounter;
     public GameScreenMiddle(Game game) {
         super(game);
         
@@ -45,6 +46,7 @@ public class GameScreenMiddle extends Screen {
 		paint.setAntiAlias(true);
 		paint.setColor(Color.WHITE);
 		
+		fpsCounter = new FPSCounter();
 		Log.d("Debug Pussycat", "GameScreenMiddle constructor");
 
     }
@@ -175,6 +177,8 @@ public class GameScreenMiddle extends Screen {
     	Graphics g = game.getGraphics();
     	
     	//Log.d("Debug Pussycat", "balls.size(): " + ballHandler.balls.size());
+    	
+    	fpsCounter.logFrame();
     	
     	for(int i = 0; i < ballHandler.balls.size(); i++){
         	g.drawScaledImage(ballHandler.balls.get(i).getImage(), (int)(ballHandler.balls.get(i).getX()-ballHandler.balls.get(i).getDiameter()/2), (int)(ballHandler.balls.get(i).getY()-ballHandler.balls.get(i).getDiameter()/2), (int)ballHandler.balls.get(i).getDiameter(), (int)ballHandler.balls.get(i).getDiameter(), 0, 0, 128, 128);

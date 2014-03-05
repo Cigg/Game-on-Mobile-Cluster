@@ -1,0 +1,23 @@
+package com.pussycat.minions.framework.implementation.test;
+
+import android.test.ActivityInstrumentationTestCase2;
+
+import com.pussycat.framework.implementation.AndroidGame;
+
+/**
+ * @author Sebastian
+ *
+ */
+public class AndroidGameTest extends
+		ActivityInstrumentationTestCase2<AndroidGame> {
+
+	public AndroidGameTest() {
+		super(AndroidGame.class);
+	}
+	
+	@Override
+	protected void setUp() throws Exception {
+		super.setUp();
+	}
+	
+}

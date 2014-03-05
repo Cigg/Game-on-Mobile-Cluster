@@ -41,6 +41,7 @@ logcat.view.colsize.TID=62
 logcat.view.colsize.Tag=133
 logcat.view.colsize.Text=682
 logcat.view.colsize.Time=165
+logcat.view.filters.list=name\: 'FPSCounter', tag\: 'FPSCounter', text\: '', pid\: '', app\: '', level\: 'verbose', name\: 'TEST', tag\: 'TEST', text\: '', pid\: '', app\: '', level\: 'verbose', 
 networkPanel.rxBytes=122
 networkPanel.rxPackets=122
 networkPanel.title=302

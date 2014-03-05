@@ -1,0 +1,8 @@
+package com.pussycat.minions.framework.implementation.test;
+
+import android.test.ActivityInstrumentationTestCase2;
+
+public class AndroidGameTest extends
+		ActivityInstrumentationTestCase2<AndroidGame> {
+
+}

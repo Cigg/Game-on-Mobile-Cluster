@@ -1,2 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<qualifiedTypeNameHistroy/>
+<qualifiedTypeNameHistroy>
+<fullyQualifiedTypeName name="com.pussycat.framework.FPSCounter"/>
+<fullyQualifiedTypeName name="com.pussycat.framework.Screen"/>
+<fullyQualifiedTypeName name="android.view.KeyEvent"/>
+<fullyQualifiedTypeName name="android.view.MotionEvent"/>
+</qualifiedTypeNameHistroy>
