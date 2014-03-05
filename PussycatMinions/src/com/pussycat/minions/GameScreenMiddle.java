@@ -12,7 +12,7 @@ import com.pussycat.framework.Image;
 import com.pussycat.framework.Screen;
 import com.pussycat.framework.Input.TouchEvent;
 
-public class GameScreen extends Screen {
+public class GameScreenMiddle extends Screen {
     enum GameState {
         Ready, Running, Paused, GameOver
     }
@@ -28,7 +28,7 @@ public class GameScreen extends Screen {
     int screenHeight;
     Paint paint;
 
-    public GameScreen(Game game) {
+    public GameScreenMiddle(Game game) {
         super(game);
         
         // Get screen dimensions
@@ -45,7 +45,7 @@ public class GameScreen extends Screen {
 		paint.setAntiAlias(true);
 		paint.setColor(Color.WHITE);
 		
-		Log.d("Debug Pussycat", "GameScreen constructor");
+		Log.d("Debug Pussycat", "GameScreenMiddle constructor");
 
     }
 
@@ -92,21 +92,21 @@ public class GameScreen extends Screen {
             	//ballHandler.addBall(0,event.x,event.y,1.5f);
             	System.out.println(event.x + " " + event.y);
             }
-            if(event.type == TouchEvent.TOUCH_DRAGGED) {
-            	ballHandler.addBall(0,event.x,event.y,1.5f);
-            }
-            if (event.type == TouchEvent.TOUCH_UP) {
-            	Log.d("Debug Pussycat", "touch event x: " + event.x + ": " + event.y);
-            	float speedX = (screenWidth/2 - event.x);
-            	float speedY = (screenHeight/2 - event.y);
-            	float tempDist = (float)Math.sqrt(speedX*speedX + speedY*speedY);
-            	speedX = ballSpeed*speedX/tempDist;
-            	speedY = ballSpeed*speedY/tempDist;
-            	//ballHandler.addBall(event.x, event.y, 1.5f, speedX, speedY);
-            	if(ballHandler.tcpClient != null){
-            		ballHandler.tcpClient.sendMessage(event.x + " " + event.y + " " + speedX + " " + speedY);
-            	}
-            }
+//            if(event.type == TouchEvent.TOUCH_DRAGGED) {
+//            	ballHandler.addBall(0,event.x,event.y,1.5f);
+//            }
+//            if (event.type == TouchEvent.TOUCH_UP) {
+//            	Log.d("Debug Pussycat", "touch event x: " + event.x + ": " + event.y);
+//            	float speedX = (screenWidth/2 - event.x);
+//            	float speedY = (screenHeight/2 - event.y);
+//            	float tempDist = (float)Math.sqrt(speedX*speedX + speedY*speedY);
+//            	speedX = ballSpeed*speedX/tempDist;
+//            	speedY = ballSpeed*speedY/tempDist;
+//            	//ballHandler.addBall(event.x, event.y, 1.5f, speedX, speedY);
+//            	if(ballHandler.tcpClient != null){
+//            		ballHandler.tcpClient.sendMessage(event.x + " " + event.y + " " + speedX + " " + speedY);
+//            	}
+//            }
 
             
         }

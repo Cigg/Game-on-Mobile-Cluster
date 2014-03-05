@@ -35,6 +35,7 @@ public class MultiThreds {
 				for(i=0; i<maxClientCount; i++) {
 					if(threads[i] == null) {
 						(threads[i] = new clientThread(clientSocket,threads,updateLoop)).start();
+						System.out.println("new clientThread: " + i);
 						break;
 					}
 				}

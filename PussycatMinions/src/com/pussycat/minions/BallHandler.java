@@ -38,11 +38,12 @@ public class BallHandler {
 		
 		Log.d("Debug Pussycat", "ADDING CONNECTION");
 		
-		Log.d("Debug Pussycat", "NUmberOfBalls: " + numberOfBalls);
-		
 		balls.add(new Ball(screenWidth/2, screenHeight/2, ballDiameter));
 	}
 	
+	/**
+	 * Update function. Gets data from server.
+	 */
 	public void update(){
 		
 		// Collision detection
@@ -165,7 +166,6 @@ public class BallHandler {
 	    final float dy = p1.y - p2.y;
 	    return a * a > (dx * dx + dy * dy);
 	}
-
 	public class connectTask extends AsyncTask<String,String,TCPClient> {
 		@Override
 		protected TCPClient doInBackground(String... message) {
@@ -187,5 +187,4 @@ public class BallHandler {
 			//System.out.println("Data is: " + data);
 		}
 	}
-	
 }

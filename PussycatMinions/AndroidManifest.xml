@@ -20,7 +20,7 @@
            android:name="com.pussycat.minions.PussycatMinions"
            android:configChanges="keyboard|keyboardHidden|orientation"
            android:label="SampleGame"
-           android:screenOrientation="landscape" >
+           android:screenOrientation="portrait" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
