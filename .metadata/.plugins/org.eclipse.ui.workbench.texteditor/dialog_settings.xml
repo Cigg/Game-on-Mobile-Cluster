@@ -13,8 +13,10 @@
 		<item value="false" key="isRegEx"/>
 		<item value="false" key="incremental"/>
 		<item value="false" key="wholeword"/>
-		<item value="addBall" key="selection"/>
+		<item value="" key="selection"/>
 		<list key="findhistory">
+			<item value="delta"/>
+			<item value="new client"/>
 			<item value="addBall"/>
 			<item value="Log"/>
 			<item value="image"/>
