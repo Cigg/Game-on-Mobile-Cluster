@@ -57,7 +57,6 @@ public class TCPClient {
 				while(mRun) {
 					serverMessage = in.readLine();
 					if(serverMessage != null && messageListner != null) {
-						//System.out.println("Server says: " + serverMessage);
 						messageListner.messageReceived(serverMessage);
 					}
 					serverMessage = null;

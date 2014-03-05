@@ -7,8 +7,8 @@
 		</list>
 	</section>
 	<section name="org.eclipse.ui.internal.QuickAccess">
-		<item value="1440" key="dialogWidth"/>
-		<item value="749" key="dialogHeight"/>
+		<item value="1800" key="dialogWidth"/>
+		<item value="942" key="dialogHeight"/>
 		<list key="orderedProviders">
 		</list>
 		<list key="textArray">

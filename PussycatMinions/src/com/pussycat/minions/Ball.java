@@ -89,6 +89,11 @@ public class Ball {
 	public void setLocked(boolean locked) {
 		this.locked = locked;
 	}
+	
+	public void setPos(float x, float y) {
+		this.pos.x = x;
+		this.pos.y = y;
+	}
 	/*
 	public void setVisible(boolean visible) {
 		this.visible = visible;
