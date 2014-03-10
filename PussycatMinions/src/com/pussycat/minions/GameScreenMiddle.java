@@ -85,6 +85,8 @@ public class GameScreenMiddle extends Screen {
        	// Update balls
     	ballHandler.update();
     	
+//    	// Try adding goalie on middle screen
+//    	Goalie.addGoalie();
         
         // All touch input is handled here:
         int len = touchEvents.size();

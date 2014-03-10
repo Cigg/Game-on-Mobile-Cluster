@@ -85,7 +85,6 @@ public class GameScreen extends Screen {
     private void updateRunning(List<TouchEvent> touchEvents, float deltaTime) {
        	// Update balls
     	ballHandler.update();
-    	
         
         // All touch input is handled here:
         int len = touchEvents.size();
