@@ -119,7 +119,7 @@ public class DeviceManager {
 	
 	// TODO: Complete function...........
 	// Converts a position in local coordinates to global coordinates
-	public void localToGlobal(String ip, float x1, float y1) {
+	public float localToGlobalX(String ip, float x1, float y1) {
 		for (Device device : this.devices) {
 		    if (device.ip.equals(ip)) {
 		    	y1 = device.resY - y1;
@@ -128,13 +128,96 @@ public class DeviceManager {
 		    	float y2 = (float) (device.posY + ((x1/device.yDPI)*Math.sin(device.rotZ) + (y1/device.yDPI)*Math.cos(device.rotZ)));
 		    	System.out.println("Global (" + x1 + ", " + y1 + ") = (" + x2 + ", " + y2 + ") = (" + x2*2.5 + ", " + y2*2.5 + ")" );
 		    	//return ((x2 <= device.resX/device.xDPI) && (y2 <= device.resY/device.yDPI));
+		    	
+		    	return x2;
 		    }
 		}
-		//return false;
+		return 0;
 	}
 	
-	public void globalToLocal(String ip, float x1, float y1) {
-		
+	public float localToGlobalY(String ip, float x1, float y1) {
+		for (Device device : this.devices) {
+		    if (device.ip.equals(ip)) {
+		    	y1 = device.resY - y1;
+				
+		    	float x2 = (float) (device.posX + ((x1/device.xDPI)*Math.cos(device.rotZ) - (y1/device.yDPI)*Math.sin(device.rotZ)));
+		    	float y2 = (float) (device.posY + ((x1/device.yDPI)*Math.sin(device.rotZ) + (y1/device.yDPI)*Math.cos(device.rotZ)));
+		    	System.out.println("Global (" + x1 + ", " + y1 + ") = (" + x2 + ", " + y2 + ") = (" + x2*2.5 + ", " + y2*2.5 + ")" );
+		    	//return ((x2 <= device.resX/device.xDPI) && (y2 <= device.resY/device.yDPI));
+		    	
+		    	return y2;
+		    }
+		}
+		return 0;
+	}
+	
+	
+	public int globalToLocalX(String ip, float xG, float yG) {
+		for (Device device : this.devices) {
+		    if (device.ip.equals(ip)) {
+		    	
+		    	float xB = xG - device.posX;
+		    	float yB = yG - device.posY;
+		    	
+		    	int xL = (int) (xB * device.xDPI);
+		    	int yL = (int) (yB * device.yDPI);
+
+		    	//System.out.println("Global:  " + xG + ", " + yG + "   Local: " + xL + ", " + yL);
+		    	return xL;
+		    }
+		}
+		return 0;
+	}
+	
+	public int globalToLocalY(String ip, float xG, float yG) {
+		for (Device device : this.devices) {
+		    if (device.ip.equals(ip)) {
+		    	
+		    	float xB = xG - device.posX;
+		    	float yB = yG - device.posY;
+		    	
+		    	int xL = (int) (xB * device.xDPI);
+		    	int yL = (int) (yB * device.yDPI);
+
+		    	//System.out.println("Global:  " + xG + ", " + yG + "   Local: " + xL + ", " + yL);
+		    	return yL;
+		    }
+		}
+		return 0;
+	}
+	
+	public float globalToLocalVelX(String ip, float xVelG, float yVelG) {
+		for (Device device : this.devices) {
+		    if (device.ip.equals(ip)) {
+		    	return xVelG * device.xDPI;
+		    }
+		}
+		return 0;
+	}
+	
+	public float globalToLocalVelY(String ip, float xVelG, float yVelG) {
+		for (Device device : this.devices) {
+		    if (device.ip.equals(ip)) {
+		    	return yVelG * device.yDPI;
+		    }
+		}
+		return 0;
+	}
+	
+	
+	public boolean isOnDevice(String ip, float xG, float yG) {
+		for (Device device : this.devices) {
+		    if (device.ip.equals(ip)) {
+		    	int xL = globalToLocalX(ip, xG, yG);
+		    	int yL = globalToLocalY(ip, xG, yG);
+		    	
+				if( xL >= 0 && yL >= 0 && xL <= device.resX && yL <= device.resY) {
+					return true;
+				}
+				return false;
+			}
+		}
+		return false;
 	}
 	
 	// TODO: Fix devision by zero. (xDPI, yDPI)

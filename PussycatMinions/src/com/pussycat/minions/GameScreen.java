@@ -161,6 +161,7 @@ public class GameScreen extends Screen {
     		     		ballHandler.tcpClient.sendData(buffer.array());
     		    		
     					internalState = GLOBAL_STATE__.MAP_DEVICE;
+    					//internalState = GLOBAL_STATE__.RUN_DEVICE;
     				break;
     				
     				

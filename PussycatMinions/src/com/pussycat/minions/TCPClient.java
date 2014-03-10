@@ -90,8 +90,7 @@ public class TCPClient {
 			/*	in = 	new BufferedReader(
 						new InputStreamReader(socket.getInputStream()));
 						*/
-				
-	     		
+
 				while(mRun) {
 					/*
 					serverMessage = in.readLine();
@@ -101,6 +100,7 @@ public class TCPClient {
 					}
 					serverMessage = null;
 					*/
+					
 					byte[] bytes = new byte[1024];
 					socket.getInputStream().read(bytes);
 		     		ByteBuffer buffer = ByteBuffer.wrap(bytes);
@@ -114,16 +114,20 @@ public class TCPClient {
 						actualState = GLOBAL_STATE__.ADD_BALL;
 					}
 					
-					
 	        		String ip = socket.getInetAddress().toString();
 
 	        		switch(actualState) {
 	        			case ADD_BALL:
-		        			float xPos = buffer.getFloat();
-				        	float yPos = buffer.getFloat();	
+		        			float xPos = buffer.getInt();
+				        	float yPos = buffer.getInt();	
 		        			float xVel = buffer.getFloat();	
 		        			float yVel = buffer.getFloat();		
-		        			Log.d("GOT", "GOT from " + ip + "  :   " + xPos + ", " + yPos + "   " + xVel + ", " + yVel);
+		        			Log.d("GOT", "GOT 2 from " + ip + "  :   " + xPos + ", " + yPos + "   " + xVel + ", " + yVel);
+	        			break;
+	        			
+	        			case SET_STATE:
+	        				short newState = buffer.getShort();
+	        				Log.d("GOT", "NEW STATE: " + newState);
 	        			break;
 	        			
 	        			default:

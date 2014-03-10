@@ -33,8 +33,10 @@ public class clientThread extends Thread{
 	private volatile static LOCAL_STATE__ internalState;
 	private volatile static float time1;
 	
-	DeviceManager deviceManager;
-	OutputStream dout;
+	private String ip;
+	private DeviceManager deviceManager;
+	private OutputStream dout;
+	
 	
 	public class Ballz {
 		
@@ -79,14 +81,19 @@ public class clientThread extends Thread{
 	
 	public volatile static LinkedBlockingQueue<Ballz> ballz = new LinkedBlockingQueue <Ballz>();
 	
+	public String getIp() {
+		return this.ip;
+	}
 	
-	public clientThread(Socket clientSocket, clientThread[] threads, UpdateLoop updateLoop, DeviceManager deviceManager) {
+	public clientThread(String ip, Socket clientSocket, clientThread[] threads, UpdateLoop updateLoop, DeviceManager deviceManager) {
 		this.deviceManager = deviceManager;
 		this.clientSocket= clientSocket;
 		this.threads = threads;
 		this.updateLoop = updateLoop;
 		maxClientCount = threads.length;
 		ballCount = 0;
+		
+		this.ip = ip;
 		internalState = LOCAL_STATE__.MAPPING_STEP1;
 	}
 	
@@ -247,12 +254,10 @@ public class clientThread extends Thread{
 			        			System.out.println("xVel = " + xVel * Math.pow(10, 9) * 2.5);
 			        			System.out.println("yVel = " + yVel * Math.pow(10, 9) * 2.5);
 			        			
-			        			deviceManager.localToGlobal(ip, x2, y2);
+			        			float xG = deviceManager.localToGlobalX(ip, x2, y2);
+			        			float yG = deviceManager.localToGlobalY(ip, x2, y2);			        		
 			        			
-			        			float xGlobal = 0;
-			        			float yGlobal = 0;
-			        			
-			        			ballz.add(new Ballz(xGlobal, yGlobal, xVel, yVel));
+			        			ballz.add(new Ballz(xG, yG, xVel, yVel));
 			        			
 		        			break;    			
 		        			

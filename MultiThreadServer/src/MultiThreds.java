@@ -32,42 +32,63 @@ public class MultiThreds {
 		//updateLoop.start();
 		deviceManager = new DeviceManager();
 		
-	   final float tickRate = 1;
+	   final float tickRate = 60;
 		
 		Thread update = new Thread() {
 		    public void run() {
 		    	
 		    	float timeBegin, timeEnd, timeDelta = 1 / tickRate, timeDelay;
 		    	while(true) {
-		    		System.out.println("Update");
+		    		//System.out.println("Update-----------------------------------------------");
 		    		timeBegin = System.nanoTime();
 		    		
-		    		
+	    			
+	    			// Update ballz	
 		    		if(threads[0] != null) {
-		    			
-		    			// Update ballz
 		    			for(clientThread.Ballz ball : threads[0].ballz) {
 		    				ball.printInfo();
 		    				ball.update(timeDelta);
 		    			}
 		    			
-		    			// Send ballz
-		    			for(clientThread.Ballz ball : threads[0].ballz) {
-		    			
-		    				ByteBuffer buffer;
-		    				buffer = ByteBuffer.allocate(1*2 + 4*4);
-		    				buffer.clear();
-		    				
-		    				buffer.putShort((short)3);			// State: Add ball
-		    				buffer.putFloat(ball.getXPos());
-		    				buffer.putFloat(ball.getYPos());
-		    				buffer.putFloat(ball.getXVel());
-		    				buffer.putFloat(ball.getYVel());
-		    				
-		    				threads[0].sendData(buffer.array());
-		    			}
-		    			
+			    		// Send ballz
+			    		for(clientThread thread : threads) {
+			    			if (thread != null) {
+			    				for(clientThread.Ballz ball : thread.ballz) {
+			    					
+			    					float xG = ball.getXPos();
+				    				float yG = ball.getYPos();
+				    				
+			    					if(deviceManager.isOnDevice(thread.getIp(), xG, yG)) {
+					    				ByteBuffer buffer;
+					    				buffer = ByteBuffer.allocate(1*2 + 4*4);
+					    				buffer.clear();
+					    				
+					    				buffer.putShort((short)3);			// State: Add ball
+					    				
+					    				
+					    				float xVelG = ball.getXVel();
+					    				float yVelG = ball.getYVel();
+					    				
+					    				int xPosL = deviceManager.globalToLocalX(thread.getIp(), xG, yG);
+					    				int yPosL = deviceManager.globalToLocalY(thread.getIp(), xG, yG);
+					    				
+					    				float xVelL = deviceManager.globalToLocalVelX(thread.getIp(), xVelG, yVelG);
+					    				float yVelL = deviceManager.globalToLocalVelY(thread.getIp(), xVelG, yVelG);
+					    				
+					    				buffer.putInt(xPosL);
+					    				buffer.putInt(yPosL);
+					    				buffer.putFloat(xVelL);
+					    				buffer.putFloat(yVelL);
+					    				
+					    				thread.sendData(buffer.array());
+			    					}
+			    				}
+			    			}
+			    		}
+			    		
 		    		}
+		    		
+	
 		    		
 		    		
 		    		timeDelay = Math.max(0, (float)((1 / tickRate)*Math.pow(10, 9)) - (System.nanoTime() - timeBegin));
@@ -92,7 +113,7 @@ public class MultiThreds {
 				int i = 0;
 				for(i=0; i<maxClientCount; i++) {
 					if(threads[i] == null) {
-						(threads[i] = new clientThread(clientSocket,threads,updateLoop, deviceManager)).start();
+						(threads[i] = new clientThread(clientSocket.getInetAddress().toString(), clientSocket,threads,updateLoop, deviceManager)).start();
 						break;
 					}
 				}
