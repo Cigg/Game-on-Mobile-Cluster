@@ -78,6 +78,47 @@ public class DeviceManager {
 		return velocity;
 	}
 	
+	public float computeVelocityX(String ip, float x1, float y1, float x2, float y2, float t) {
+		for (Device device : this.devices) {
+		    if (device.ip.equals(ip)) {
+		    	
+		    	float deltaX = (x2 - x1) / device.xDPI;
+		    	float deltaY = (y2 - y1) / device.yDPI;
+		    	
+				float velX = deltaX/t;
+				float velY = deltaY/t;
+				
+				float velXF = (float) (velX*Math.cos(-device.rotZ) - velY*Math.sin(-device.rotZ));
+				float velYF = (float) (velX*Math.sin(-device.rotZ) + velY*Math.cos(-device.rotZ));
+				
+				return velXF;
+		    }
+		}
+		return 0;
+	}
+	
+	
+	public float computeVelocityY(String ip, float x1, float y1, float x2, float y2, float t) {
+		for (Device device : this.devices) {
+		    if (device.ip.equals(ip)) {
+				y1 = device.resY - y1;
+				y2 = device.resY - y2;
+		    	
+		    	float deltaX = (x2 - x1) / device.xDPI;
+		    	float deltaY = (y2 - y1) / device.yDPI;
+		    	
+				float velX = deltaX/t;
+				float velY = deltaY/t;
+				
+				float velXF = (float) (velX*Math.cos(-device.rotZ) - velY*Math.sin(device.rotZ));
+				float velYF = (float) (velX*Math.sin(device.rotZ) + velY*Math.cos(device.rotZ));
+				
+				return velYF;
+		    }
+		}
+		return 0;
+	}
+	
 	
 	// TODO: Fix devision by zero. (t, ppi)
 	// Compute global coordinate velocity along one axis of a vector based on two given positions and a delta time. 
@@ -104,6 +145,27 @@ public class DeviceManager {
 		}
 		return 0;
 	}
+	
+	/*
+	public float addRotationX(String ip, float x){
+		for (Device device : this.devices) {
+		    if (device.ip.equals(ip)) {
+				return (float) (x * Math.cos(device.rotZ));
+		    }
+		}
+		return 0;
+	}
+	
+	public float addRotationY(String ip, float y){
+		for (Device device : this.devices) {
+		    if (device.ip.equals(ip)) {
+				return (float) (y * Math.sin(device.rotZ));
+		    }
+		}
+		return 0;
+	}
+	*/
+	
 	
 	
 	// Checks if a device is added.
@@ -156,12 +218,25 @@ public class DeviceManager {
 		for (Device device : this.devices) {
 		    if (device.ip.equals(ip)) {
 		    	
+		    	
 		    	float xB = xG - device.posX;
+		    	float yB = yG - device.posY;
+		    	
+		    	float xT = (float) (xB*Math.cos(-device.rotZ) - yB*Math.sin(-device.rotZ));
+		    	float yT = (float) (xB*Math.sin(-device.rotZ) + yB*Math.cos(-device.rotZ));
+		    	
+		    	int xL = (int) (xT * device.xDPI);
+		    	int yL = (int) (yT * device.yDPI);
+		    	
+		    	yL = device.resY - yL;
+		    	
+		    /*	float xB = xG - device.posX;
 		    	float yB = yG - device.posY;
 		    	
 		    	int xL = (int) (xB * device.xDPI);
 		    	int yL = (int) (yB * device.yDPI);
-
+		    	yL = device.resY - yL;
+			*/
 		    	//System.out.println("Global:  " + xG + ", " + yG + "   Local: " + xL + ", " + yL);
 		    	return xL;
 		    }
@@ -176,8 +251,12 @@ public class DeviceManager {
 		    	float xB = xG - device.posX;
 		    	float yB = yG - device.posY;
 		    	
-		    	int xL = (int) (xB * device.xDPI);
-		    	int yL = (int) (yB * device.yDPI);
+		    	float xT = (float) (xB*Math.cos(-device.rotZ) - yB*Math.sin(-device.rotZ));
+		    	float yT = (float) (xB*Math.sin(-device.rotZ) + yB*Math.cos(-device.rotZ));
+		    	
+		    	int xL = (int) (xT * device.xDPI);
+		    	int yL = (int) (yT * device.yDPI);
+		    	
 		    	yL = device.resY - yL;
 		    	//System.out.println("Global:  " + xG + ", " + yG + "   Local: " + xL + ", " + yL);
 		    	return yL;

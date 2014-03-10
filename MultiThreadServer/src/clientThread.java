@@ -37,7 +37,7 @@ public class clientThread extends Thread{
 	private DeviceManager deviceManager;
 	private OutputStream dout;
 	
-	static final int MAX_LIFETIME = 10 * (int)Math.pow(10, 9);
+	static final int MAX_LIFETIME = 5;
 	static final float MAX_POSITION_X = (float) (100 / 2.5);
 	static final float MAX_POSITION_Y = MAX_POSITION_X;
 	
@@ -61,10 +61,11 @@ public class clientThread extends Thread{
 			this.xPos += this.xVel * deltaTime;
 			this.yPos += this.yVel * deltaTime;
 			this.lifeTime += deltaTime;
+			System.out.println("Life: " + this.lifeTime * Math.pow(10, -9));
 		}
 		
 		public boolean isDead() {
-			if(this.lifeTime > MAX_LIFETIME && outOfBounds()) {
+			if((this.lifeTime * Math.pow(10, -9)) > MAX_LIFETIME || outOfBounds()) {
 				return true;
 			}
 			return false;
@@ -269,10 +270,17 @@ public class clientThread extends Thread{
 					        	float y2 = buffer.getFloat();
 			        			float t  = buffer.getFloat();	
 			        		
-			        			float xVel = deviceManager.computeVelX(ip, x1, x2, t);
-			        			float yVel = deviceManager.computeVelY(ip, y1, y2, t);	
+			        			//float xVel = deviceManager.computeVelX(ip, x1, x2, t);
+			        			//float yVel = deviceManager.computeVelY(ip, y1, y2, t);	
+			        			
+			        			float xVel = deviceManager.computeVelocityX(ip, x1, y1, x2, y2, t);
+			        			float yVel = deviceManager.computeVelocityY(ip, x1, y1, x2, y2, t);
+			        			
+			        			
 			        			System.out.println("xVel = " + xVel * Math.pow(10, 9) * 2.5);
 			        			System.out.println("yVel = " + yVel * Math.pow(10, 9) * 2.5);
+			        			
+			        			
 			        			
 			        			float xG = deviceManager.localToGlobalX(ip, x2, y2);
 			        			float yG = deviceManager.localToGlobalY(ip, x2, y2);			        		

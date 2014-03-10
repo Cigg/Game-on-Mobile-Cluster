@@ -62,6 +62,7 @@ public class TCPClient {
 				
 				dout.write(buffer);
 				dout.flush();
+				
 
 			} catch (IOException e) {
 				e.printStackTrace();
