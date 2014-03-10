@@ -18,7 +18,7 @@ public class GameScreenMiddle extends Screen {
         Ready, Running, Paused, GameOver
     }
 
-    GameState state = GameState.Ready;
+    GameState state = GameState.Running;
 
     // Variable Setup
     // You would create game objects here.
@@ -187,10 +187,6 @@ public class GameScreenMiddle extends Screen {
 
     private void drawReadyUI() {
         Graphics g = game.getGraphics();
-        
-        g.drawARGB(155, 0, 0, 0);
-        g.drawString("Tap to create a ball",
-                640, 300, paint);
 
     }
 
