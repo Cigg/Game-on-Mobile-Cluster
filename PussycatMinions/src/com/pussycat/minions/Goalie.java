@@ -1,72 +1,63 @@
 package com.pussycat.minions;
 
+import com.pussycat.framework.Image;
+
 import android.R.bool;
+import android.graphics.PointF;
 
 public class Goalie {
 	
-	private float direction;
-	private float radius;
-	private float position;
-	private float goalOpeningWidth; //the distance between the two corners that creates the opening
-	private bool goal;
+	/*
+	 * As of now, this is more or less only a copy from class Ball.
+	 */
 	
-	private void generateFence() {
-		
+	Image image;
+	private PointF pos;
+	private float diameter;
+	// private float direction;
+	// private float goalOpeningWidth; //the distance between the two corners that creates the opening
+	// private bool goal;
+	
+	public Goalie(float startX, float startY, float diameter){
+		image = Assets.hole;
+		setPos(new PointF(startX, startY));
+		this.setDiameter(diameter);
 	}
 	
-	public static void addGoalie() {
-		// TODO Auto-generated method stub
-		
+	public Image getImage(){
+		return image;
+	}
+	
+	public PointF getPoint() {
+		return pos;
+	}
+	
+	public float getX() {
+		return pos.x;
 	}
 
-
-	public float getDirection() {
-		return direction;
+	public float getY() {
+		return pos.y;
+	}
+	
+	public void setX(float x) {
+		this.pos.x = x;
 	}
 
-
-	public void setDirection(float direction) {
-		this.direction = direction;
+	public void setY(float y) {
+		this.pos.y = y;
 	}
 
-
-	public float getPosition() {
-		return position;
+	public void setPos(PointF pos) {
+		this.pos = pos;
 	}
 
-
-	public void setPosition(float position) {
-		this.position = position;
+	public float getDiameter() {
+		return diameter;
 	}
 
-
-	public float getRadius() {
-		return radius;
-	}
-
-
-	public void setRadius(float radius) {
-		this.radius = radius;
-	}
-
-
-	public bool getGoal() {
-		return goal;
-	}
-
-
-	public void setGoal(bool goal) {
-		this.goal = goal;
-	}
-
-
-	public float getGoalOpeningWidth() {
-		return goalOpeningWidth;
-	}
-
-
-	public void setGoalOpeningWidth(float goalOpeningWidth) {
-		this.goalOpeningWidth = goalOpeningWidth;
+	public void setDiameter(float diameter) {
+		this.diameter = diameter;
 	}
 	
 }
