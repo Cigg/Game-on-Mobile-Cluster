@@ -25,6 +25,8 @@ public class LoadingScreen extends Screen {
         Assets.button_player_pressed = g.newImage("button_player_pressed.png", ImageFormat.RGB565);
         Assets.button_middle = g.newImage("button_middle.png", ImageFormat.RGB565);
         Assets.button_middle_pressed = g.newImage("button_middle_pressed.png", ImageFormat.RGB565);
+        Assets.button_skip = g.newImage("button_skip.png", ImageFormat.RGB565);
+        Assets.button_skip_pressed = g.newImage("button_skip_pressed.png", ImageFormat.RGB565);
         
         Log.d("Debug Pussycat", "LoadingScreen update");
         
