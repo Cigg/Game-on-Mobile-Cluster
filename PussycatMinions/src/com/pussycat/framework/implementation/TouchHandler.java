@@ -13,5 +13,7 @@ public interface TouchHandler extends OnTouchListener {
     
     public int getTouchY(int pointer);
     
+    public float getTime(int pointer);
+    
     public List<TouchEvent> getTouchEvents();
 }

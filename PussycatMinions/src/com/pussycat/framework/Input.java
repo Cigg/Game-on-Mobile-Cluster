@@ -9,10 +9,12 @@ public interface Input {
         public static final int TOUCH_UP = 1;
         public static final int TOUCH_DRAGGED = 2;
         public static final int TOUCH_HOLD = 3;
+        
 
         public int type;
         public int x, y;
         public int pointer;
+        public float time;
 
 
     }
@@ -22,6 +24,8 @@ public interface Input {
     public int getTouchX(int pointer);
 
     public int getTouchY(int pointer);
+    
+    public float getTime(int pointer);
 
     public List<TouchEvent> getTouchEvents();
 }
