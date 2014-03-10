@@ -33,8 +33,8 @@ public class BallHandler {
 		
 		balls = new ArrayList<Ball>();
 		
-		Looper.prepare();
-		new connectTask().execute("");
+		//Looper.prepare();
+		//new connectTask().execute("");
 		
 		Log.d("Debug Pussycat", "ADDING CONNECTION");
 		
