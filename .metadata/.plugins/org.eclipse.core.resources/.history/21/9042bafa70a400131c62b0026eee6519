@@ -1,0 +1,7 @@
+import android.test.ActivityInstrumentationTestCase2;
+
+
+public class PussycatMinionTest extends
+		ActivityInstrumentationTestCase2<PussycatMinion> {
+
+}

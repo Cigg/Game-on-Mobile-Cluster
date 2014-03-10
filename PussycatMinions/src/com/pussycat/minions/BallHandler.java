@@ -33,7 +33,7 @@ public class BallHandler {
 		
 		balls = new ArrayList<Ball>();
 		
-		Looper.prepare();
+		//Looper.prepare();
 		new connectTask().execute("");
 		
 		Log.d("Debug Pussycat", "ADDING CONNECTION");
@@ -186,5 +186,9 @@ public class BallHandler {
 			data = values[0];
 			//System.out.println("Data is: " + data);
 		}
+	}
+	
+	public TCPClient getTCPClient() {
+		return tcpClient;
 	}
 }

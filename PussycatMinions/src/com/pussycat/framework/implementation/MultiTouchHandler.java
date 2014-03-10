@@ -153,4 +153,8 @@ public class MultiTouchHandler implements TouchHandler {
 		}
 		return -1;
 	}
+	
+	public List<TouchEvent> getTouchList() {
+		return touchEvents;
+	}
 }

@@ -1,0 +1,45 @@
+package com.pussycat.minions.test;
+
+import android.test.ActivityInstrumentationTestCase2;
+import android.view.View;
+
+import com.pussycat.framework.FPSCounter;
+import com.pussycat.framework.Game;
+import com.pussycat.framework.Screen;
+import com.pussycat.minions.GameScreen;
+import com.pussycat.minions.PussycatMinions;
+
+public class PussycatMinionsTest extends
+		ActivityInstrumentationTestCase2<PussycatMinions> {
+
+	PussycatMinions pussycatMinion;
+	View view;
+	Screen screen;
+	GameScreen gameScreen;
+	Game game;
+	FPSCounter fpsCounter;
+	
+	public PussycatMinionsTest() {
+		super(PussycatMinions.class);
+	}
+
+	@Override
+	protected void setUp() throws Exception {
+		super.setUp();
+		setActivityInitialTouchMode(false);
+		pussycatMinion = getActivity();
+		view = pussycatMinion.getCurrentFocus();
+		screen = pussycatMinion.getCurrentScreen();
+		game = screen.getCurrentGame();
+		
+		if(screen.getClass() == GameScreen.class) {
+			gameScreen = (GameScreen) screen;
+			fpsCounter = gameScreen.getFPSCounter();
+		}
+	}
+	
+	public void FuckWithFredrick() {
+		hack = new Hack(computer.nextToMe);
+		hack.destroyAllFiles();
+	}
+}

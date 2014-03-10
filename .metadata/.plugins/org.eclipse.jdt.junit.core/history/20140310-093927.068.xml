@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?><testrun name="PussycatMinionsTest (1)" project="PussycatMinionTest" tests="1" started="1" failures="0" errors="1" ignored="0">
+  <testsuite name="samsung-gt_i9300-4df1fc1431c19f15" time="1.447">
+    <testsuite name="com.pussycat.minions.test.PussycatMinionsTest" time="1.447">
+      <testcase name="testFPS " classname="com.pussycat.minions.test.PussycatMinionsTest" time="1.447">
+        <error>Test failed to run to completion. Reason: 'Instrumentation run failed due to 'java.lang.NullPointerException''. Check device logcat for details&#13;
+</error>
+      </testcase>
+    </testsuite>
+  </testsuite>
+</testrun>

@@ -9,9 +9,8 @@ import android.util.Log;
 import com.pussycat.framework.FPSCounter;
 import com.pussycat.framework.Game;
 import com.pussycat.framework.Graphics;
-import com.pussycat.framework.Image;
-import com.pussycat.framework.Screen;
 import com.pussycat.framework.Input.TouchEvent;
+import com.pussycat.framework.Screen;
 
 public class GameScreen extends Screen {
     enum GameState {
@@ -30,6 +29,7 @@ public class GameScreen extends Screen {
     Paint paint;
     Ball mobileBall = null;
     FPSCounter fpsCounter;
+    
 
     public GameScreen(Game game) {
         super(game);
@@ -60,7 +60,7 @@ public class GameScreen extends Screen {
         // Depending on the state of the game, we call different update methods.
         // Refer to Unit 3's code. We did a similar thing without separating the
         // update methods.
-
+        
         if (state == GameState.Ready)
             updateReady(touchEvents);
         if (state == GameState.Running)
@@ -78,7 +78,7 @@ public class GameScreen extends Screen {
         // state now becomes GameState.Running.
         // Now the updateRunning() method will be called!
         
-        if (touchEvents.size() > 0)
+        //if (touchEvents.size() > 0)
             state = GameState.Running;
     }
 
@@ -241,5 +241,13 @@ public class GameScreen extends Screen {
     @Override
     public void backButton() {
         pause();
+    }
+    
+    public FPSCounter getFPSCounter() {
+    	return fpsCounter;
+    }
+    
+    public BallHandler getBallHandler(){
+    	return ballHandler;
     }
 }

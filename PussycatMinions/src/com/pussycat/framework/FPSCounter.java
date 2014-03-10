@@ -14,4 +14,8 @@ public class FPSCounter {
             startTime = System.nanoTime();
         }
     }
+    
+    public int getFPS(){
+    	return frames;
+    }
 }

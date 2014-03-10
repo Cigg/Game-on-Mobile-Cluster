@@ -19,6 +19,7 @@ public class PussycatMinions extends AndroidGame {
     	width = metrics.widthPixels;
     	height = metrics.heightPixels;
         ppi = metrics.xdpi;
+        
     	
     	//TO-DO: calculate the correct height of display
     	/*
