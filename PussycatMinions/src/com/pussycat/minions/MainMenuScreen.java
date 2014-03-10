@@ -64,10 +64,10 @@ public class MainMenuScreen extends Screen {
             	middleButton.setPressed(false);
             	
             	if(playerButton.inBounds(event.x, event.y)){
-            		game.setScreen(new GameScreen(game));
+            		game.setScreen(new SetupScreen(game));
             	}
             	if(middleButton.inBounds(event.x, event.y)){
-            		game.setScreen(new GameScreenMiddle(game));
+            		game.setScreen(new SetupScreenMiddle(game));
             	}
             	//START GAME
 //            	if(inBounds(event, 0,0, PussycatMinions.getScreenWidth(), PussycatMinions.getScreenHeight()/2))
@@ -78,19 +78,10 @@ public class MainMenuScreen extends Screen {
         }
     }
     
-    private boolean inBounds(TouchEvent event, int x, int y, int width,
-            int height) {
-        if (event.x > x && event.x < x + width - 1 && event.y > y
-                && event.y < y + height - 1)
-            return true;
-        else
-            return false;
-    }
-
-
     @Override
     public void paint(float deltaTime) {
         Graphics g = game.getGraphics();
+        g.drawARGB(255,100,100,100);
         
         drawUI();
     }
