@@ -32,7 +32,7 @@ public class MultiThreds {
 		//updateLoop.start();
 		deviceManager = new DeviceManager();
 		
-	   final float tickRate = 100;
+	   final float tickRate = 128;
 		
 		Thread update = new Thread() {
 		    public void run() {
@@ -48,6 +48,10 @@ public class MultiThreds {
 		    			for(clientThread.Ballz ball : threads[0].ballz) {
 		    				ball.printInfo();
 		    				ball.update(timeDelta);
+		    				if(ball.isDead()) {
+		    					threads[0].ballz.remove(ball);
+		    				}
+		    					
 		    			}
 		    			
 			    		// Send ballz

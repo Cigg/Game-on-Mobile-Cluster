@@ -37,17 +37,22 @@ public class clientThread extends Thread{
 	private DeviceManager deviceManager;
 	private OutputStream dout;
 	
+	static final int MAX_LIFETIME = 10 * (int)Math.pow(10, 9);
+	static final float MAX_POSITION_X = (float) (100 / 2.5);
+	static final float MAX_POSITION_Y = MAX_POSITION_X;
 	
 	public class Ballz {
-		
+				
 		float xPos, yPos;
 		float xVel, yVel;
+		float  mass, radious, lifeTime;
 		
 		public Ballz(float xPos, float yPos, float xVel, float yVel) {
 			this.xPos = xPos;
 			this.yPos = yPos;
 			this.xVel = xVel;
 			this.yVel = yVel;
+			this.lifeTime = 0;
 			System.out.println("Added ballz: " + xPos + ", " + yPos + "    " + xVel + ", " + yVel); // * Math.pow(10, 9) * 2.5
 		}
 		
@@ -55,6 +60,21 @@ public class clientThread extends Thread{
 		public void update(float deltaTime) {
 			this.xPos += this.xVel * deltaTime;
 			this.yPos += this.yVel * deltaTime;
+			this.lifeTime += deltaTime;
+		}
+		
+		public boolean isDead() {
+			if(this.lifeTime > MAX_LIFETIME && outOfBounds()) {
+				return true;
+			}
+			return false;
+		}
+		
+		public boolean outOfBounds() {
+			if(Math.abs(this.xPos) < MAX_POSITION_X &&  Math.abs(this.yPos) < MAX_POSITION_Y) {
+				return false;
+			}
+			return true;
 		}
 		
 		
