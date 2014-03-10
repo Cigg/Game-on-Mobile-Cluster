@@ -1,9 +1,11 @@
 package com.pussycat.minions;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import android.graphics.Color;
 import android.graphics.Paint;
+import android.graphics.PointF;
 import android.util.Log;
 
 import com.pussycat.framework.FPSCounter;
@@ -17,18 +19,19 @@ public class GameScreen extends Screen {
         Ready, Running, Paused, GameOver
     }
 
-    GameState state = GameState.Ready;
-
+    private GameState state = GameState.Ready;
     // Variable Setup
     // You would create game objects here.
     private BallHandler ballHandler;
+    private float ballSpeed = 20.0f;
+    private ArrayList<PointF> prevBallPositions;
+    private int numberBallPositions = 10;
     
-    float ballSpeed = 20.0f;
-    int screenWidth;
-    int screenHeight;
-    Paint paint;
-    Ball mobileBall = null;
-    FPSCounter fpsCounter;
+    private int screenWidth;
+    private int screenHeight;
+    private Paint paint;
+    private Ball mobileBall = null;
+    private FPSCounter fpsCounter;
     
 
     public GameScreen(Game game) {
@@ -41,6 +44,7 @@ public class GameScreen extends Screen {
         // Initialize game objects here
         ballHandler = new BallHandler(1.5f);
         
+        
         // Defining a paint object
 		paint = new Paint();
 		paint.setTextSize(30);
@@ -49,6 +53,8 @@ public class GameScreen extends Screen {
 		paint.setColor(Color.WHITE);
 		fpsCounter = new FPSCounter();
 		Log.d("Debug Pussycat", "GameScreen constructor");
+		
+		prevBallPositions = new ArrayList<PointF>();
 
     }
 
@@ -85,7 +91,6 @@ public class GameScreen extends Screen {
     private void updateRunning(List<TouchEvent> touchEvents, float deltaTime) {
        	// Update balls
     	ballHandler.update();
-    	
         
         // All touch input is handled here:
         int len = touchEvents.size();
@@ -100,12 +105,20 @@ public class GameScreen extends Screen {
             if(event.type == TouchEvent.TOUCH_DRAGGED) {
             	if(mobileBall != null) {
             		mobileBall.setPos(event.x,event.y);
+            		prevBallPositions.add(new PointF(event.x, event.y));
+            		if(prevBallPositions.size() > numberBallPositions){
+            			prevBallPositions.remove(0);
+            		}
             	}
             }
             if (event.type == TouchEvent.TOUCH_UP) {
             	Log.d("Debug Pussycat", "touch event x: " + event.x + ": " + event.y);
-            	float speedX = (screenWidth/2 - event.x);
-            	float speedY = (screenHeight/2 - event.y);
+            	float speedX = 0;
+            	float speedY = 0;
+            	for(int j = 0; j < prevBallPositions.size() - 1; j++){
+            		speedX += prevBallPositions.get(j+1).x - prevBallPositions.get(j).x;
+            		speedY += prevBallPositions.get(j+1).y - prevBallPositions.get(j).y;
+            	}
             	float tempDist = (float)Math.sqrt(speedX*speedX + speedY*speedY);
             	speedX = ballSpeed*speedX/tempDist;
             	speedY = ballSpeed*speedY/tempDist;
@@ -114,6 +127,8 @@ public class GameScreen extends Screen {
             		ballHandler.tcpClient.sendMessage(event.x + " " + event.y + " " + speedX + " " + speedY);
             	}
             	mobileBall = null;
+            	
+            	prevBallPositions.clear();
             }
 
             
