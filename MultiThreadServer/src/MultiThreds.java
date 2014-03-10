@@ -32,7 +32,7 @@ public class MultiThreds {
 		//updateLoop.start();
 		deviceManager = new DeviceManager();
 		
-	   final float tickRate = 60;
+	   final float tickRate = 100;
 		
 		Thread update = new Thread() {
 		    public void run() {

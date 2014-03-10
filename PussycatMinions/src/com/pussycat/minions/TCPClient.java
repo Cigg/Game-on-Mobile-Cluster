@@ -10,6 +10,8 @@ import java.io.PrintWriter;
 import java.net.InetAddress;
 import java.net.Socket;
 import java.nio.ByteBuffer;
+import java.util.concurrent.LinkedBlockingQueue;
+
 
 import android.util.Log;
 
@@ -26,9 +28,14 @@ public class TCPClient {
 	BufferedWriter buffw;
 	
 	LOCAL_STATE__ internalState;
+	public volatile LinkedBlockingQueue<DataPackage> messages = new LinkedBlockingQueue <DataPackage>();
 	
 	public TCPClient(OnMessageReceived listner){
 		messageListner = listner;
+	}
+	
+	public TCPClient() {
+		
 	}
 	
 	public void sendMessage(String message) {
@@ -101,10 +108,15 @@ public class TCPClient {
 					serverMessage = null;
 					*/
 					
+					
+					
 					byte[] bytes = new byte[1024];
 					socket.getInputStream().read(bytes);
 		     		ByteBuffer buffer = ByteBuffer.wrap(bytes);
+		     		
+		     		messages.add(new DataPackage(bytes, socket.getInetAddress().toString(), socket.getPort()));
 					
+		     		/*
 					short state = buffer.getShort();
 					GLOBAL_STATE__ actualState;
 					
@@ -122,7 +134,7 @@ public class TCPClient {
 				        	float yPos = buffer.getInt();	
 		        			float xVel = buffer.getFloat();	
 		        			float yVel = buffer.getFloat();		
-		        			Log.d("GOT", "GOT 2 from " + ip + "  :   " + xPos + ", " + yPos + "   " + xVel + ", " + yVel);
+		        			Log.d("GOT", "GOT from " + ip + "  :   " + xPos + ", " + yPos + "   " + xVel + ", " + yVel);
 	        			break;
 	        			
 	        			case SET_STATE:
@@ -133,6 +145,7 @@ public class TCPClient {
 	        			default:
 	        			break;
 	        		}
+	        		*/
 				}
 			} catch (Exception e) {
 				Log.e("Android", "ERROR", e);

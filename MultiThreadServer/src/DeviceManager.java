@@ -178,7 +178,7 @@ public class DeviceManager {
 		    	
 		    	int xL = (int) (xB * device.xDPI);
 		    	int yL = (int) (yB * device.yDPI);
-
+		    	yL = device.resY - yL;
 		    	//System.out.println("Global:  " + xG + ", " + yG + "   Local: " + xL + ", " + yL);
 		    	return yL;
 		    }

@@ -188,4 +188,8 @@ public class BallHandler {
 		}
 	}
 	
+	public void clearBalls() {
+		balls.clear();
+	}
+	
 }

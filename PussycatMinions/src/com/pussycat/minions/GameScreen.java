@@ -37,9 +37,9 @@ public class GameScreen extends Screen {
 
 	private float downX, downY;
 	private float downTime, previousTime;
+	
+	private TCPClient comm;
 
-	
-	
 
     public GameScreen(Game game) {
         super(game);
@@ -60,6 +60,16 @@ public class GameScreen extends Screen {
 		
 		previousTime = 0;
 		internalState = GLOBAL_STATE__.ADD_DEVICE;
+		
+		// Jocke ska fixa, lugnt
+		Thread t = new Thread() {
+			public void run() {
+				comm = new TCPClient();
+				comm.run();
+			}
+		};
+		t.start();
+		
     }
 
     @Override
@@ -97,10 +107,10 @@ public class GameScreen extends Screen {
         //This is identical to the update() method from our Unit 2/3 game.
     	
     	// Update balls
-    	ballHandler.update();
+    	//ballHandler.update();
     	
         
-        // 1. All touch input is handled here:
+       // Update touch events
         int len = touchEvents.size();
         for (int i = 0; i < len; i++) {
             TouchEvent event = touchEvents.get(i);
@@ -158,7 +168,7 @@ public class GameScreen extends Screen {
     		    		buffer.putInt(PussycatMinions.getScreenWidth());	// ResX
     		    		buffer.putInt(PussycatMinions.getScreenHeight());	// ResY
     		    		
-    		     		ballHandler.tcpClient.sendData(buffer.array());
+    		     		comm.sendData(buffer.array());
     		    		
     					internalState = GLOBAL_STATE__.MAP_DEVICE;
     					//internalState = GLOBAL_STATE__.RUN_DEVICE;
@@ -178,7 +188,7 @@ public class GameScreen extends Screen {
     		    		buffer.putFloat(currentY);		// y2
     		    		buffer.putFloat(deltaTimeT);    // t
 
-    		    		ballHandler.tcpClient.sendData(buffer.array());
+    		    		comm.sendData(buffer.array());
 
     		    		internalState = GLOBAL_STATE__.RUN_DEVICE;
     				break;
@@ -197,7 +207,7 @@ public class GameScreen extends Screen {
     		    		buffer.putFloat(currentY);		// y2
     		    		buffer.putFloat(deltaTimeT);	// t
     		    		
-    		    		ballHandler.tcpClient.sendData(buffer.array());
+    		    		comm.sendData(buffer.array());
     				break;
     				
     				
@@ -207,7 +217,49 @@ public class GameScreen extends Screen {
     			
     			previousTime = currentTime;
     		}
-        }   
+        }  
+        
+        // Update communication
+        ballHandler.clearBalls();
+        while(!comm.messages.isEmpty()){
+        	DataPackage data = comm.messages.poll();
+        	
+        	if(data != null) {
+        		ByteBuffer buffer = ByteBuffer.wrap(data.getData());
+        		short state = buffer.getShort();
+				
+        		GLOBAL_STATE__ actualState;
+				
+				try {
+					actualState = GLOBAL_STATE__.values()[state];
+				} catch(Exception e) {
+					actualState = GLOBAL_STATE__.ADD_BALL;
+				}
+				
+	    		String ip = data.getIp();
+	    		
+	    		switch(actualState) {
+	    			case ADD_BALL:
+	        			float xPos = buffer.getInt();
+			        	float yPos = buffer.getInt();	
+	        			float xVel = buffer.getFloat();	
+	        			float yVel = buffer.getFloat();		
+	        			Log.d("GOT", "GOT from " + ip + "  :   " + xPos + ", " + yPos + "   " + xVel + ", " + yVel);
+	        			
+	        			ballHandler.addBall(xPos, yPos, 1, xVel, yVel);
+	    			break;
+	    			
+	    			case SET_STATE:
+	    				short newState = buffer.getShort();
+	    				Log.d("GOT", "NEW STATE: " + newState);
+	    			break;
+	    			
+	    			default:
+	    			break;
+	    		}
+        	}
+        }
+        
         
     }
 
