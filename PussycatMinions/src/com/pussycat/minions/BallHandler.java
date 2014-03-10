@@ -191,4 +191,8 @@ public class BallHandler {
 	public TCPClient getTCPClient() {
 		return tcpClient;
 	}
+	
+	public String getData() {
+		return data;
+	}
 }

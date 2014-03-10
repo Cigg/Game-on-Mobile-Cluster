@@ -46,7 +46,7 @@ public class clientThread extends Thread{
 		
         for (int j = 0; j < maxClientsCount; j++) {
             if (thread[j] != null) {
-            	globalCoords = new GlobalCoords(0,1250,800*j,800*(j+1));
+            	globalCoords = new GlobalCoords(800*j,800*(j+1),0,1250);
             	System.out.println(globalCoords.minX + " " + globalCoords.maxX + " " + globalCoords.minY + " " + globalCoords.maxY);
             }
           }
@@ -65,7 +65,7 @@ public class clientThread extends Thread{
 						if(message != null){
 							if(!message.isEmpty()){
 								System.out.println();
-								System.out.println(message);
+								System.out.println("clientServer: " + message);
 								String[] parts = message.split(" ");
 								posX = Float.parseFloat(parts[0]);
 								posY = Float.parseFloat(parts[1]);
