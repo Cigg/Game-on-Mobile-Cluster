@@ -6,6 +6,7 @@ import com.pussycat.framework.Sound;
 public class Assets {
     
     public static Image ball;
+    public static Image hole;
     public static Image button_player;
     public static Image button_player_pressed;
     public static Image button_middle;
