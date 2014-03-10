@@ -1,2 +1,5 @@
 # Mac
 .DS_store
+
+# Metadata
+.metadata

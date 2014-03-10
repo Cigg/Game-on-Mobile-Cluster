@@ -92,14 +92,4 @@ public class Server {
 				break;
 		}
 	}
-	
-	public String screenTest(){
-		//System.out.println("Server - screenTest()");
-		String str1 = deviceManager.getInputForScreenTest(index1);
-		String str2 = deviceManager.getInputForScreenTest(index2);
-		
-		String strFinal = str1 + " " + str2;
-		//System.out.println("Server - screenTest() - returns: " + strFinal);
-		return strFinal;
-	}	
 }
