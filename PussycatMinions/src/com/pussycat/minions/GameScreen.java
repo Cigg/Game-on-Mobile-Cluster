@@ -1,7 +1,12 @@
 package com.pussycat.minions;
 
+
 import java.io.ByteArrayOutputStream;
 import java.util.ArrayList;
+
+
+import java.nio.ByteBuffer;
+
 import java.util.List;
 
 import android.content.Context;
@@ -16,6 +21,8 @@ import android.util.Log;
 import com.pussycat.framework.FPSCounter;
 import com.pussycat.framework.Game;
 import com.pussycat.framework.Graphics;
+
+
 import com.pussycat.framework.Input.TouchEvent;
 import com.pussycat.framework.Screen;
 
@@ -25,6 +32,7 @@ public class GameScreen extends Screen {
     }
 
     private GameState state = GameState.Ready;
+
     // Variable Setup
     // You would create game objects here.
     private BallHandler ballHandler;
@@ -38,6 +46,19 @@ public class GameScreen extends Screen {
     private Ball mobileBall = null;
     private FPSCounter fpsCounter;
     Context context;
+
+    
+    
+    // New
+    private GLOBAL_STATE__ internalState;
+    
+	private float currentX, currentY;
+
+	private float downX, downY;
+	private float downTime, previousTime;
+	
+	private TCPClient comm;
+
 
     public GameScreen(Game game) {
         super(game);
@@ -60,6 +81,19 @@ public class GameScreen extends Screen {
 		Log.d("Debug Pussycat", "GameScreen constructor");
 		
 		prevBallPositions = new ArrayList<PointF>();
+
+		
+		previousTime = 0;
+		internalState = GLOBAL_STATE__.ADD_DEVICE;
+		
+		// Jocke ska fixa, lugnt
+		Thread t = new Thread() {
+			public void run() {
+				comm = new TCPClient();
+				comm.run();
+			}
+		};
+		t.start();
 		
     }
 
@@ -97,10 +131,14 @@ public class GameScreen extends Screen {
        	// Update balls
     	ballHandler.update();
         
+
         // All touch input is handled here:
+       // Update touch events
+
         int len = touchEvents.size();
         for (int i = 0; i < len; i++) {
             TouchEvent event = touchEvents.get(i);
+            /*
             if(event.type == TouchEvent.TOUCH_DOWN){
             	System.out.println("MobileBall added");
             	if(mobileBall == null) {
@@ -135,9 +173,149 @@ public class GameScreen extends Screen {
             	
             	prevBallPositions.clear();
             }
-
             
+            */
+        	currentX = event.x;
+    		currentY = event.y;
+    		final float currentTime = event.time;
+    	
+    		
+    		if(event.type == TouchEvent.TOUCH_DOWN) {
+    			downTime = currentTime;
+    			downX = currentX;
+    			downY = currentY;
+
+    		} else if(event.type == TouchEvent.TOUCH_DRAGGED) {
+    			
+    		} else if(event.type == TouchEvent.TOUCH_UP) {
+    			
+    			final float deltaTimeT = currentTime - downTime;
+
+    			ByteBuffer buffer; 
+    			
+    			switch(internalState) {
+    				case ADD_DEVICE:
+    					Log.d("AppStates", "ADD_DEVICE");
+    					
+    					buffer = ByteBuffer.allocate(1*2 + 4*4);
+    		    		buffer.clear();
+    		    		
+    		    		buffer.putShort((short) 0);							// State: ADD_DEVICE
+
+    		    		buffer.putInt(PussycatMinions.getXDPI());			// XDPI
+    		    		buffer.putInt(PussycatMinions.getYDPI());			// YDPI
+    		    		buffer.putInt(PussycatMinions.getScreenWidth());	// ResX
+    		    		buffer.putInt(PussycatMinions.getScreenHeight());	// ResY
+    		    		
+    		     		comm.sendData(buffer.array());
+    		    		
+    					internalState = GLOBAL_STATE__.MAP_DEVICE;
+    					//internalState = GLOBAL_STATE__.RUN_DEVICE;
+    				break;
+    				
+    				
+    				case MAP_DEVICE:
+    					Log.d("AppStates", "MAP_DEVICE");
+    					buffer = ByteBuffer.allocate(2*2 + 5*4);
+    		    		buffer.clear();
+    					    		
+    		    		buffer.putShort((short) 1);		// State: MAP_DEVICE
+    		    		
+    		    		buffer.putFloat(downX);			// x1
+    		    		buffer.putFloat(downY); 		// y1
+    		    		buffer.putFloat(currentX);		// x2
+    		    		buffer.putFloat(currentY);		// y2
+    		    		buffer.putFloat(deltaTimeT);    // t
+
+    		    		comm.sendData(buffer.array());
+
+    		    		internalState = GLOBAL_STATE__.RUN_DEVICE;
+    				break;
+    				
+    				case RUN_DEVICE:
+    					Log.d("AppStates", "RUN_DEVICE");
+    					
+    					buffer = ByteBuffer.allocate(1*2 + 5*4);
+    		    		buffer.clear();
+    		    		
+    		    		buffer.putShort((short) 2);		// State: RUN_DEVICE
+
+    		    		buffer.putFloat(downX);			// x1
+    		    		buffer.putFloat(downY); 		// y1
+    		    		buffer.putFloat(currentX);		// x2
+    		    		buffer.putFloat(currentY);		// y2
+    		    		buffer.putFloat(deltaTimeT);	// t
+    		    		
+    		    		comm.sendData(buffer.array());
+    				break;
+    				
+    				
+    				default:
+    				break;
+    			}
+    			
+    			previousTime = currentTime;
+    		}
+        }  
+        
+        // Update communication
+        
+        while(comm != null && comm.dataPackage != null){
+        	DataPackage data = comm.dataPackage;
+        	comm.dataPackage = null;
+        	//ballHandler.clearBalls();
+        	if(data != null) {
+        		ByteBuffer buffer = ByteBuffer.wrap(data.getData());
+        		short state = buffer.getShort();
+				
+        		GLOBAL_STATE__ actualState;
+				
+				try {
+					actualState = GLOBAL_STATE__.values()[state];
+				} catch(Exception e) {
+					actualState = GLOBAL_STATE__.ADD_BALL;
+				}
+				
+	    		//String ip = data.getIp();
+	    		
+	    		switch(actualState) {
+	    			case ADD_BALL:
+	    				int id = buffer.getInt();
+    					float xPos = buffer.getInt();
+			        	float yPos = buffer.getInt();	
+	        			float xVel = buffer.getFloat();	
+	        			float yVel = buffer.getFloat();		
+	        			
+		        		//Log.d("GOT", "GOT from " + ip + "  :   " + xPos + ", " + yPos + "   " + xVel + ", " + yVel);
+	        			ballHandler.addBall(id, xPos, yPos, 1, xVel, yVel);
+	    			break;
+	    			
+	    			case ADD_BALLS:
+	    				final short nBalls = buffer.getShort();
+	    				Log.d("NBALLS", "NBALLS: " + nBalls);
+	    				for(int i=0; i<nBalls; i++) {
+	    					int id2 = buffer.getInt();
+	    					float xPos2 = buffer.getInt();
+				        	float yPos2 = buffer.getInt();	
+		        			float xVel2 = buffer.getFloat();	
+		        			float yVel2 = buffer.getFloat();		
+		        			//Log.d("GOT", "GOT from " + ip + "  :   " + xPos2 + ", " + yPos2 + "   " + xVel2 + ", " + yVel2);
+		        			ballHandler.addBall(id2, xPos2, yPos2, 1, xVel2, yVel2);
+	    				}
+	    			break;
+	    			
+	    			case SET_STATE:
+	    				short newState = buffer.getShort();
+	    				Log.d("GOT", "NEW STATE: " + newState);
+	    			break;
+	    			
+	    			default:
+	    			break;
+	    		}
+        	}
         }
+        
+        
     }
 
     private void updatePaused(List<TouchEvent> touchEvents) {

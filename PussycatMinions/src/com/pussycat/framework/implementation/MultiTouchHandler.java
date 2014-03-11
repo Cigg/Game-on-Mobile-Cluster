@@ -16,6 +16,7 @@ public class MultiTouchHandler implements TouchHandler {
 	boolean[] isTouched = new boolean[MAX_TOUCHPOINTS];
 	int[] touchX = new int[MAX_TOUCHPOINTS];
 	int[] touchY = new int[MAX_TOUCHPOINTS];
+	float[] times = new float[MAX_TOUCHPOINTS];
 	int[] id = new int[MAX_TOUCHPOINTS];
 	Pool<TouchEvent> touchEventPool;
 	List<TouchEvent> touchEvents = new ArrayList<TouchEvent>();
@@ -66,6 +67,7 @@ public class MultiTouchHandler implements TouchHandler {
 					touchEvent.y = touchY[i] = (int) (event.getY(i) * scaleY);
 					isTouched[i] = true;
 					id[i] = pointerId;
+					touchEvent.time = System.nanoTime();
 					touchEventsBuffer.add(touchEvent);
 					break;
 
@@ -79,6 +81,7 @@ public class MultiTouchHandler implements TouchHandler {
 					touchEvent.y = touchY[i] = (int) (event.getY(i) * scaleY);
 					isTouched[i] = false;
 					id[i] = -1;
+					touchEvent.time = System.nanoTime();
 					touchEventsBuffer.add(touchEvent);
 					break;
 
@@ -90,6 +93,7 @@ public class MultiTouchHandler implements TouchHandler {
 					touchEvent.y = touchY[i] = (int) (event.getY(i) * scaleY);
 					isTouched[i] = true;
 					id[i] = pointerId;
+					touchEvent.time = System.nanoTime();
 					touchEventsBuffer.add(touchEvent);
 					break;
 				}
@@ -128,6 +132,17 @@ public class MultiTouchHandler implements TouchHandler {
 				return 0;
 			else
 				return touchY[index];
+		}
+	}
+	
+	@Override
+	public float getTime(int pointer) {
+		synchronized (this) {
+			int index = getIndex(pointer);
+			if (index < 0 || index >= MAX_TOUCHPOINTS)
+				return 0;
+			else
+				return times[index];
 		}
 	}
 

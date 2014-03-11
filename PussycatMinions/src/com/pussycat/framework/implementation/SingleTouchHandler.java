@@ -14,6 +14,7 @@ public class SingleTouchHandler implements TouchHandler {
     boolean isTouched;
     int touchX;
     int touchY;
+    float time;
     Pool<TouchEvent> touchEventPool;
     List<TouchEvent> touchEvents = new ArrayList<TouchEvent>();
     List<TouchEvent> touchEventsBuffer = new ArrayList<TouchEvent>();
@@ -56,6 +57,7 @@ public class SingleTouchHandler implements TouchHandler {
             
             touchEvent.x = touchX = (int)(event.getX() * scaleX);
             touchEvent.y = touchY = (int)(event.getY() * scaleY);
+            touchEvent.time = System.nanoTime();
             touchEventsBuffer.add(touchEvent);                        
             
             return true;
@@ -83,6 +85,13 @@ public class SingleTouchHandler implements TouchHandler {
     public int getTouchY(int pointer) {
         synchronized(this) {
             return touchY;
+        }
+    }
+    
+    @Override
+    public float getTime(int pointer) {
+        synchronized(this) {
+            return time;
         }
     }
 

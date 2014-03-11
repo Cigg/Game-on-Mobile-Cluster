@@ -1,13 +1,14 @@
 package com.pussycat.minions;
 
 import android.graphics.PointF;
+import android.util.Log;
 
 import com.pussycat.framework.Image;
-import com.pussycat.minions.GameScreen;
 
 public class Ball {
 
 	Image image;
+	private int id;
 	private PointF pos;
 	private float speedX, speedY, diameter;
 	//private boolean visible;
@@ -33,11 +34,22 @@ public class Ball {
 		locked = false;
 	}
 	
+	public Ball(int id, float startX, float startY, float diameter, float speedX, float speedY){
+		image = Assets.ball;
+		this.id = id;
+		pos = new PointF(startX, startY);
+		(this).speedX = speedX;
+		(this).speedY = speedY;
+		this.diameter = diameter;
+		locked = false;
+	}
+	
 	public void update(){
-		if(!locked){
+		//if(!locked){
 			pos.x += speedX;
 			pos.y += speedY;
-		}
+			//Log.d("UPDATE", pos.x + " " + pos.y + " " + speedX + " " + speedY + " ");
+		//}
 	}
 
 	public Image getImage(){
@@ -90,9 +102,21 @@ public class Ball {
 		this.locked = locked;
 	}
 	
+
 	public void setPos(float x, float y) {
 		this.pos.x = x;
 		this.pos.y = y;
+	}
+
+	public void updateBall(int posX, int posY, float speedX, float speedY){
+		this.pos.x = posX;
+		this.pos.y = posY;
+		this.speedX = speedX;
+		this.speedY = speedY;
+	}
+	
+	public int getId() {
+		return id; 
 	}
 	/*
 	public void setVisible(boolean visible) {

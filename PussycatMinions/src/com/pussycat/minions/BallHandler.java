@@ -17,6 +17,7 @@ public class BallHandler {
 	int numberOfBalls;
 	TCPClient tcpClient = null;
 	String data;
+	ArrayList<Integer> idList = new ArrayList<Integer>();
 	
 	/**
 	 * BallHandler constructor
@@ -34,11 +35,14 @@ public class BallHandler {
 		balls = new ArrayList<Ball>();
 		
 		//Looper.prepare();
-		new connectTask().execute("");
+
+		//new connectTask().execute("");
 		
 		Log.d("Debug Pussycat", "ADDING CONNECTION");
 		
-		balls.add(new Ball(screenWidth/2, screenHeight/2, ballDiameter));
+		Log.d("Debug Pussycat", "NUmberOfBalls: " + numberOfBalls);
+		
+		//balls.add(new Ball(screenWidth/2, screenHeight/2, ballDiameter));
 	}
 	
 	/**
@@ -65,7 +69,7 @@ public class BallHandler {
 				balls.get(i).update();
 		}*/
 		
-		if(tcpClient != null){
+		/*if(tcpClient != null){
 			tcpClient.getData();
 			balls.clear();
 			balls.add(new Ball(screenWidth/2, screenHeight/2, 1.5f));
@@ -82,6 +86,11 @@ public class BallHandler {
 					}
 				}
 			}
+		}*/
+		
+		//Log.d("UPDATE", balls.size()+"");
+		for(int i=0; i<balls.size(); i++){
+			balls.get(i).update();
 		}
 	}
 
@@ -109,6 +118,28 @@ public class BallHandler {
 		balls.add(new Ball(x, y, ballDiameter, speedX, speedY));
 	}
 	
+	
+	public void addBall(int id, float x, float y, float ballDiameterCentimeters, float speedX, float speedY){
+		boolean found = false;
+		for(int i = 0; i < idList.size(); i++){
+			if(id == idList.get(i)){
+				found = true;
+			}
+		}
+		
+		if(found){
+			for(int i=0; i < balls.size(); i++){
+				if(balls.get(i).getId() == id){
+					balls.get(i).updateBall((int)x,(int)y, speedX, speedY);
+				}
+			}
+		}else {
+			float ballDiameter = ppi*(ballDiameterCentimeters*0.3937f);
+			Log.d("UPDATE", speedX +" "+ speedY);
+			balls.add(new Ball(id, x, y, ballDiameter, speedX, speedY));
+			idList.add(id);
+		}
+	}
 	/**
 	 * 
 	 * @param index
@@ -188,7 +219,14 @@ public class BallHandler {
 		}
 	}
 	
+
 	public TCPClient getTCPClient() {
 		return tcpClient;
 	}
+
+	public void clearBalls() {
+		balls.clear();
+	}
+	
 }
+

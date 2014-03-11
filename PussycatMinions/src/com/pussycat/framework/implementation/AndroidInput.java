@@ -34,6 +34,10 @@ public class AndroidInput implements Input {
         return touchHandler.getTouchY(pointer);
     }
 
+    @Override
+    public float getTime(int pointer) {
+        return touchHandler.getTime(pointer);
+    }
 
 
     @Override
