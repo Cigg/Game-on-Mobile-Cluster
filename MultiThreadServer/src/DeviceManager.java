@@ -268,7 +268,17 @@ public class DeviceManager {
 	public float globalToLocalVelX(String ip, float xVelG, float yVelG) {
 		for (Device device : this.devices) {
 		    if (device.ip.equals(ip)) {
-		    	return xVelG * device.xDPI;
+		    	
+		    	float xT = (float) (xVelG*Math.cos(-device.rotZ) - yVelG*Math.sin(-device.rotZ));
+		    	float yT = (float) (xVelG*Math.sin(-device.rotZ) + yVelG*Math.cos(-device.rotZ));
+		    	
+		    	int xL = (int) (xT * device.xDPI);
+		    	int yL = (int) (yT * device.yDPI);
+		    	
+		    	yL = device.resY - yL;
+		    	//System.out.println("Global:  " + xG + ", " + yG + "   Local: " + xL + ", " + yL);
+		    	return xL;
+		    	
 		    }
 		}
 		return 0;
@@ -277,7 +287,15 @@ public class DeviceManager {
 	public float globalToLocalVelY(String ip, float xVelG, float yVelG) {
 		for (Device device : this.devices) {
 		    if (device.ip.equals(ip)) {
-		    	return yVelG * device.yDPI;
+		    	float xT = (float) (xVelG*Math.cos(-device.rotZ) - yVelG*Math.sin(-device.rotZ));
+		    	float yT = (float) (xVelG*Math.sin(-device.rotZ) + yVelG*Math.cos(-device.rotZ));
+		    	
+		    	int xL = (int) (xT * device.xDPI);
+		    	int yL = (int) (yT * device.yDPI);
+		    	
+		    	yL = device.resY - yL;
+		    	//System.out.println("Global:  " + xG + ", " + yG + "   Local: " + xL + ", " + yL);
+		    	return yL;
 		    }
 		}
 		return 0;

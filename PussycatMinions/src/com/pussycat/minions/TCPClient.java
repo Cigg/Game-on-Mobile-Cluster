@@ -59,7 +59,10 @@ public class TCPClient {
 				bf.putFloat((float) 2000.20);
 				dout.write(bf.array());
 				*/
+				ByteBuffer bufferLength = ByteBuffer.allocate(4);
+				bufferLength.putInt(buffer.length);
 				
+				dout.write(bufferLength.array());
 				dout.write(buffer);
 				dout.flush();
 				
