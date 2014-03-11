@@ -109,13 +109,30 @@ public class TCPClient {
 					serverMessage = null;
 					*/
 					
+					/*
+					int length = socket.getInputStream().available();					
+					Log.d("DATAP", "DATAP available: " + socket.getInputStream().available());
 					
+					if(length > 0) {
+						length = Math.min(1024, length);
+						byte[] bytes = new byte[length];
+						socket.getInputStream().read(bytes);
+			     		messages.add(new DataPackage(bytes, socket.getInetAddress().toString(), socket.getPort()));
+					}
+					*/
+					byte[] bytesLength = new byte[4];
+					socket.getInputStream().read(bytesLength);	
+					ByteBuffer bufferLength = ByteBuffer.wrap(bytesLength);
 					
-					byte[] bytes = new byte[1024];
-					socket.getInputStream().read(bytes);
-		     		ByteBuffer buffer = ByteBuffer.wrap(bytes);
-		     		
-		     		messages.add(new DataPackage(bytes, socket.getInetAddress().toString(), socket.getPort()));
+					int length = bufferLength.getInt();
+				    length = Math.max(0, length);
+
+					if(length > 0) {
+						byte[] bytes = new byte[length];
+						socket.getInputStream().read(bytes);
+						messages.add(new DataPackage(bytes, socket.getInetAddress().toString(), socket.getPort()));
+					}
+
 					
 		     		/*
 					short state = buffer.getShort();

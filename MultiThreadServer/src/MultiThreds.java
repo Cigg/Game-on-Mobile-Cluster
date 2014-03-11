@@ -51,8 +51,7 @@ public class MultiThreds {
 		    				if(ball.isDead()) {
 		    					threads[0].ballz.remove(ball);
 		    				}
-		    					
-		    			}
+		    			}		    			
 		    			
 			    		// Send ballz
 			    		for(clientThread thread : threads) {

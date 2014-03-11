@@ -244,7 +244,6 @@ public class GameScreen extends Screen {
 			        	float yPos = buffer.getInt();	
 	        			float xVel = buffer.getFloat();	
 	        			float yVel = buffer.getFloat();		
-	        			
 		        		Log.d("GOT", "GOT from " + ip + "  :   " + xPos + ", " + yPos + "   " + xVel + ", " + yVel);
 	        			ballHandler.addBall(xPos, yPos, 1, xVel, yVel);
 	    			break;
@@ -260,9 +259,6 @@ public class GameScreen extends Screen {
 		        			Log.d("GOT", "GOT from " + ip + "  :   " + xPos2 + ", " + yPos2 + "   " + xVel2 + ", " + yVel2);
 		        			ballHandler.addBall(xPos2, yPos2, 1, xVel2, yVel2);
 	    				}
-	        			
-	        			
-	        			
 	    			break;
 	    			
 	    			case SET_STATE:
