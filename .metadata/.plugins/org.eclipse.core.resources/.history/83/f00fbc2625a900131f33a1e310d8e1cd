@@ -135,8 +135,7 @@ public class TCPClient {
 					if(length > 0) {
 						byte[] bytes = new byte[length];
 						socket.getInputStream().read(bytes);
-						dataPackage = new DataPackage(bytes, socket.getInetAddress().toString(), socket.getPort());
-						//messages.add(new DataPackage(bytes, socket.getInetAddress().toString(), socket.getPort()));
+						messages.add(new DataPackage(bytes, socket.getInetAddress().toString(), socket.getPort()));
 					}
 
 					

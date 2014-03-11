@@ -191,25 +191,18 @@ public class clientThread extends Thread{
 						int length = bufferLength.getInt();
 					    length = Math.max(0, length);
 					    
+						System.out.println("In thread: " + i);
+						short state = buffer.getShort();
+						GLOBAL_STATE__ actualState;
+						
+						try {
+							actualState = GLOBAL_STATE__.values()[state];
+						} catch(Exception e) {
+							actualState = GLOBAL_STATE__.REG;
+						}
+						
+		        		String ip = clientSocket.getInetAddress().toString();
 					    
-					    if(length > 0) {
-							byte[] bytes = new byte[length];
-							clientSocket.getInputStream().read(bytes);
-							ByteBuffer buffer = ByteBuffer.wrap(bytes);
-				
-							System.out.println("In thread: " + i);
-							short state = buffer.getShort();
-							GLOBAL_STATE__ actualState;
-							
-							try {
-								actualState = GLOBAL_STATE__.values()[state];
-							} catch(Exception e) {
-								actualState = GLOBAL_STATE__.REG;
-							}
-							
-			        		String ip = clientSocket.getInetAddress().toString();
-	
-			        	
 		        		switch(actualState) {
 		        			case ADD_DEVICE:
 		        				
@@ -335,6 +328,7 @@ public class clientThread extends Thread{
 								default:
 								break;
 			        		}
+		        		
 						}
 
 					}

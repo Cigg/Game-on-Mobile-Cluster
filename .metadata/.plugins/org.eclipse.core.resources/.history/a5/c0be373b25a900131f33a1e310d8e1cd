@@ -107,7 +107,7 @@ public class GameScreen extends Screen {
         //This is identical to the update() method from our Unit 2/3 game.
     	
     	// Update balls
-    	ballHandler.update();
+    	//ballHandler.update();
     	
         
        // Update touch events

@@ -92,8 +92,8 @@ public class MultiThreds {
 					    				buffer.putInt(ball.id);
 					    				buffer.putInt(xPosL);
 					    				buffer.putInt(yPosL);
-					    				buffer.putFloat((float) (xVelL*Math.pow(10, 9)));
-					    				buffer.putFloat((float) -(yVelL*Math.pow(10, 9)));
+					    				buffer.putFloat((float) (ball.getXVel()*Math.pow(10, 9)*2.5));
+					    				buffer.putFloat((float) -(ball.getYVel()*Math.pow(10, 9)*2.5));
 					    				
 					    				nBalls ++;
 				    					
