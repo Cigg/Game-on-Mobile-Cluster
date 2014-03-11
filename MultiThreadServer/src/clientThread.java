@@ -46,8 +46,10 @@ public class clientThread extends Thread{
 		float xPos, yPos;
 		float xVel, yVel;
 		float  mass, radious, lifeTime;
+		int id;
 		
-		public Ballz(float xPos, float yPos, float xVel, float yVel) {
+		public Ballz(int id,float xPos, float yPos, float xVel, float yVel) {
+			this.id = id;
 			this.xPos = xPos;
 			this.yPos = yPos;
 			this.xVel = xVel;
@@ -61,7 +63,7 @@ public class clientThread extends Thread{
 			this.xPos += this.xVel * deltaTime;
 			this.yPos += this.yVel * deltaTime;
 			this.lifeTime += deltaTime;
-			System.out.println("Life: " + this.lifeTime * Math.pow(10, -9));
+			//System.out.println("Life: " + this.lifeTime * Math.pow(10, -9));
 		}
 		
 		public boolean isDead() {
@@ -275,8 +277,7 @@ public class clientThread extends Thread{
 			        			
 			        			float xVel = deviceManager.computeVelocityX(ip, x1, y1, x2, y2, t);
 			        			float yVel = deviceManager.computeVelocityY(ip, x1, y1, x2, y2, t);
-			        			
-			        			
+			        		
 			        			System.out.println("xVel = " + xVel * Math.pow(10, 9) * 2.5);
 			        			System.out.println("yVel = " + yVel * Math.pow(10, 9) * 2.5);
 			        			
@@ -284,9 +285,15 @@ public class clientThread extends Thread{
 			        			
 			        			float xG = deviceManager.localToGlobalX(ip, x2, y2);
 			        			float yG = deviceManager.localToGlobalY(ip, x2, y2);			        		
-			        			
-			        			ballz.add(new Ballz(xG, yG, xVel, yVel));
-			        			
+			        			ballCount++;
+			        			 synchronized (this) {
+			        				 ballz.add(new Ballz(ballCount,xG, yG, xVel, yVel));
+			        				 for (int j = 0; j < maxClientsCount; j++) {
+							              if (threads[j] != null) {
+							                threads[j].ballCount = ballCount;
+							              }
+							            }
+							        }
 		        			break;    			
 		        			
 		  

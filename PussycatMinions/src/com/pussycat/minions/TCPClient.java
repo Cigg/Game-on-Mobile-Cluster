@@ -17,7 +17,7 @@ import android.util.Log;
 
 public class TCPClient {
 	private String serverMessage;
-	public static String SERVERIP = "192.168.43.122";
+	public static String SERVERIP = "192.168.43.213";
 	public static final int SERVERPORT = 4444;
 	private boolean mRun = false;
 	private OnMessageReceived messageListner = null;
@@ -28,7 +28,9 @@ public class TCPClient {
 	BufferedWriter buffw;
 	
 	LOCAL_STATE__ internalState;
-	public volatile LinkedBlockingQueue<DataPackage> messages = new LinkedBlockingQueue <DataPackage>();
+	//public volatile LinkedBlockingQueue<DataPackage> messages = new LinkedBlockingQueue <DataPackage>();
+	public DataPackage dataPackage = null;
+	
 	
 	public TCPClient(OnMessageReceived listner){
 		messageListner = listner;
@@ -115,7 +117,8 @@ public class TCPClient {
 					socket.getInputStream().read(bytes);
 		     		ByteBuffer buffer = ByteBuffer.wrap(bytes);
 		     		
-		     		messages.add(new DataPackage(bytes, socket.getInetAddress().toString(), socket.getPort()));
+		     		dataPackage = new DataPackage(bytes, socket.getInetAddress().toString(), socket.getPort());
+		     		//messages.add(new DataPackage(bytes, socket.getInetAddress().toString(), socket.getPort()));
 					
 		     		/*
 					short state = buffer.getShort();
