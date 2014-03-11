@@ -3,18 +3,22 @@ package com.pussycat.framework.implementation;
 import java.io.IOException;
 import java.io.InputStream;
 
+import android.R;
 import android.content.res.AssetManager;
 import android.graphics.Bitmap;
 import android.graphics.Bitmap.Config;
 import android.graphics.BitmapFactory;
 import android.graphics.BitmapFactory.Options;
+import android.graphics.BitmapRegionDecoder;
 import android.graphics.Canvas;
+import android.graphics.Matrix;
 import android.graphics.Paint;
 import android.graphics.Paint.Style;
 import android.graphics.Rect;
 
 import com.pussycat.framework.Graphics;
 import com.pussycat.framework.Image;
+import com.pussycat.minions.PussycatMinions;
 
 public class AndroidGraphics implements Graphics {
     AssetManager assets;
@@ -35,17 +39,9 @@ public class AndroidGraphics implements Graphics {
     @Override
     public Image newImage(String fileName, ImageFormat format) {
         Config config = null;
-       /* if (format == ImageFormat.RGB565)
-            config = Config.RGB_565;
-        else if (format == ImageFormat.ARGB4444)
-            config = Config.ARGB_4444;
-        else
-            config = Config.ARGB_8888;
-		*/
         config = Config.ARGB_8888;
         Options options = new Options();
-        options.inPreferredConfig = config;
-        
+        options.inPreferredConfig = config;        
         
         InputStream in = null;
         Bitmap bitmap = null;
@@ -76,7 +72,84 @@ public class AndroidGraphics implements Graphics {
 
         return new AndroidImage(bitmap, format);
     }
+    
+    @Override
+    public Image newBackground(String fileName, ImageFormat format) {
+    	
+    	int imageHeight = 4000;
+    	int imageWidth = 5000;
+    	int screenHeight = PussycatMinions.getScreenHeight();
+    	int screenWidth  = PussycatMinions.getScreenWidth();
+    	
+    	int xStart = (int) ((imageHeight - screenHeight)/2);
+        int yStart = (int) ((imageWidth - screenWidth)/2);
+        
+    	Config config = null;
+        config = Config.ARGB_8888;
+        Options options = new Options();
+        options.inPreferredConfig = config;
+        
+    	//Bitmap yourBitmap = Bitmap.createBitmap(fileName, xStart, yStart, screenWidth, screenHeight);		
+       
+                
+        InputStream in = null;
+        Bitmap bitmap = null;
+       // Bitmap bitmapLarge = null;
+        
+        Rect rect = new Rect(yStart, xStart, yStart+screenWidth, xStart+screenHeight+50);
+        
+        int x1 = (int) (rect.left);
+        int y1 = (int) (rect.top);
+        int x2 = (int) (rect.left + rect.height());
+        int y2 = (int) (rect.top + rect.width());
+        
+        float pts[] = new float[4];
+        pts[0] = x1;
+        pts[1] = y1;
+        pts[2] = x2;
+        pts[3] = y2;
+        
+        Matrix M = new Matrix();
+       	M.setRotate(45);
+        M.mapPoints(pts);
+        System.out.println("Not rotated - x: " + x1 + "    y: " + y1);
+        System.out.println("Rotated - x: " + pts[1] + "    y: " + pts[0]);
+        //Rect rectRotated = new Rect((int) pts[1], (int)pts[0],(int)pts[3], (int)pts[2]);
+        
+        //Rect rotatedRect = rect*M;
+        try {
+            in = assets.open(fileName);
+            	// bitmap = BitmapFactory.decodeStream(in, null, options);
+				BitmapRegionDecoder decoder = BitmapRegionDecoder.newInstance(in, false);
+				bitmap = decoder.decodeRegion(rect, null);
+	            // bitmapLarge = BitmapFactory.decodeStream(in, null, options);
+				//Bitmap bitmap1 = BitmapFactory.decodeResource(null, );
+				//bitmap = Bitmap.createBitmap(bitmap1, xStart, yStart, screenWidth, screenHeight, M, false);
+            if (bitmap == null)
+                throw new RuntimeException("Couldn't load bitmap from asset '"
+                        + fileName + "'");
+        } catch (IOException e) {
+            throw new RuntimeException("Couldn't load bitmap from asset '"
+                    + fileName + "'");
+        } finally {
+            if (in != null) {
+                try {
+                    in.close();
+                } catch (IOException e) {
+                }
+            }
+        }
 
+        if (bitmap.getConfig() == Config.RGB_565)
+            format = ImageFormat.RGB565;
+        else if (bitmap.getConfig() == Config.ARGB_4444)
+            format = ImageFormat.ARGB4444;
+        else
+            format = ImageFormat.ARGB8888;
+
+        return new AndroidImage(bitmap, format);
+    }
+    
     @Override
     public void clearScreen(int color) {
         canvas.drawRGB((color & 0xff0000) >> 16, (color & 0xff00) >> 8,

@@ -1,11 +1,16 @@
 package com.pussycat.minions;
 
+import java.io.ByteArrayOutputStream;
 import java.util.ArrayList;
 import java.util.List;
 
+import android.content.Context;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.PointF;
+import android.media.Image;
 import android.util.Log;
 
 import com.pussycat.framework.FPSCounter;
@@ -32,7 +37,7 @@ public class GameScreen extends Screen {
     private Paint paint;
     private Ball mobileBall = null;
     private FPSCounter fpsCounter;
-    
+    Context context;
 
     public GameScreen(Game game) {
         super(game);
@@ -55,7 +60,7 @@ public class GameScreen extends Screen {
 		Log.d("Debug Pussycat", "GameScreen constructor");
 		
 		prevBallPositions = new ArrayList<PointF>();
-
+		
     }
 
     @Override
@@ -170,6 +175,7 @@ public class GameScreen extends Screen {
 
         // Example:
         //g.drawImage(Assets.menu, 0, 0);
+        g.drawImage(Assets.background, 0, 0);
         drawBalls();
      
         // Secondly, draw the UI above the game elements.

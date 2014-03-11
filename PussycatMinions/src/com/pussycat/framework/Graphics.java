@@ -9,6 +9,8 @@ public interface Graphics {
 	}
 
 	public Image newImage(String fileName, ImageFormat format);
+	
+	public Image newBackground(String fileName, ImageFormat format);
 
 	public void clearScreen(int color);
 
