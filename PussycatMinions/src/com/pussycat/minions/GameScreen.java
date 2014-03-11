@@ -240,13 +240,29 @@ public class GameScreen extends Screen {
 	    		
 	    		switch(actualState) {
 	    			case ADD_BALL:
-	        			float xPos = buffer.getInt();
+    					float xPos = buffer.getInt();
 			        	float yPos = buffer.getInt();	
 	        			float xVel = buffer.getFloat();	
 	        			float yVel = buffer.getFloat();		
-	        			Log.d("GOT", "GOT from " + ip + "  :   " + xPos + ", " + yPos + "   " + xVel + ", " + yVel);
 	        			
+		        		Log.d("GOT", "GOT from " + ip + "  :   " + xPos + ", " + yPos + "   " + xVel + ", " + yVel);
 	        			ballHandler.addBall(xPos, yPos, 1, xVel, yVel);
+	    			break;
+	    			
+	    			case ADD_BALLS:
+	    				final short nBalls = buffer.getShort();
+	    				Log.d("NBALLS", "NBALLS: " + nBalls);
+	    				for(int i=0; i<nBalls; i++) {
+	    					float xPos2 = buffer.getInt();
+				        	float yPos2 = buffer.getInt();	
+		        			float xVel2 = buffer.getFloat();	
+		        			float yVel2 = buffer.getFloat();		
+		        			Log.d("GOT", "GOT from " + ip + "  :   " + xPos2 + ", " + yPos2 + "   " + xVel2 + ", " + yVel2);
+		        			ballHandler.addBall(xPos2, yPos2, 1, xVel2, yVel2);
+	    				}
+	        			
+	        			
+	        			
 	    			break;
 	    			
 	    			case SET_STATE:

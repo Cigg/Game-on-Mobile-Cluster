@@ -57,11 +57,49 @@ public class MultiThreds {
 			    		// Send ballz
 			    		for(clientThread thread : threads) {
 			    			if (thread != null) {
+			    				
+			    				byte[] arr = new byte[1024];
+			    				ByteBuffer buffer;
+			    				buffer = ByteBuffer.wrap(arr);
+			    				buffer.clear();
+			    				
+			    				buffer.putShort((short)5);			// State: Add balls
+			    				buffer.putShort((short)0);			// nBalls, byte 2 och 3
+			    				
+			    				short nBalls = 0;
+			    				
 			    				for(clientThread.Ballz ball : thread.ballz) {
+			    			
+			    					if(buffer.capacity() < 16) {
+			    						break;
+			    					}
 			    					
 			    					float xG = ball.getXPos();
 				    				float yG = ball.getYPos();
 				    				
+				    				
+				    				if(deviceManager.isOnDevice(thread.getIp(), xG, yG)) {
+				    					float xVelG = ball.getXVel();
+					    				float yVelG = ball.getYVel();
+					    				
+					    				int xPosL = deviceManager.globalToLocalX(thread.getIp(), xG, yG);
+					    				int yPosL = deviceManager.globalToLocalY(thread.getIp(), xG, yG);
+					    				
+					    				float xVelL = deviceManager.globalToLocalVelX(thread.getIp(), xVelG, yVelG);
+					    				float yVelL = deviceManager.globalToLocalVelY(thread.getIp(), xVelG, yVelG);
+					    				
+					    				buffer.putInt(xPosL);
+					    				buffer.putInt(yPosL);
+					    				buffer.putFloat(xVelL);
+					    				buffer.putFloat(yVelL);
+					    				
+					    				nBalls ++;
+				    					
+				    				}
+				    				
+				    				
+				    				
+				    				/*
 			    					if(deviceManager.isOnDevice(thread.getIp(), xG, yG)) {
 					    				ByteBuffer buffer;
 					    				buffer = ByteBuffer.allocate(1*2 + 4*4);
@@ -86,7 +124,12 @@ public class MultiThreds {
 					    				
 					    				thread.sendData(buffer.array());
 			    					}
+			    					*/
 			    				}
+			    				
+			    				buffer.position(2);
+			    				buffer.putShort(nBalls);
+			    				thread.sendData(buffer.array());
 			    			}
 			    		}
 			    		
