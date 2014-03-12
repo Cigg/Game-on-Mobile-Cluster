@@ -162,7 +162,7 @@ public class clientThread extends Thread{
 		/*
         for (int j = 0; j < maxClientsCount; j++) {
             if (thread[j] != null) {
-            	globalCoords = new GlobalCoords(0,1250,800*j,800*(j+1));
+            	globalCoords = new GlobalCoords(800*j,800*(j+1),0,1250);
             	System.out.println(globalCoords.minX + " " + globalCoords.maxX + " " + globalCoords.minY + " " + globalCoords.maxY);
             }
           }

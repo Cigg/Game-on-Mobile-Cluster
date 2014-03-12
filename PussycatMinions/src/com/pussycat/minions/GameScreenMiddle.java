@@ -23,6 +23,7 @@ public class GameScreenMiddle extends Screen {
     // Variable Setup
     // You would create game objects here.
     private BallHandler ballHandler;
+    private GoalieHandler goalieHandler;
     
     float ballSpeed = 20.0f;
     int screenWidth;
@@ -84,9 +85,6 @@ public class GameScreenMiddle extends Screen {
     private void updateRunning(List<TouchEvent> touchEvents, float deltaTime) {
        	// Update balls
     	ballHandler.update();
-    	
-//    	// Try adding goalie on middle screen
-//    	Goalie.addGoalie();
         
         // All touch input is handled here:
         int len = touchEvents.size();
@@ -151,7 +149,9 @@ public class GameScreenMiddle extends Screen {
 
         // Example:
         //g.drawImage(Assets.menu, 0, 0);
+        
         drawBalls();
+        drawGoalies();
      
         // Secondly, draw the UI above the game elements.
         if (state == GameState.Ready)
@@ -184,6 +184,20 @@ public class GameScreenMiddle extends Screen {
     	
     	for(int i = 0; i < ballHandler.balls.size(); i++){
         	g.drawScaledImage(ballHandler.balls.get(i).getImage(), (int)(ballHandler.balls.get(i).getX()-ballHandler.balls.get(i).getDiameter()/2), (int)(ballHandler.balls.get(i).getY()-ballHandler.balls.get(i).getDiameter()/2), (int)ballHandler.balls.get(i).getDiameter(), (int)ballHandler.balls.get(i).getDiameter(), 0, 0, 128, 128);
+    	}
+    }
+    
+    private void drawGoalies(){
+    	Graphics g = game.getGraphics();
+    	
+    	//Log.d("Debug Pussycat", "goalies.size(): " + goalieHandler.goalies.size());
+    	
+    	fpsCounter.logFrame();
+    	
+    	goalieHandler.addGoalie(50,50,1.5f);
+    	
+    	for(int i = 0; i < goalieHandler.goalies.size(); i++){
+        	g.drawScaledImage(goalieHandler.goalies.get(i).getImage(), (int)(goalieHandler.goalies.get(i).getX()-goalieHandler.goalies.get(i).getDiameter()/2), (int)(goalieHandler.goalies.get(i).getY()-goalieHandler.goalies.get(i).getDiameter()/2), (int)goalieHandler.goalies.get(i).getDiameter(), (int)goalieHandler.goalies.get(i).getDiameter(), 0, 0, 128, 128);
     	}
     }
 

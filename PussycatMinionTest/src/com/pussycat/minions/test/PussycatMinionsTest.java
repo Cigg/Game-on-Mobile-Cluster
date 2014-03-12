@@ -43,7 +43,7 @@ public class PussycatMinionsTest extends
 				new Runnable() {
 					public void run() {
 						r = new Random();
-						int numberOfBalls = 500;
+						int numberOfBalls = 300;
 						int maxX = pussycatMinions.getScreenHeight();
 						int maxY = pussycatMinions.getScreenHeight();
 						
@@ -53,19 +53,30 @@ public class PussycatMinionsTest extends
 						GameScreen gameScreen = (GameScreen) game.getCurrentScreen();
 						fpsCounter = gameScreen.getFPSCounter();
 						ballHandler = gameScreen.getBallHandler();
-						tcpClient = ballHandler.getTCPClient();
+						while(tcpClient == null){
+							tcpClient = ballHandler.getTCPClient();
+						}
 						if(tcpClient != null) {
 							for(int i = 0; i < numberOfBalls; i++) {
 								int x = r.nextInt(maxX);
 								int y = r.nextInt(maxY);
+								float dx = r.nextFloat()/10;
+								float dy = r.nextFloat()/10;
 								Log.d("TEST", x + " " + y);
-								tcpClient.sendMessage(x + " " + y + " " + 0 + " " + 0);
+								tcpClient.sendMessage(x + " " + y + " " + dx + " " + dy);
 							}
 						}
-						//view = (AndroidFastRenderView) pussycatMinions.getCurrentFocus();
-						Log.d("TEST",screen.toString());
-						Log.d("TEST",game.toString());
+						try {
+							Thread.sleep(1000);
+						} catch (InterruptedException e) {
+							e.printStackTrace();
+						}
 					}
 				});
+	}
+	
+	@Override 
+	public void tearDown() throws InterruptedException {
+	    while (true) { Thread.sleep(2000); }
 	}
 }

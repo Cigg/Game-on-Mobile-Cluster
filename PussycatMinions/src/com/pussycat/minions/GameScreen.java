@@ -123,7 +123,7 @@ public class GameScreen extends Screen {
         // state now becomes GameState.Running.
         // Now the updateRunning() method will be called!
         
-        //if (touchEvents.size() > 0)
+        if (touchEvents.size() > 0)
             state = GameState.Running;
     }
 

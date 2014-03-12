@@ -228,5 +228,7 @@ public class BallHandler {
 		balls.clear();
 	}
 	
+	public String getData() {
+		return data;
+	}
 }
-
