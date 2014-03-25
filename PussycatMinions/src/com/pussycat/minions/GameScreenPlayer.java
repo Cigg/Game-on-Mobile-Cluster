@@ -26,7 +26,7 @@ import com.pussycat.framework.Graphics;
 import com.pussycat.framework.Input.TouchEvent;
 import com.pussycat.framework.Screen;
 
-public class GameScreen extends Screen {
+public class GameScreenPlayer extends Screen {
     enum GameState {
         Ready, Running, Paused, GameOver
     }
@@ -60,7 +60,7 @@ public class GameScreen extends Screen {
 	private TCPClient comm;
 
 
-    public GameScreen(Game game) {
+    public GameScreenPlayer(Game game) {
         super(game);
         
         // Get screen dimensions
