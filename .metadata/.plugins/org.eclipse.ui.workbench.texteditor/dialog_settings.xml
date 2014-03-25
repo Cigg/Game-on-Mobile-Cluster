@@ -13,16 +13,16 @@
 		<item value="false" key="casesensitive"/>
 		<item value="false" key="incremental"/>
 		<item value="false" key="wholeword"/>
-		<item value="playerButton" key="selection"/>
+		<item value="internalState" key="selection"/>
 		<list key="findhistory">
+			<item value="internalState"/>
+			<item value="clear"/>
+			<item value="game"/>
 			<item value="playerButton"/>
 			<item value="comm"/>
 			<item value="ballSpeed"/>
 			<item value="addBall"/>
 			<item value="BallAdd"/>
-			<item value="def"/>
-			<item value="defult"/>
-			<item value="actualState"/>
 		</list>
 		<list key="replacehistory">
 		</list>

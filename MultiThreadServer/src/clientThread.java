@@ -11,6 +11,12 @@ import java.nio.ByteBuffer;
 import java.util.concurrent.LinkedBlockingQueue;
 
 
+/**
+ * One clientThread for one device.
+ * Adds and sends balls the balls.
+ *
+ */
+
 public class clientThread extends Thread{
 	private PrintWriter out;
 	private BufferedReader in;
@@ -58,7 +64,6 @@ public class clientThread extends Thread{
 			System.out.println("Added ballz: " + xPos + ", " + yPos + "    " + xVel + ", " + yVel); // * Math.pow(10, 9) * 2.5
 		}
 		
-		
 		public void update(float deltaTime) {
 			this.xPos += this.xVel * deltaTime;
 			this.yPos += this.yVel * deltaTime;
@@ -104,10 +109,23 @@ public class clientThread extends Thread{
 	
 	public volatile static LinkedBlockingQueue<Ballz> ballz = new LinkedBlockingQueue <Ballz>();
 	
+	/**
+	 * Get the ip of the client
+	 *
+	 */
 	public String getIp() {
 		return this.ip;
 	}
 	
+	/**
+	 * Starts one clientThread
+	 * 
+	 * @param ip			 	The ip adress for the client
+	 * @param clientSocket	 	The socket on the server
+	 * @param threads			An array with all clientThreads
+	 * @param updateLoop		An update thread (not used at this moment)
+	 * @param deviceManager		Stores device information
+	 */
 	public clientThread(String ip, Socket clientSocket, clientThread[] threads, UpdateLoop updateLoop, DeviceManager deviceManager) {
 		this.deviceManager = deviceManager;
 		this.clientSocket= clientSocket;
@@ -120,6 +138,10 @@ public class clientThread extends Thread{
 		internalState = LOCAL_STATE__.MAPPING_STEP1;
 	}
 	
+	/**
+	 * @deprecated replaced by sendData
+	 * {@link #sendData(byte[])}
+	 */
 	public void sendMessage(String message) {
 		if(out != null && !out.checkError()){
 			//out.println(message);
@@ -127,6 +149,11 @@ public class clientThread extends Thread{
 		}
 	}
 	
+	
+	/**
+	 * Send data to device
+	 * @param buffer Array of bytes to send to device 
+	 */
 	public void sendData(byte[] buffer) {
 		if(buffer.length > 0) {	
 			try {
@@ -154,6 +181,9 @@ public class clientThread extends Thread{
 		}
 	}
 	
+	/**
+	 * Starts the thread and reads new data from device 
+	 */
 	public void run() {
 		running = true;
 		int maxClientsCount = this.maxClientCount;
@@ -300,9 +330,6 @@ public class clientThread extends Thread{
 							        }
 		        			break;    			
 		        			
-		  
-
-			        		
 		        			case REG:
 			        			/*String message = buffer.array().toString();
 			        			System.out.println("Message: " + message);
@@ -346,6 +373,7 @@ public class clientThread extends Thread{
 			e.printStackTrace();
 		}
 	}
+	
 	
 	private void toGlobal(){
 		posX += globalCoords.minX;
