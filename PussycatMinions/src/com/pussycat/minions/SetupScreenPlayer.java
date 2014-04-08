@@ -9,9 +9,9 @@ import com.pussycat.framework.Game;
 import com.pussycat.framework.Graphics;
 import com.pussycat.framework.Input.TouchEvent;
 import com.pussycat.framework.Screen;
-import com.pussycat.minions.GameScreen.GameState;
+import com.pussycat.minions.GameScreenPlayer.GameState;
 
-public class SetupScreen extends Screen {
+public class SetupScreenPlayer extends Screen {
     enum GameState {
         Ready, Running
     }
@@ -22,7 +22,7 @@ public class SetupScreen extends Screen {
 
 	Paint paint;
 	
-    public SetupScreen(Game game) {
+    public SetupScreenPlayer(Game game) {
         super(game);
         
         // Defining a paint object
@@ -83,7 +83,7 @@ public class SetupScreen extends Screen {
             	skipButton.setPressed(false);
             	
             	if(skipButton.inBounds(event.x, event.y)){
-            		game.setScreen(new GameScreen(game));
+            		game.setScreen(new GameScreenPlayer(game));
             	}
             }
         }

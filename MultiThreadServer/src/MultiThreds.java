@@ -4,6 +4,10 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.nio.ByteBuffer;
 
+/**
+ * Main loop for the server.
+ *
+ */
 
 public class MultiThreds {
 	private static ServerSocket serverSocket = null;

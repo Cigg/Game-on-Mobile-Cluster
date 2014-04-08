@@ -9,7 +9,7 @@ import com.pussycat.framework.Game;
 import com.pussycat.framework.Graphics;
 import com.pussycat.framework.Input.TouchEvent;
 import com.pussycat.framework.Screen;
-import com.pussycat.minions.GameScreen.GameState;
+import com.pussycat.minions.GameScreenPlayer.GameState;
 
 public class SetupScreenMiddle extends Screen {
     enum GameState {
