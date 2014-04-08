@@ -18,9 +18,10 @@ import java.util.concurrent.LinkedBlockingQueue;
 import android.util.Log;
 
 public class TCPClient {
-	public static String SERVERIP = "192.168.43.122";
-	//public static String SERVERIP = "192.168.0.102";
-	
+
+	private String serverMessage;
+	public static String SERVERIP = "192.168.43.148";
+
 	public static final int SERVERPORT = 4444;
 	private boolean isRunning = false;
 	

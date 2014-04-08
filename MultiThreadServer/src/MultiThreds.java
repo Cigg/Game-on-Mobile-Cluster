@@ -4,6 +4,9 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.nio.ByteBuffer;
 
+import org.jbox2d.common.Vec2;
+
+
 /**
  * Main loop for the server.
  *
@@ -12,6 +15,8 @@ import java.nio.ByteBuffer;
 public class MultiThreds {
 	private static ServerSocket serverSocket = null;
 	private static Socket clientSocket = null;
+	
+	public static PhysicsWorld physicsWorld;
 	
 	private static final int maxClientCount = 10;
 	private static final clientThread[] threads = new clientThread[maxClientCount];
@@ -36,16 +41,22 @@ public class MultiThreds {
 		//updateLoop.start();
 		deviceManager = new DeviceManager();
 		
-	   final float tickRate = 20;
+		final float tickRate = 20;
+   
+	   // Initiate Physics
+	   physicsWorld = new PhysicsWorld();
+	   physicsWorld.create(new Vec2(0.0f, 0.0f)); //no gravity
 		
-		Thread update = new Thread() {
+	   Thread update = new Thread() {
 		    public void run() {
 		    	
 		    	float timeBegin, timeEnd = 0, timeDelta = 1 / tickRate, timeDelay;
 		    	while(true) {
-		    		//System.out.println("Update-----------------------------------------------");
 		    		timeBegin = System.nanoTime();
 		    		
+		    		// Update physics
+		    		physicsWorld.update(timeDelta);
+	    			
 	    			// Update ballz	
 		    		if(threads[0] != null) {
 		    			for(clientThread.Ballz ball : threads[0].ballz) {
@@ -55,7 +66,6 @@ public class MultiThreds {
 		    					threads[0].ballz.remove(ball);
 		    				}
 		    			}		
-
 		    			
 		        		// Send data
 		    			for(clientThread thread : threads) {
@@ -65,7 +75,7 @@ public class MultiThreds {
 			    					if(data != null) {
 			    						
 			    						ByteBuffer test = ByteBuffer.wrap(data);
-			    						System.out.println("SEND to " + thread.getIp() + ": " + test.getShort() + "  " + test.getShort());
+			    						//System.out.println("SEND to " + thread.getIp() + ": " + test.getShort() + "  " + test.getShort());
 			    						
 			    						thread.sendData(data);
 			    					}
@@ -180,4 +190,5 @@ public class MultiThreds {
 			}
 		}
 	}//End of Main
+	
 } // End of MultiThreds

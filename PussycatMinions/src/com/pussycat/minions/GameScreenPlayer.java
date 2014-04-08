@@ -34,7 +34,6 @@ public class GameScreenPlayer extends Screen {
     private GameState state = GameState.Ready;
 
     // Variable Setup
-    // You would create game objects here.
     private BallHandler ballHandler;
     private float ballSpeed = 20.0f;
     private ArrayList<PointF> prevBallPositions;
@@ -47,21 +46,18 @@ public class GameScreenPlayer extends Screen {
     private FPSCounter fpsCounter;
     Context context;
 
-    
-
     private GLOBAL_STATE__ internalState;
     private int nClocks;
     private float reciveDelay, sendDelay;
     
 	private float currentX, currentY;
-
 	private float downX, downY;
 	private float downTime, previousTime;
 	private float timeBegin, timeEnd, timeDelta;
 	
 	private TCPClient comm;
 
-
+	// Constructor
     public GameScreenPlayer(Game game) {
         super(game);
         
@@ -71,7 +67,6 @@ public class GameScreenPlayer extends Screen {
 
         // Initialize game objects here
         ballHandler = new BallHandler(1.5f);
-        
         
         // Defining a paint object
 		paint = new Paint();
@@ -83,7 +78,6 @@ public class GameScreenPlayer extends Screen {
 		Log.d("Debug Pussycat", "GameScreen constructor");
 		
 		prevBallPositions = new ArrayList<PointF>();
-
 		
 		previousTime = 0;
 		internalState = GLOBAL_STATE__.SYNCHRONIZE_DEVICE;
@@ -267,13 +261,14 @@ public class GameScreenPlayer extends Screen {
        	// Update balls
     	ballHandler.update(reciveDelay);
         
+        // All touch input is handled here:
+       // Update touch events
     	Thread.currentThread().setPriority(Thread.MAX_PRIORITY);
 
         int len = touchEvents.size();
         for (int i = 0; i < len; i++) {
         	
             TouchEvent event = touchEvents.get(i);
-           
         	currentX = event.x;
     		currentY = event.y;
     		final float currentTime = event.time;

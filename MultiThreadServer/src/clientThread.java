@@ -10,6 +10,8 @@ import java.net.Socket;
 import java.nio.ByteBuffer;
 import java.util.concurrent.LinkedBlockingQueue;
 
+import org.jbox2d.common.Vec2;
+
 
 /**
  * One clientThread for one device.
@@ -61,12 +63,24 @@ public class clientThread extends Thread{
 			this.xVel = xVel;
 			this.yVel = yVel;
 			this.lifeTime = 0;
+			
+			// old
+			// addBall(float x, float y, Object data, float density, float radius, float bounce, float friction)
+			MultiThreds.physicsWorld.addBall(xPos, yPos, xVel, yVel,  id, 0.03f, 0.2f, 0.8f, 0.3f);
+			
 			System.out.println("Added ballz: " + xPos + ", " + yPos + "    " + xVel + ", " + yVel); // * Math.pow(10, 9) * 2.5
 		}
 		
 		public void update(float deltaTime) {
-			this.xPos += this.xVel * deltaTime;
-			this.yPos += this.yVel * deltaTime;
+			// Get pos from PhysicsWorld. Physics handles position and velocity
+			Vec2 position = MultiThreds.physicsWorld.getPositionFromId(id);
+			this.xPos = position.x;
+			this.yPos = position.y;
+			
+			// Old way
+			//this.xPos += this.xVel * deltaTime;
+			//this.yPos += this.yVel * deltaTime;
+			
 			this.lifeTime += deltaTime;
 			//System.out.println("Life: " + this.lifeTime * Math.pow(10, -9));
 		}
