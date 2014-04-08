@@ -15,4 +15,5 @@ public class Assets {
     public static Image button_skip;
     public static Image button_skip_pressed;
     public static Sound click;
+	public static Image localBall;
 }

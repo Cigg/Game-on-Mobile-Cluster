@@ -12,7 +12,7 @@ import org.jbox2d.dynamics.World;
 
 public class PhysicsWorld {
 
-	private Map<Integer, Body> bodies = new HashMap<Integer, Body>();
+	private Map<Integer, Body> bodies = new HashMap<Integer, Body>(); // HashMap with bodyID and Body
 
 	private World world;
 
@@ -52,14 +52,14 @@ public class PhysicsWorld {
 
 	public void update(float deltaTime) {
 		// Update Physics World
-		world.step(deltaTime, 10, 10); // vilka värden bör de 2 sista parametrarna ha?
+		world.step(deltaTime, 6, 6); // vilka värden bör de 2 sista parametrarna ha?
 	}
 
 	public World getWorld() {
 		return world;
 	}
 	
-	public Body getBodyFromId(int id) {
-		return bodies.get(id);
+	public Vec2 getPositionFromId(int id) {
+		return bodies.get(id).getPosition();
 	}
 }

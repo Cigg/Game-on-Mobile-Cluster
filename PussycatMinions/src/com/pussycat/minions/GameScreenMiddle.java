@@ -84,7 +84,7 @@ public class GameScreenMiddle extends Screen {
 
     private void updateRunning(List<TouchEvent> touchEvents, float deltaTime) {
        	// Update balls
-    	ballHandler.update();
+    	ballHandler.update(deltaTime); // wronk
         
         // All touch input is handled here:
         int len = touchEvents.size();

@@ -16,7 +16,7 @@ public class MultiThreds {
 	private static ServerSocket serverSocket = null;
 	private static Socket clientSocket = null;
 	
-	private static PhysicsWorld physicsWorld;
+	public static PhysicsWorld physicsWorld;
 	
 	private static final int maxClientCount = 10;
 	private static final clientThread[] threads = new clientThread[maxClientCount];
@@ -41,16 +41,16 @@ public class MultiThreds {
 		//updateLoop.start();
 		deviceManager = new DeviceManager();
 		
-	   final float tickRate = 500;
-	   
+		final float tickRate = 20;
+   
 	   // Initiate Physics
 	   physicsWorld = new PhysicsWorld();
-	   physicsWorld.create(new Vec2(0.0f, 0.0f));
+	   physicsWorld.create(new Vec2(0.0f, 0.0f)); //no gravity
 		
 	   Thread update = new Thread() {
 		    public void run() {
 		    	
-		    	float timeBegin, timeEnd, timeDelta = 1 / tickRate, timeDelay;
+		    	float timeBegin, timeEnd = 0, timeDelta = 1 / tickRate, timeDelay;
 		    	while(true) {
 		    		timeBegin = System.nanoTime();
 		    		
@@ -61,11 +61,27 @@ public class MultiThreds {
 		    		if(threads[0] != null) {
 		    			for(clientThread.Ballz ball : threads[0].ballz) {
 		    				//ball.printInfo();
-		    				ball.update(timeDelta);	    				
+		    				ball.update(timeDelta);
 		    				if(ball.isDead()) {
 		    					threads[0].ballz.remove(ball);
 		    				}
-		    			}		    			
+		    			}		
+		    			
+		        		// Send data
+		    			for(clientThread thread : threads) {
+		    				if (thread != null) {
+			    				while(deviceManager.hasMessagesToSend(thread.getIp())) {
+			    					byte[] data = deviceManager.getNextMessage(thread.getIp());
+			    					if(data != null) {
+			    						
+			    						ByteBuffer test = ByteBuffer.wrap(data);
+			    						//System.out.println("SEND to " + thread.getIp() + ": " + test.getShort() + "  " + test.getShort());
+			    						
+			    						thread.sendData(data);
+			    					}
+			    				}
+		    				}
+		    			}
 		    			
 			    		// Send ballz
 			    		for(clientThread thread : threads) {
@@ -76,78 +92,63 @@ public class MultiThreds {
 			    				buffer = ByteBuffer.wrap(arr);
 			    				buffer.clear();
 			    				
-			    				buffer.putShort((short)5);			// State: Add balls
-			    				buffer.putShort((short)0);			// nBalls, byte 2 och 3
+			    				buffer.putShort((short) GLOBAL_STATE__.ADD_BALLS.ordinal());	// State: Add balls
+			    				buffer.putShort((short) 0);										// nBalls, byte 2 och 3
 			    				
 			    				short nBalls = 0;
 			    				
 			    				for(clientThread.Ballz ball : thread.ballz) {
 			    			
-			    					if(buffer.capacity() < 16) {
-			    						break;
-			    					}
+			    					if(buffer.limit() - buffer.position() >= 5*4) {
 			    					
-			    					float xG = ball.getXPos();
-				    				float yG = ball.getYPos();
-				    				
-				    				
-				    				if(deviceManager.isOnDevice(thread.getIp(), xG, yG)) {
-				    					float xVelG = ball.getXVel();
-					    				float yVelG = ball.getYVel();
+				    					float xG = ball.getXPos();
+					    				float yG = ball.getYPos();
 					    				
-					    				int xPosL = deviceManager.globalToLocalX(thread.getIp(), xG, yG);
-					    				int yPosL = deviceManager.globalToLocalY(thread.getIp(), xG, yG);
-					    				
-					    				float xVelL = deviceManager.globalToLocalVelX(thread.getIp(), xVelG, yVelG);
-					    				float yVelL = deviceManager.globalToLocalVelY(thread.getIp(), xVelG, yVelG);
-					    				
-					    				//System.out.println(xVelL + " " + yVelL);
-					    				
-					    				buffer.putInt(ball.id);
-					    				buffer.putInt(xPosL);
-					    				buffer.putInt(yPosL);
-					    				buffer.putFloat((float) (xVelL*Math.pow(10, 9)));
-					    				buffer.putFloat((float) -(yVelL*Math.pow(10, 9)));
-					    				
-					    				nBalls ++;
-				    					
-				    				}
+					    				if(deviceManager.isOnDevice(thread.getIp(), xG, yG)) {
+					    					float xVelG = ball.getXVel();
+						    				float yVelG = ball.getYVel();
+						    				
+						    				float xPosL = deviceManager.globalToLocalX(thread.getIp(), xG, yG);
+						    				float yPosL = deviceManager.globalToLocalY(thread.getIp(), xG, yG);
+						    				
+						    				float xVelL = deviceManager.globalToLocalVelX(thread.getIp(), xVelG, yVelG);
+						    				float yVelL = deviceManager.globalToLocalVelY(thread.getIp(), xVelG, yVelG);
+						    				
+						    				buffer.putInt(ball.id);
+						    				buffer.putFloat(xPosL);
+						    				buffer.putFloat(yPosL);
+						    				
+						    				buffer.putFloat(xVelL);
+						    				buffer.putFloat(yVelL);
+						    				
+						    				//buffer.putFloat((float) (xVelL*Math.pow(10, 9)));
+						    				//buffer.putFloat((float) -(yVelL*Math.pow(10, 9)));
+						    				
+						    				nBalls ++;
+					    					
+					    				}
 				    				
-				    				
-				    				
-				    				/*
-			    					if(deviceManager.isOnDevice(thread.getIp(), xG, yG)) {
-					    				ByteBuffer buffer;
-					    				buffer = ByteBuffer.allocate(1*2 + 4*4);
+			    					} else {
+			    						buffer.position(2);
+					    				buffer.putShort(nBalls);
+					    				thread.sendData(buffer.array());
+					    				
+					    				nBalls = 0;
 					    				buffer.clear();
 					    				
-					    				buffer.putShort((short)3);			// State: Add ball
-					    				
-					    				
-					    				float xVelG = ball.getXVel();
-					    				float yVelG = ball.getYVel();
-					    				
-					    				int xPosL = deviceManager.globalToLocalX(thread.getIp(), xG, yG);
-					    				int yPosL = deviceManager.globalToLocalY(thread.getIp(), xG, yG);
-					    				
-					    				float xVelL = deviceManager.globalToLocalVelX(thread.getIp(), xVelG, yVelG);
-					    				float yVelL = deviceManager.globalToLocalVelY(thread.getIp(), xVelG, yVelG);
-					    				
-					    				buffer.putInt(xPosL);
-					    				buffer.putInt(yPosL);
-					    				buffer.putFloat(xVelL);
-					    				buffer.putFloat(yVelL);
-					    				
-					    				thread.sendData(buffer.array());
+					    				buffer.putShort((short)5);			// State: Add balls
+					    				buffer.putShort((short)0);			// nBalls, byte 2 och 3
 			    					}
-			    					*/
+			    					
 			    				}
 			    				
 			    				buffer.position(2);
 			    				buffer.putShort(nBalls);
 			    				thread.sendData(buffer.array());
+			
 			    			}
 			    		}
+			    				    		
 			    		
 		    		}
 		    		
@@ -190,7 +191,4 @@ public class MultiThreds {
 		}
 	}//End of Main
 	
-	public static PhysicsWorld getPhysicsWorld() {
-		return physicsWorld;
-	}
 } // End of MultiThreds

@@ -15,6 +15,8 @@ public class Ball {
 	private boolean locked;
 	private int color;
 	
+	private float newX, newY, oldX, oldY, newSpeedX, newSpeedY, oldSpeedX, oldSpeedY, newTime, oldTime;
+	
 	
 	public Ball(float startX, float startY, float diameter){
 		image = Assets.ball;
@@ -25,11 +27,15 @@ public class Ball {
 		locked = true;
 	}
 	
-	public Ball(float startX, float startY, float diameter, float speedX, float speedY){
-		image = Assets.ball;
+	public Ball(float startX, float startY, float diameter, float speedX, float speedY, boolean local){
+		if(local) {
+			image = Assets.localBall;
+		} else {
+			image = Assets.ball;
+		}
 		pos = new PointF(startX, startY);
-		(this).speedX = speedX;
-		(this).speedY = speedY;
+		this.speedX = speedX;
+		this.speedY = speedY;
 		this.diameter = diameter;
 		locked = false;
 	}
@@ -38,19 +44,85 @@ public class Ball {
 		image = Assets.ball;
 		this.id = id;
 		pos = new PointF(startX, startY);
-		(this).speedX = speedX;
-		(this).speedY = speedY;
+		this.speedX = speedX;
+		this.speedY = speedY;
 		this.diameter = diameter;
 		locked = false;
 	}
 	
-	public void update(){
-		//if(!locked){
-			pos.x += speedX;
-			pos.y += speedY;
-			//Log.d("UPDATE", pos.x + " " + pos.y + " " + speedX + " " + speedY + " ");
-		//}
+	public Ball(int id, float startX, float startY, float diameter, float speedX, float speedY, boolean local, float time){
+		
+		if(local) {
+			image = Assets.localBall;
+		} else {
+			image = Assets.ball;
+		}
+		this.id = id;
+		pos = new PointF(startX, startY);
+		this.speedX = speedX;
+		this.speedY = speedY;
+		this.diameter = diameter;
+		locked = false;
+		
+		this.newX = startX;
+		this.newY = startY;
+		this.newSpeedX = speedX;
+		this.newSpeedY = speedY;
+		this.newTime = time;
+
 	}
+	
+	public void update(float reciveDelay){
+			/*
+			pos.x = (int) (pos.x + speedX * timeDelta);
+			pos.y = (int) (pos.y + speedY * timeDelta);
+			*/
+		
+		float untilNowFromLast = System.nanoTime() + reciveDelay - this.oldTime;
+		float deltaTime = this.newTime - this.oldTime;
+		
+		
+		float scale = untilNowFromLast / deltaTime;
+		
+		Log.d("SCALE", "SCALE = " + scale);
+		
+	//	if(scale <= 1) {
+		/*
+			pos.x = cubicInterpolation(oldX, oldX + oldSpeedX * deltaTime, newX - newSpeedX * deltaTime, newX, scale);
+			pos.y = cubicInterpolation(oldY, oldY + oldSpeedY * deltaTime, newY - newSpeedY * deltaTime, newY, scale);
+			speedX = cosineInterpolation(oldSpeedX, newSpeedX, scale);
+			speedY = cosineInterpolation(oldSpeedY, newSpeedY, scale);
+		*/
+		
+			pos.x = linearInterpolation(oldX, newX, scale);
+			pos.y = linearInterpolation(oldY, newY, scale);
+			speedX = linearInterpolation(oldSpeedX, newSpeedX, scale);
+			speedY = linearInterpolation(oldSpeedY, newSpeedY, scale);
+	//	}
+		
+		
+	}
+	
+	float linearInterpolation(float x1, float x2, float scale) {
+		return x1 * (1 - scale) + x2 * scale;
+	}
+	
+	float cosineInterpolation(float x1, float x2, float scale) {
+		float scale2 = (float) ((1 - Math.cos(scale * Math.PI)) / 2);
+		return x1 * (1 - scale2) + x2 * scale2;
+	}
+	
+	float cubicInterpolation(float x0, float x1, float x2, float x3, float scale) {
+		float a0, a1, a2, a3, scale2;
+		scale2 = scale * scale;
+		a0 = x3 - x2 - x0 + x1;
+		a1 = x0 - x1 - a0;
+		a2 = x2 - x0;
+		a3 = x1;
+		return (a0*scale*scale2 + a1*scale2 + a2*scale + a3); 
+	}
+	
+
 
 	public Image getImage(){
 		return image;
@@ -78,6 +150,10 @@ public class Ball {
 
 	public float getSpeedX() {
 		return speedX;
+	}
+
+	public float getSpeedY() {
+		return speedY;
 	}
 
 	/*
@@ -108,12 +184,27 @@ public class Ball {
 		this.pos.y = y;
 	}
 
-	public void updateBall(int posX, int posY, float speedX, float speedY){
+	public void updateBall(float posX, float posY, float speedX, float speedY){
 		this.pos.x = posX;
 		this.pos.y = posY;
 		this.speedX = speedX;
 		this.speedY = speedY;
 	}
+	
+	public void updatePos(float x, float y, float speedX, float speedY, float time) {
+		this.oldX = this.newX;
+		this.oldY = this.newY;
+		this.oldSpeedX = this.newSpeedX;
+		this.oldSpeedY = this.newSpeedY;
+		this.oldTime = this.newTime;
+		
+		this.newX = x;
+		this.newY = y;
+		this.newSpeedX = speedX;
+		this.newSpeedY = speedY;
+		this.newTime = time;
+	}
+	
 	
 	public int getId() {
 		return id; 

@@ -3,6 +3,7 @@ package com.pussycat.minions;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
@@ -10,179 +11,188 @@ import java.io.PrintWriter;
 import java.net.InetAddress;
 import java.net.Socket;
 import java.nio.ByteBuffer;
+import java.util.ArrayList;
 import java.util.concurrent.LinkedBlockingQueue;
 
 
 import android.util.Log;
 
 public class TCPClient {
+
 	private String serverMessage;
 	public static String SERVERIP = "192.168.43.148";
+
 	public static final int SERVERPORT = 4444;
-	private boolean mRun = false;
-	private OnMessageReceived messageListner = null;
+	private boolean isRunning = false;
 	
 	PrintWriter out;
 	BufferedReader in;
 	OutputStream dout;
+	InputStream din;
 	BufferedWriter buffw;
 	
-	LOCAL_STATE__ internalState;
-	//public volatile LinkedBlockingQueue<DataPackage> messages = new LinkedBlockingQueue <DataPackage>();
-	public DataPackage dataPackage = null;
+	GLOBAL_STATE__ internalState;
+	BallHandler ballHandler;
+	//public volatile LinkedBlockingQueue<DataPackage> messages = new LinkedBlockingQueue <DataPackage>(); 	// Old legacy
+	//public volatile ArrayList<DataPackage> messages = new ArrayList<DataPackage>();
 	
+	public EndlessQueue messages;
 	
-	public TCPClient(OnMessageReceived listner){
-		messageListner = listner;
+	public TCPClient(GLOBAL_STATE__ internalState, BallHandler ballHandler) {
+		this.internalState = internalState;
+		this.ballHandler = ballHandler;
+		 messages = new EndlessQueue(new DataPackage[3]);
 	}
+
 	
-	public TCPClient() {
-		
-	}
-	
-	public void sendMessage(String message) {
-		if(out != null && !out.checkError()) {
-			out.println(message);
-			out.flush();
-		}
-	}
-	
-	public void sendData(byte[] buffer) {
+	public synchronized void sendData(byte[] buffer) {
 		if(buffer.length > 0) {	
 			try {
-				/*
-				Log.d("AppWrite", "Writes: " + buffer.toString());
-				byte[] arr = new byte[500];
-				ByteBuffer bf = ByteBuffer.wrap(arr);
-				bf.putShort((short)16);
-				bf.putFloat((float) 17.17);
-				bf.putFloat((float) 18.18);
-				bf.putFloat((float) 19.19);
-				bf.putFloat((float) 2000.20);
-				dout.write(bf.array());
-				*/
-				ByteBuffer bufferLength = ByteBuffer.allocate(4);
-				bufferLength.putInt(buffer.length);
+				ByteBuffer header = ByteBuffer.allocate(8);
+				header.putInt(buffer.length);
+				header.putFloat(System.nanoTime());
 				
-				dout.write(bufferLength.array());
-				dout.write(buffer);
-				dout.flush();
-				
-
+				if(dout != null) {
+					dout.write(header.array());
+					dout.write(buffer);
+					dout.flush();
+				}
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
 		}
 	}
-	
-	public void getData(){
-		if(out !=null && !out.checkError()) {
-			out.println("");
-			out.flush();
-		}
-	}
-	
-	public void stopClient() {
-		mRun = false;
+
+	public void stopCommuinication() {
+		isRunning = false;
 	}
 	
 	public void run() {
-		mRun = true;
+		isRunning = true;
 		
 		try {
 			InetAddress serverAddr = InetAddress.getByName(SERVERIP);
 			Socket socket = new Socket(serverAddr, SERVERPORT);
 			
+			socket.setTcpNoDelay(true);
+			//socket.setPerformancePreferences(connectionTime, latency, bandwidth)
 			try {
-			/*	out = 	new PrintWriter(
-						new BufferedWriter(
-						new OutputStreamWriter(socket.getOutputStream())), true);
-			*/
-				dout = socket.getOutputStream();
 				
-			/*	in = 	new BufferedReader(
-						new InputStreamReader(socket.getInputStream()));
-						*/
-
-				while(mRun) {
-					/*
-					serverMessage = in.readLine();
-					if(serverMessage != null && messageListner != null) {
-						messageListner.messageReceived(serverMessage);
-					}
-					serverMessage = null;
-					*/
+				dout = socket.getOutputStream();
+				din = socket.getInputStream();
+				byte[] headerBuffer = new byte[8];
+				
+				while(isRunning) {
 					
-					/*
-					int length = socket.getInputStream().available();					
-					Log.d("DATAP", "DATAP available: " + socket.getInputStream().available());
+					din.read(headerBuffer);	
+					float reciveTime = System.nanoTime();
 					
-					if(length > 0) {
-						length = Math.min(1024, length);
-						byte[] bytes = new byte[length];
-						socket.getInputStream().read(bytes);
-			     		messages.add(new DataPackage(bytes, socket.getInetAddress().toString(), socket.getPort()));
-					}
-					*/
-					byte[] bytesLength = new byte[4];
-					socket.getInputStream().read(bytesLength);	
-					ByteBuffer bufferLength = ByteBuffer.wrap(bytesLength);
+					ByteBuffer header = ByteBuffer.wrap(headerBuffer);
 					
-					int length = bufferLength.getInt();
+					int length = header.getInt();
 				    length = Math.max(0, length);
+				    
+				    float sendTime = header.getFloat();
 
 					if(length > 0) {
+						
 						byte[] bytes = new byte[length];
-						socket.getInputStream().read(bytes);
-						dataPackage = new DataPackage(bytes, socket.getInetAddress().toString(), socket.getPort());
-						//messages.add(new DataPackage(bytes, socket.getInetAddress().toString(), socket.getPort()));
-					}
+					
+						din.read(bytes);
+						DataPackage dataPackageToAdd = new DataPackage(bytes, socket.getInetAddress().toString(), socket.getPort(), sendTime, reciveTime);
+						
+						messages.add(dataPackageToAdd);
+						
+						synchronized (messages) {
+							messages.notify();
+						};
+						
+						/*
+					
+			        		ByteBuffer buffer = ByteBuffer.wrap(bytes);
+			        		short state = buffer.getShort();
+							
+			        		GLOBAL_STATE__ actualState;
+							
+							try {
+								actualState = GLOBAL_STATE__.values()[state];
+							} catch(Exception e) {
+								actualState = GLOBAL_STATE__.ADD_BALL;
+							}
+						
+				    		
+				    		switch(actualState) {
+				    			case ADD_BALL:
+				    			{
+				    				int id = buffer.getInt();
+			    					float xPos = buffer.getInt();
+						        	float yPos = buffer.getInt();	
+				        			float xVel = buffer.getFloat();	
+				        			float yVel = buffer.getFloat();		
+				        			
+					        		//Log.d("GOT", "GOT from " + ip + "  :   " + xPos + ", " + yPos + "   " + xVel + ", " + yVel);
+				        			ballHandler.addBall(id, xPos, yPos, 1, xVel, yVel, false);
+				    			}
+				    			break;
+				    			
+				    			case ADD_BALLS:
+				    			{
+				    				final short nBalls = buffer.getShort();
+				    				//Log.d("NBALLS", "NBALLS: " + nBalls);
+				    				for(int i=0; i<nBalls; i++) {
+				    					int id = buffer.getInt();
+				    					float xPos = buffer.getFloat();
+							        	float yPos = buffer.getFloat();	
+					        			float xVel = buffer.getFloat();	
+					        			float yVel = buffer.getFloat();		
+					        			
+					        			Log.d("VEL", "GOT xVel = " + xVel * Math.pow(10, 9) * 2.5);
+					        			Log.d("VEL", "GOT yVel = " + yVel * Math.pow(10, 9) * 2.5);
+					        			
+					        			//Log.d("GOT", "GOT from " + ip + "  :   " + xPos + ", " + yPos + "   " + xVel + ", " + yVel);
+					        			ballHandler.addBall(id, xPos, yPos, 1, xVel, yVel, false);
+				    				}
+				    			}
+				    			break;
+				    			
+				    			case SET_STATE:
+				    			{
+				    				short newState = buffer.getShort();
+				    				
+				    				Log.d("FINGERS", "GOT: " + newState);
+				    				Log.d("GOT", "NEW STATE: " + newState);
+				    				
+				    				GLOBAL_STATE__ newInternalState;
+				    				
+			        				try {
+			        					newInternalState = GLOBAL_STATE__.values()[newState];
+									} catch(Exception e) {
+										newInternalState = internalState;
+										System.out.println("ERROR: Invalid state: " + newState);
+									}
+			        				
+			        				 internalState = newInternalState;
+				    			}
+				    			break;
+				    			
+				    			default:
+				    			break;
+				    		}*/
+			        	}
+						
 
-					
-		     		/*
-					short state = buffer.getShort();
-					GLOBAL_STATE__ actualState;
-					
-					try {
-						actualState = GLOBAL_STATE__.values()[state];
-					} catch(Exception e) {
-						actualState = GLOBAL_STATE__.ADD_BALL;
-					}
-					
-	        		String ip = socket.getInetAddress().toString();
-
-	        		switch(actualState) {
-	        			case ADD_BALL:
-		        			float xPos = buffer.getInt();
-				        	float yPos = buffer.getInt();	
-		        			float xVel = buffer.getFloat();	
-		        			float yVel = buffer.getFloat();		
-		        			Log.d("GOT", "GOT from " + ip + "  :   " + xPos + ", " + yPos + "   " + xVel + ", " + yVel);
-	        			break;
-	        			
-	        			case SET_STATE:
-	        				short newState = buffer.getShort();
-	        				Log.d("GOT", "NEW STATE: " + newState);
-	        			break;
-	        			
-	        			default:
-	        			break;
-	        		}
-	        		*/
 				}
+				
 			} catch (Exception e) {
 				Log.e("Android", "ERROR", e);
 			} finally {
 				socket.close();
 			}
+			
 		} catch (Exception e) {
 			Log.e("Android", "ERROR", e);
 		}
 	}
 	
-	public interface OnMessageReceived {
-		public void messageReceived(String message);
-	}
-	
-}//End of TCPClient
+}
 

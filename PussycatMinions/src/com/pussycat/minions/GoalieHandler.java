@@ -51,7 +51,7 @@ public class GoalieHandler {
 	public void update(){
 		
 		if(tcpClient != null){
-			tcpClient.getData();
+		//	tcpClient.getData();
 			goalies.clear();
 			goalies.add(new Goalie(screenWidth/2, screenHeight/2, 1.5f));
 			if(data != "" && data != null) {
@@ -142,13 +142,13 @@ public class GoalieHandler {
 	public class connectTask extends AsyncTask<String,String,TCPClient> {
 		@Override
 		protected TCPClient doInBackground(String... message) {
-			tcpClient = new TCPClient(new TCPClient.OnMessageReceived() {
+			/*tcpClient = new TCPClient(new TCPClient.OnMessageReceived() {
 				@Override
 				public void messageReceived(String message) {
 					// TODO Auto-generated method stub
 					publishProgress(message);
 				}
-			});
+			});*/
 			tcpClient.run();
 			return null;
 		}

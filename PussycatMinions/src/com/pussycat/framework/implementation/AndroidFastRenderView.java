@@ -18,7 +18,6 @@ public class AndroidFastRenderView extends SurfaceView implements Runnable {
         this.game = game;
         this.framebuffer = framebuffer;
         this.holder = getHolder();
-
     }
 
     public void resume() { 
@@ -29,6 +28,8 @@ public class AndroidFastRenderView extends SurfaceView implements Runnable {
     }      
     
     public void run() {
+        Thread.currentThread().setName("RENDER");
+        
         Rect dstRect = new Rect();
         long startTime = System.nanoTime();
         while(running) {  

@@ -1,5 +1,7 @@
 
+import java.nio.ByteBuffer;
 import java.util.ArrayList;
+import java.util.concurrent.LinkedBlockingQueue;
 
 
 // TODO: Make all computations based on new data types like vectors and
@@ -20,8 +22,12 @@ public class DeviceManager {
 		int yDPI;
 		int resX;			// The device's resolution.
 		int resY;
+		boolean needsMapping;
+		short type;
 		
-		public Device(String ip, int xDPI, int yDPI, int resX, int resY) {
+		private LinkedBlockingQueue<byte[]> messagesToSend = new LinkedBlockingQueue <byte[]>();
+		
+		public Device(String ip, short type, int xDPI, int yDPI, int resX, int resY) {
 			this.ip = ip;
 			this.xDPI = xDPI;
 			this.yDPI = yDPI;
@@ -30,8 +36,16 @@ public class DeviceManager {
 			this.rotZ = 0; 			// Zero rotation for main-device.
 			this.posX = 0; 			// The global origin is defined on main-device.
 			this.posY = 0; 			// The global origin is defined on main-device.
+			
+			this.type = type;
+			
+			
+			if(type == 0) {
+				needsMapping = false;
+			} else {
+				needsMapping = true;
+			}
 		}
-	
 	}
 	
 	
@@ -47,15 +61,15 @@ public class DeviceManager {
 	DeviceManager() {
 		this.devices = new ArrayList<Device>();
 	}
-
 	
-	public void addDevice(String ip, int xDPI, int yDPI, int resX, int resY) {
+	
+	public void addDevice(String ip, short type, int xDPI, int yDPI, int resX, int resY) {
 		if(deviceIsAdded(ip)) {	
 			System.out.println("Device is already addedd: " + ip + " " + xDPI + " " + yDPI + " " + resX + " " +resY);
 			return;
 		}
 		
-		this.devices.add(new Device(ip, xDPI, yDPI, resX, resY));
+		this.devices.add(new Device(ip, type, xDPI, yDPI, resX, resY));
 		System.out.println("Added device: " + ip + " " + xDPI + " " + yDPI + " " + resX + " " +resY);
 	}
 
@@ -78,42 +92,43 @@ public class DeviceManager {
 		return velocity;
 	}
 	
+	// TODO: Se över, gör om gör rätt.
 	public float computeVelocityX(String ip, float x1, float y1, float x2, float y2, float t) {
 		for (Device device : this.devices) {
 		    if (device.ip.equals(ip)) {
 		    	
-		    	float deltaX = (x2 - x1) / device.xDPI;
-		    	float deltaY = (y2 - y1) / device.yDPI;
+		    	double deltaX = (x2 - x1) / device.xDPI;
+		    	double deltaY = (y2 - y1) / device.yDPI;
 		    	
-				float velX = deltaX/t;
-				float velY = deltaY/t;
+		    	double velX = deltaX/t;
+		    	double velY = deltaY/t;
 				
-				float velXF = (float) (velX*Math.cos(-device.rotZ) - velY*Math.sin(-device.rotZ));
-				float velYF = (float) (velX*Math.sin(-device.rotZ) + velY*Math.cos(-device.rotZ));
+		    	double velXF = (float) (velX*Math.cos(-device.rotZ) - velY*Math.sin(-device.rotZ));
+		    	double velYF = (float) (velX*Math.sin(-device.rotZ) + velY*Math.cos(-device.rotZ));
 				
-				return velXF;
+				return (float) velXF;
 		    }
 		}
 		return 0;
 	}
 	
-	
+	// TODO: Se över, gör om gör rätt.
 	public float computeVelocityY(String ip, float x1, float y1, float x2, float y2, float t) {
 		for (Device device : this.devices) {
 		    if (device.ip.equals(ip)) {
 				y1 = device.resY - y1;
 				y2 = device.resY - y2;
 		    	
-		    	float deltaX = (x2 - x1) / device.xDPI;
-		    	float deltaY = (y2 - y1) / device.yDPI;
+				double deltaX = (x2 - x1) / device.xDPI;
+		    	double deltaY = (y2 - y1) / device.yDPI;
 		    	
-				float velX = deltaX/t;
-				float velY = deltaY/t;
+		    	double velX = deltaX/t;
+		    	double velY = deltaY/t;
 				
-				float velXF = (float) (velX*Math.cos(-device.rotZ) - velY*Math.sin(device.rotZ));
-				float velYF = (float) (velX*Math.sin(device.rotZ) + velY*Math.cos(device.rotZ));
+		    	double velXF = (float) (velX*Math.cos(-device.rotZ) - velY*Math.sin(device.rotZ));
+		    	double velYF = (float) (velX*Math.sin(device.rotZ) + velY*Math.cos(device.rotZ));
 				
-				return velYF;
+				return (float) velYF;
 		    }
 		}
 		return 0;
@@ -166,7 +181,60 @@ public class DeviceManager {
 	}
 	*/
 	
+
+	public void setMappingAtMainDevice() {
+		for (Device device : this.devices) {
+		    if (device.type == 0) {
+		    	// @ Main device
+				System.out.println("Found Main-device");
+				
+				ByteBuffer buffer = ByteBuffer.allocate(2*2);
+	    		buffer.clear();
+	    		
+	    		buffer.putShort((short) GLOBAL_STATE__.SET_STATE.ordinal());	// State: 		SET_STATE
+	    		buffer.putShort((short) GLOBAL_STATE__.MAP_DEVICE.ordinal());	// New state: 	MAP_DEVICE
+	    		
+	    		device.messagesToSend.add(buffer.array());
+		    }
+		}
+	}
 	
+	public void setMappingAtAllDevices() {
+		for (Device device : this.devices) {
+				System.out.println("Found Main-device");
+				
+				ByteBuffer buffer = ByteBuffer.allocate(2*2);
+	    		buffer.clear();
+	    		
+	    		buffer.putShort((short) GLOBAL_STATE__.SET_STATE.ordinal());	// State: 		SET_STATE
+	    		buffer.putShort((short) GLOBAL_STATE__.MAP_DEVICE.ordinal());	// New state: 	MAP_DEVICE
+	    		
+	    		device.messagesToSend.add(buffer.array());
+		}
+	}
+	
+	
+	
+	public byte[] getNextMessage(String ip) {
+		for (Device device : this.devices) {
+			if(device.ip.equals(ip)) {
+				return device.messagesToSend.poll();
+			}
+		}
+		return null;
+	}
+	
+	public boolean hasMessagesToSend(String ip) {
+		for (Device device : this.devices) {
+			if(device.ip.equals(ip)) {
+			    if(!device.messagesToSend.isEmpty()) {
+			    	return true;
+			    }
+			    return false;
+			}
+		}
+		return false;
+	}
 	
 	// Checks if a device is added.
 	public boolean deviceIsAdded(String ip) {
@@ -187,7 +255,7 @@ public class DeviceManager {
 		    	y1 = device.resY - y1;
 				
 		    	float x2 = (float) (device.posX + ((x1/device.xDPI)*Math.cos(device.rotZ) - (y1/device.yDPI)*Math.sin(device.rotZ)));
-		    	float y2 = (float) (device.posY + ((x1/device.yDPI)*Math.sin(device.rotZ) + (y1/device.yDPI)*Math.cos(device.rotZ)));
+		    	float y2 = (float) (device.posY + ((x1/device.xDPI)*Math.sin(device.rotZ) + (y1/device.yDPI)*Math.cos(device.rotZ)));
 		    	System.out.println("Global (" + x1 + ", " + y1 + ") = (" + x2 + ", " + y2 + ") = (" + x2*2.5 + ", " + y2*2.5 + ")" );
 		    	//return ((x2 <= device.resX/device.xDPI) && (y2 <= device.resY/device.yDPI));
 		    	
@@ -203,7 +271,7 @@ public class DeviceManager {
 		    	y1 = device.resY - y1;
 				
 		    	float x2 = (float) (device.posX + ((x1/device.xDPI)*Math.cos(device.rotZ) - (y1/device.yDPI)*Math.sin(device.rotZ)));
-		    	float y2 = (float) (device.posY + ((x1/device.yDPI)*Math.sin(device.rotZ) + (y1/device.yDPI)*Math.cos(device.rotZ)));
+		    	float y2 = (float) (device.posY + ((x1/device.xDPI)*Math.sin(device.rotZ) + (y1/device.yDPI)*Math.cos(device.rotZ)));
 		    	System.out.println("Global (" + x1 + ", " + y1 + ") = (" + x2 + ", " + y2 + ") = (" + x2*2.5 + ", " + y2*2.5 + ")" );
 		    	//return ((x2 <= device.resX/device.xDPI) && (y2 <= device.resY/device.yDPI));
 		    	
@@ -214,7 +282,7 @@ public class DeviceManager {
 	}
 	
 	
-	public int globalToLocalX(String ip, float xG, float yG) {
+	public float globalToLocalX(String ip, float xG, float yG) {
 		for (Device device : this.devices) {
 		    if (device.ip.equals(ip)) {
 		    	
@@ -225,8 +293,8 @@ public class DeviceManager {
 		    	float xT = (float) (xB*Math.cos(-device.rotZ) - yB*Math.sin(-device.rotZ));
 		    	float yT = (float) (xB*Math.sin(-device.rotZ) + yB*Math.cos(-device.rotZ));
 		    	
-		    	int xL = (int) (xT * device.xDPI);
-		    	int yL = (int) (yT * device.yDPI);
+		    	float xL = (xT * device.xDPI);
+		    	float yL = (yT * device.yDPI);
 		    	
 		    	yL = device.resY - yL;
 		    	
@@ -244,7 +312,7 @@ public class DeviceManager {
 		return 0;
 	}
 	
-	public int globalToLocalY(String ip, float xG, float yG) {
+	public float globalToLocalY(String ip, float xG, float yG) {
 		for (Device device : this.devices) {
 		    if (device.ip.equals(ip)) {
 		    	
@@ -254,8 +322,8 @@ public class DeviceManager {
 		    	float xT = (float) (xB*Math.cos(-device.rotZ) - yB*Math.sin(-device.rotZ));
 		    	float yT = (float) (xB*Math.sin(-device.rotZ) + yB*Math.cos(-device.rotZ));
 		    	
-		    	int xL = (int) (xT * device.xDPI);
-		    	int yL = (int) (yT * device.yDPI);
+		    	float xL = (xT * device.xDPI);
+		    	float yL = (yT * device.yDPI);
 		    	
 		    	yL = device.resY - yL;
 		    	//System.out.println("Global:  " + xG + ", " + yG + "   Local: " + xL + ", " + yL);
@@ -265,19 +333,19 @@ public class DeviceManager {
 		return 0;
 	}
 	
+	
 	public float globalToLocalVelX(String ip, float xVelG, float yVelG) {
 		for (Device device : this.devices) {
 		    if (device.ip.equals(ip)) {
 		    	
-		    	float xT = (float) (xVelG*Math.cos(-device.rotZ) - yVelG*Math.sin(-device.rotZ));
-		    	float yT = (float) (xVelG*Math.sin(-device.rotZ) + yVelG*Math.cos(-device.rotZ));
 		    	
-		    	int xL = (int) (xT * device.xDPI);
-		    	int yL = (int) (yT * device.yDPI);
-		    	
-		    	yL = device.resY - yL;
-		    	//System.out.println("Global:  " + xG + ", " + yG + "   Local: " + xL + ", " + yL);
-		    	return xL;
+		    	double velX = xVelG;
+		    	double velY = yVelG;
+				
+		    	double velXF = (float) (velX*Math.cos(-device.rotZ) - velY*Math.sin(-device.rotZ));
+		    	double velYF = (float) (velX*Math.sin(-device.rotZ) + velY*Math.cos(-device.rotZ));
+				
+		    	return (float) (velXF * device.xDPI);
 		    	
 		    }
 		}
@@ -287,15 +355,16 @@ public class DeviceManager {
 	public float globalToLocalVelY(String ip, float xVelG, float yVelG) {
 		for (Device device : this.devices) {
 		    if (device.ip.equals(ip)) {
-		    	float xT = (float) (xVelG*Math.cos(-device.rotZ) - yVelG*Math.sin(-device.rotZ));
-		    	float yT = (float) (xVelG*Math.sin(-device.rotZ) + yVelG*Math.cos(-device.rotZ));
 		    	
-		    	int xL = (int) (xT * device.xDPI);
-		    	int yL = (int) (yT * device.yDPI);
 		    	
-		    	yL = device.resY - yL;
-		    	//System.out.println("Global:  " + xG + ", " + yG + "   Local: " + xL + ", " + yL);
-		    	return yL;
+		    	
+		    	double velX = xVelG;
+		    	double velY = - yVelG;
+				
+		    	double velXF = (float) (velX*Math.cos(-device.rotZ) - velY*Math.sin(device.rotZ));
+		    	double velYF = (float) (velX*Math.sin(device.rotZ) + velY*Math.cos(device.rotZ));
+				
+				return (float)(velYF * device.yDPI);
 		    }
 		}
 		return 0;
@@ -305,10 +374,10 @@ public class DeviceManager {
 	public boolean isOnDevice(String ip, float xG, float yG) {
 		for (Device device : this.devices) {
 		    if (device.ip.equals(ip)) {
-		    	int xL = globalToLocalX(ip, xG, yG);
-		    	int yL = globalToLocalY(ip, xG, yG);
+		    	float xL = globalToLocalX(ip, xG, yG);
+		    	float yL = globalToLocalY(ip, xG, yG);
 		    	
-				if( xL >= 0 && yL >= 0 && xL <= device.resX && yL <= device.resY) {
+				if(xL >= 0 && yL >= 0 && xL <= device.resX && yL <= device.resY) {
 					return true;
 				}
 				return false;
@@ -317,21 +386,44 @@ public class DeviceManager {
 		return false;
 	}
 	
+	
+	public boolean needsMapping(String ip) {
+		for (Device device : this.devices) {
+		    if (device.ip.equals(ip)) {
+		    	return device.needsMapping;
+		    }
+		}
+		return false;
+	}
+	
+	public void setNeedsMapping(String ip, boolean needsMapping) {
+		for (Device device : this.devices) {
+		    if (device.ip.equals(ip)) {
+		    	device.needsMapping = needsMapping;
+		    	return;
+		    }
+		}
+	}
+	
 	// TODO: Fix devision by zero. (xDPI, yDPI)
 	// Point mapping on main device.
-	public void devicePointMappingStep1(String ip, float x1, float y1, float x2, float y2, float t) {
+	public void devicePointMappingStep1(String ip, float x1, float y1Org, float x2, float y2Org, float t) {
 		for (Device device : this.devices) {
 		    if (device.ip.equals(ip)) {
 		    	// Set origin to the lower left corner.
-				y1 = device.resY - y1;
-				y2 = device.resY - y2;
+				float y1 = device.resY - y1Org;
+				float y2 = device.resY - y2Org;
 				
 				// Compute the released position in global coordinates.
-		    	this.pos2x = x2/device.xDPI;
-		    	this.pos2y = y2/device.yDPI;
+		    	//this.pos2x = x2/device.xDPI;
+		    	//this.pos2y = y2/device.yDPI;
+		    	this.pos2x = localToGlobalX(ip, x2, y2Org);
+		    	this.pos2y = localToGlobalY(ip, x2, y2Org);
+		    	
 		    	
 		    	// Compute the vector's angle relative the global positive x-axis.
-		    	this.theta1 = computeTheta(x1, y1, x2, y2);
+		    	//this.theta1 = computeTheta(x1, y1, x2, y2);
+		    	this.theta1 = device.rotZ + computeTheta(x1, y1, x2, y2);
 		    	
 		    	// Compute the velocity between push down and release.
 		    	this.velocity1 = computeVelocity(x1, y1, x2, y2, t, device.xDPI, device.yDPI);
@@ -345,12 +437,12 @@ public class DeviceManager {
 	
 	// TODO: Fix devision by zero. (xDPI, yDPI)
 	// Point mapping on regular device.
-	public void devicePointMappingStep2(String ip, float x1, float y1, float x2, float y2, float t, float deltaT) {
+	public void devicePointMappingStep2(String ip, float x1, float y1Org, float x2, float y2Org, float t, float deltaT) {
 		for (Device device : this.devices) {
 		    if (device.ip.equals(ip)) {
 		    	// Set origin to the lower left corner.
-				y1 = device.resY - y1;
-				y2 = device.resY - y2;
+				float y1 = device.resY - y1Org;
+				float y2 = device.resY - y2Org;
 				
 				// Set the time to be between the first release position and the second push down position.
 				deltaT = deltaT - t;
@@ -385,6 +477,15 @@ public class DeviceManager {
 		     	System.out.println("device.posX = " + device.posX + " eller " + device.posX*2.5);
 		    	System.out.println("device.posY = " + device.posY + " eller " + device.posY*2.5);
 		    	System.out.println("--------------------------");
+		    	
+				
+				
+		    	this.pos2x = localToGlobalX(ip, x2, y2Org);
+		    	this.pos2y = localToGlobalY(ip, x2, y2Org);
+		    	//this.theta1 = theta1;
+		    	this.velocity1 = velocity2;
+		    	
+		    	
 		    	
 		    	// The device is now mapped, no need to loop through the other devices.
 		    	return;
