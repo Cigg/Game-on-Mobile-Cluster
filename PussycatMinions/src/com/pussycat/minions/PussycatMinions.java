@@ -16,7 +16,7 @@ public class PussycatMinions extends AndroidGame {
     
 	@Override
     public Screen getInitScreen() {
-    	
+		
     	DisplayMetrics metrics = getResources().getDisplayMetrics();
     	width = metrics.widthPixels;
     	height = metrics.heightPixels;

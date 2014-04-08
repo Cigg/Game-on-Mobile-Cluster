@@ -62,13 +62,17 @@ public class MainMenuScreen extends Screen {
             if (event.type == TouchEvent.TOUCH_UP) {
             	playerButton.setPressed(false);
             	middleButton.setPressed(false);
-            	
+
+            	game.setScreen(new GameScreen(game));
+            	/*
             	if(playerButton.inBounds(event.x, event.y)){
             		game.setScreen(new SetupScreen(game));
             	}
             	if(middleButton.inBounds(event.x, event.y)){
             		game.setScreen(new SetupScreenMiddle(game));
             	}
+            	
+*/
             	//START GAME
 //            	if(inBounds(event, 0,0, PussycatMinions.getScreenWidth(), PussycatMinions.getScreenHeight()/2))
 //            		game.setScreen(new GameScreen(game));
