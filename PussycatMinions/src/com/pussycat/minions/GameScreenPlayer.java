@@ -34,7 +34,6 @@ public class GameScreenPlayer extends Screen {
     private GameState state = GameState.Ready;
 
     // Variable Setup
-    // You would create game objects here.
     private BallHandler ballHandler;
     private float ballSpeed = 20.0f;
     private ArrayList<PointF> prevBallPositions;
@@ -46,20 +45,15 @@ public class GameScreenPlayer extends Screen {
     private Ball mobileBall = null;
     private FPSCounter fpsCounter;
     Context context;
-
-    
     
     // New
     private GLOBAL_STATE__ internalState;
-    
 	private float currentX, currentY;
-
 	private float downX, downY;
 	private float downTime, previousTime;
-	
 	private TCPClient comm;
 
-
+	// Constructor
     public GameScreenPlayer(Game game) {
         super(game);
         
@@ -69,7 +63,6 @@ public class GameScreenPlayer extends Screen {
 
         // Initialize game objects here
         ballHandler = new BallHandler(1.5f);
-        
         
         // Defining a paint object
 		paint = new Paint();
@@ -81,7 +74,6 @@ public class GameScreenPlayer extends Screen {
 		Log.d("Debug Pussycat", "GameScreen constructor");
 		
 		prevBallPositions = new ArrayList<PointF>();
-
 		
 		previousTime = 0;
 		internalState = GLOBAL_STATE__.ADD_DEVICE;
@@ -131,50 +123,12 @@ public class GameScreenPlayer extends Screen {
        	// Update balls
     	ballHandler.update();
         
-
         // All touch input is handled here:
        // Update touch events
 
         int len = touchEvents.size();
         for (int i = 0; i < len; i++) {
             TouchEvent event = touchEvents.get(i);
-            /*
-            if(event.type == TouchEvent.TOUCH_DOWN){
-            	System.out.println("MobileBall added");
-            	if(mobileBall == null) {
-            		mobileBall = new Ball(event.x, event.y, 1.5f*PussycatMinions.getPpi()*0.3937f);
-            	}
-            }
-            if(event.type == TouchEvent.TOUCH_DRAGGED) {
-            	if(mobileBall != null) {
-            		mobileBall.setPos(event.x,event.y);
-            		prevBallPositions.add(new PointF(event.x, event.y));
-            		if(prevBallPositions.size() > numberBallPositions){
-            			prevBallPositions.remove(0);
-            		}
-            	}
-            }
-            if (event.type == TouchEvent.TOUCH_UP) {
-            	Log.d("Debug Pussycat", "touch event x: " + event.x + ": " + event.y);
-            	float speedX = 0;
-            	float speedY = 0;
-            	for(int j = 0; j < prevBallPositions.size() - 1; j++){
-            		speedX += prevBallPositions.get(j+1).x - prevBallPositions.get(j).x;
-            		speedY += prevBallPositions.get(j+1).y - prevBallPositions.get(j).y;
-            	}
-            	float tempDist = (float)Math.sqrt(speedX*speedX + speedY*speedY);
-            	speedX = ballSpeed*speedX/tempDist;
-            	speedY = ballSpeed*speedY/tempDist;
-            	//ballHandler.addBall(event.x, event.y, 1.5f, speedX, speedY);
-            	if(ballHandler.tcpClient != null){
-            		ballHandler.tcpClient.sendMessage(event.x + " " + event.y + " " + speedX + " " + speedY);
-            	}
-            	mobileBall = null;
-            	
-            	prevBallPositions.clear();
-            }
-            
-            */
         	currentX = event.x;
     		currentY = event.y;
     		final float currentTime = event.time;
@@ -248,7 +202,6 @@ public class GameScreenPlayer extends Screen {
     		    		
     		    		comm.sendData(buffer.array());
     				break;
-    				
     				
     				default:
     				break;

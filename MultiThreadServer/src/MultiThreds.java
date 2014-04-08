@@ -4,6 +4,9 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.nio.ByteBuffer;
 
+import org.jbox2d.common.Vec2;
+
+
 /**
  * Main loop for the server.
  *
@@ -12,6 +15,8 @@ import java.nio.ByteBuffer;
 public class MultiThreds {
 	private static ServerSocket serverSocket = null;
 	private static Socket clientSocket = null;
+	
+	private static PhysicsWorld physicsWorld;
 	
 	private static final int maxClientCount = 10;
 	private static final clientThread[] threads = new clientThread[maxClientCount];
@@ -37,21 +42,26 @@ public class MultiThreds {
 		deviceManager = new DeviceManager();
 		
 	   final float tickRate = 500;
+	   
+	   // Initiate Physics
+	   physicsWorld = new PhysicsWorld();
+	   physicsWorld.create(new Vec2(0.0f, 0.0f));
 		
-		Thread update = new Thread() {
+	   Thread update = new Thread() {
 		    public void run() {
 		    	
 		    	float timeBegin, timeEnd, timeDelta = 1 / tickRate, timeDelay;
 		    	while(true) {
-		    		//System.out.println("Update-----------------------------------------------");
 		    		timeBegin = System.nanoTime();
 		    		
+		    		// Update physics
+		    		physicsWorld.update(timeDelta);
 	    			
 	    			// Update ballz	
 		    		if(threads[0] != null) {
 		    			for(clientThread.Ballz ball : threads[0].ballz) {
 		    				//ball.printInfo();
-		    				ball.update(timeDelta);
+		    				ball.update(timeDelta);	    				
 		    				if(ball.isDead()) {
 		    					threads[0].ballz.remove(ball);
 		    				}
@@ -179,4 +189,8 @@ public class MultiThreds {
 			}
 		}
 	}//End of Main
+	
+	public static PhysicsWorld getPhysicsWorld() {
+		return physicsWorld;
+	}
 } // End of MultiThreds
