@@ -408,12 +408,5 @@ public class clientThread extends Thread{
 		}
 	}
 	
-<<<<<<< HEAD
-=======
-	
-	private void toGlobal(){
-		posX += globalCoords.minX;
-		posY += globalCoords.minY;
-	}
->>>>>>> 7909bf71c5ba26fc60e760a68d8c79e0396da006
+
 }//END OF clientThread
