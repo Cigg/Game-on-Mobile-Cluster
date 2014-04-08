@@ -167,90 +167,15 @@ public class GameScreenPlayer extends Screen {
 			    			{
 			    				final short nBalls = buffer.getShort();
 					        			
-			        			/*if(lastData != null) {
-			        			
-			        				for(int i=0; i<nBalls; i++) {
-				    					int id = buffer.getInt();
-				    					float xPos = buffer.getFloat();
-							        	float yPos = buffer.getFloat();	
-					        			float xVel = buffer.getFloat();	
-					        			float yVel = buffer.getFloat();		
-					        		
-					        			ByteBuffer lastBuffer = ByteBuffer.wrap(lastData.getData());
-				        				short nLastBalls = lastBuffer.getShort(); // the state
-				        				nLastBalls = lastBuffer.getShort(); // nballs
-				        				
-				        				
-					        			boolean found = false;
-					        			for(int j=0; j<nLastBalls; j++) {
-					        				
-					        				int idl = lastBuffer.getInt();
-					    					float xPosl = lastBuffer.getFloat();
-								        	float yPosl = lastBuffer.getFloat();	
-						        			float xVell = lastBuffer.getFloat();	
-						        			float yVell = lastBuffer.getFloat();		
-						        		
-					        				if(id == idl) {
-					        					Log.d("INTERPOLATION", "nLastBalls: " + nLastBalls);
-					        					found = true;
-					        					
-					        					float lastBallsTime = lastData.getSendTime();
-					        					float thisBallsTime = data.getSendTime();
-					        					
-					        					float deltaTime = thisBallsTime - lastBallsTime;
-					        					
-					        					float untilNowFromLast = System.nanoTime() + reciveDelay - lastBallsTime;
-					        					
-					        					float scale = untilNowFromLast / deltaTime;
-					        					
-					        					float diffX = xPos - xPosl;
-					        					float diffY = yPos - yPosl;
-					        					
-					        					ballHandler.addBall(idl, xPosl + diffX * scale, yPosl + diffY * scale, 1, xVell, yVell, false, 0);
-					        				}
-					        			}
-					        			
-					        			if(found) {
-					        				Log.d("INTERPOLATION", "FOUND!!!! " + nLastBalls);
-					        			} else {
-					        				ballHandler.addBall(id, xPos, yPos, 1, xVel, yVel, false, System.nanoTime() + reciveDelay - data.getSendTime());
-					        			}
-				    				}
-			        				
-			        			} else {
-			        				*/
-			        				Log.d("INTERPOLATION", "ERRRRRRRRRRRRROR!!!! ");
-				    				for(int i=0; i<nBalls; i++) {
-				    					int id = buffer.getInt();
-				    					float xPos = buffer.getFloat();
-							        	float yPos = buffer.getFloat();	
-					        			float xVel = buffer.getFloat();	
-					        			float yVel = buffer.getFloat();		
-					        			
-					        			Log.d("VEL", "GOT xVel = " + xVel * Math.pow(10, 9) * 2.5);
-					        			Log.d("VEL", "GOT yVel = " + yVel * Math.pow(10, 9) * 2.5);
-					        			
-			        					
-					        			ballHandler.addBall(id, xPos, yPos, 1, xVel, yVel, false, /*System.nanoTime() + reciveDelay - data.getSendTime()*/ reciveDelay , data.getSendTime());
-				    				}
-				    				
-			        			/*}
-			        	
-	        					if(lastData == null) {
-	        						lastData = data;
-	        					} else {
-	        						float lastBallsTime = lastData.getSendTime();
-		        					float thisBallsTime = data.getSendTime();
-				        			float deltaTime = thisBallsTime - lastBallsTime;
-		        					float untilNowFromLast = System.nanoTime() + reciveDelay - lastBallsTime;
-		        					float scale = untilNowFromLast / deltaTime;
-		        					
-		        					if(scale >= 1.0) {
-		        						lastData = data;
-		        					}
-	        					}
-			        			*/
-			    				
+			    				for(int i=0; i<nBalls; i++) {
+			    					int id = buffer.getInt();
+			    					float xPos = buffer.getFloat();
+						        	float yPos = buffer.getFloat();	
+				        			float xVel = buffer.getFloat();	
+				        			float yVel = buffer.getFloat();					        			
+	
+				        			ballHandler.addBall(id, xPos, yPos, 1, xVel, yVel, false, /*System.nanoTime() + reciveDelay - data.getSendTime()*/ reciveDelay , data.getSendTime());
+			    				}
 			    			}
 			    			break;
 			    			
@@ -340,119 +265,9 @@ public class GameScreenPlayer extends Screen {
     	 
     	 
        	// Update balls
-    	//ballHandler.update(timeDelta);
     	ballHandler.update(reciveDelay);
         
     	Thread.currentThread().setPriority(Thread.MAX_PRIORITY);
-    	
-    	/*
-    	if(comm != null){
-			DataPackage data = (DataPackage) comm.messages.popFront();
-
-    	if(data != null) {
-    		ByteBuffer buffer = ByteBuffer.wrap(data.getData());
-    		short state = buffer.getShort();
-			
-    		GLOBAL_STATE__ actualState;
-			
-			try {
-				actualState = GLOBAL_STATE__.values()[state];
-			} catch(Exception e) {
-				actualState = GLOBAL_STATE__.ADD_BALL;
-			}
-			
-    		String ip = data.getIp();
-    		
-    		switch(actualState) {
-			    		
-				    		case SYNCHRONIZE_DEVICE:
-			    			{		    				
-			    				float t1 = buffer.getFloat();
-			    				float t2 = buffer.getFloat();
-			    				float t3 = data.getSendTime();
-			    				float t4 = data.getReciveTime();
-			    									
-			    				nClocks ++;
-			    				sendDelay = t2 - t1;
-			    				reciveDelay = -(t4 - t3);
-			    				Log.d("CLOCK", "DelayDifference = " + (reciveDelay - sendDelay)* Math.pow(10, -9));
-			    			    				
-			    				
-			    				Log.d("CLOCK", "reciveDelay = " + reciveDelay* Math.pow(10, -9) + " sendDelay = " + sendDelay* Math.pow(10, -9));
-			    				Log.d("CLOCK", "CLock: " + nClocks + " = " + reciveDelay + " = " + reciveDelay * Math.pow(10, -9));
-			    				Log.d("CLOCK", "CLOCK ==== " + (System.nanoTime() + reciveDelay) * Math.pow(10, -9) );
-			    			}
-			    			break;
-			    			
-			    			case ADD_BALL:
-			    			{
-			    				int id = buffer.getInt();
-		    					float xPos = buffer.getInt();
-					        	float yPos = buffer.getInt();	
-			        			float xVel = buffer.getFloat();	
-			        			float yVel = buffer.getFloat();		
-			        			
-				        		//Log.d("GOT", "GOT from " + ip + "  :   " + xPos + ", " + yPos + "   " + xVel + ", " + yVel);
-			        			ballHandler.addBall(id, xPos, yPos, 1, xVel, yVel, false);
-			    			}
-			    			break;
-			    			
-			    			case ADD_BALLS:
-			    			{
-			    				final short nBalls = buffer.getShort();
-			    				//Log.d("NBALLS", "NBALLS: " + nBalls);
-			    				for(int i=0; i<nBalls; i++) {
-			    					int id = buffer.getInt();
-			    					float xPos = buffer.getFloat();
-						        	float yPos = buffer.getFloat();	
-				        			float xVel = buffer.getFloat();	
-				        			float yVel = buffer.getFloat();		
-				        			
-				        			Log.d("VEL", "GOT xVel = " + xVel * Math.pow(10, 9) * 2.5);
-				        			Log.d("VEL", "GOT yVel = " + yVel * Math.pow(10, 9) * 2.5);
-				        			
-				        			//Log.d("GOT", "GOT from " + ip + "  :   " + xPos + ", " + yPos + "   " + xVel + ", " + yVel);
-				        			ballHandler.addBall(id, xPos, yPos, 1, xVel, yVel, false);
-			    				}
-			    			}
-			    			break;
-			    			
-			    			case SET_STATE:
-			    			{
-			    				short newState = buffer.getShort();
-			    				
-			    				Log.d("FINGERS", "GOT: " + newState);
-			    				Log.d("GOT", "NEW STATE: " + newState);
-			    				
-			    				GLOBAL_STATE__ newInternalState;
-			    				
-		        				try {
-		        					newInternalState = GLOBAL_STATE__.values()[newState];
-								} catch(Exception e) {
-									newInternalState = internalState;
-									System.out.println("ERROR: Invalid state: " + newState);
-								}
-		        				
-		        				 internalState = newInternalState;
-			    			}
-			    			break;
-			    			
-			    			case REG:
-			    			break;
-			    			
-			    			default:
-			    			break;
-			    		}
-    	} else {
-			synchronized (comm.messages) {
-				try {
-					comm.messages.wait();
-				} catch (InterruptedException e) {
-					e.printStackTrace();
-				}
-			};
-    	}
-	}*/
 
         int len = touchEvents.size();
         for (int i = 0; i < len; i++) {
@@ -516,7 +331,7 @@ public class GameScreenPlayer extends Screen {
     		    		
     		    		buffer.putShort((short) GLOBAL_STATE__.ADD_DEVICE.ordinal());	// State: ADD_DEVICE
 
-    		    		buffer.putShort((short) 1);										// type, 0 är hårdkodat till main-device
+    		    		buffer.putShort((short) 1);										// type, 0 är hårdkodat till main-device - sätt 1 för alla andra devices
     		    		buffer.putInt(PussycatMinions.getXDPI());						// XDPI
     		    		buffer.putInt(PussycatMinions.getYDPI());						// YDPI
     		    		buffer.putInt(PussycatMinions.getScreenWidth());				// ResX
