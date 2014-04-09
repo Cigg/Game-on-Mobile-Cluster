@@ -28,6 +28,10 @@ public class AndroidGraphics implements Graphics {
     Rect srcRect = new Rect();
     Rect dstRect = new Rect();
     Bitmap bitmap;
+    
+    public Canvas getCanvas() {
+    	return canvas;
+    }
 
     public AndroidGraphics(AssetManager assets, Bitmap frameBuffer) {
         this.assets = assets;
@@ -184,8 +188,7 @@ public class AndroidGraphics implements Graphics {
     }
     
 
-    public void drawImage(Image Image, int x, int y, int srcX, int srcY,
-            int srcWidth, int srcHeight) {
+    public void drawImage(Image Image, int x, int y, int srcX, int srcY, int srcWidth, int srcHeight) {
         srcRect.left = srcX;
         srcRect.top = srcY;
         srcRect.right = srcX + srcWidth;

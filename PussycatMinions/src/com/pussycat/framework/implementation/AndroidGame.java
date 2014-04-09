@@ -9,6 +9,7 @@ import android.os.Bundle;
 import android.os.PowerManager;
 import android.os.PowerManager.WakeLock;
 import android.os.StrictMode;
+import android.util.DisplayMetrics;
 import android.view.Window;
 import android.view.WindowManager;
 
@@ -18,6 +19,7 @@ import com.pussycat.framework.Game;
 import com.pussycat.framework.Graphics;
 import com.pussycat.framework.Input;
 import com.pussycat.framework.Screen;
+import com.pussycat.minions.PussycatMinions;
 
 public abstract class AndroidGame extends Activity implements Game {
     AndroidFastRenderView renderView;
@@ -37,10 +39,14 @@ public abstract class AndroidGame extends Activity implements Game {
         requestWindowFeature(Window.FEATURE_NO_TITLE);
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
                 WindowManager.LayoutParams.FLAG_FULLSCREEN);
+        
+        DisplayMetrics metrics = getResources().getDisplayMetrics();
+    	int width = metrics.widthPixels;
+    	int height = metrics.heightPixels;
 
         boolean isPortrait = getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT;
-        int frameBufferWidth = isPortrait ? 800: 1280;
-        int frameBufferHeight = isPortrait ? 1280: 800;
+        int frameBufferWidth = isPortrait ? width : height;
+        int frameBufferHeight = isPortrait ? height: width;
         Bitmap frameBuffer = Bitmap.createBitmap(frameBufferWidth,
                 frameBufferHeight, Config.RGB_565);
         

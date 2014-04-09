@@ -9,6 +9,7 @@ import java.nio.ByteBuffer;
 import java.util.List;
 
 import android.content.Context;
+import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.PointF;
@@ -377,6 +378,9 @@ public class GameScreenMiddle extends Screen {
     @Override
     public void paint(float deltaTime) {
         Graphics g = game.getGraphics();
+//        Canvas c = g.getCanvas();
+//        Log.d("Debug Pussycat", "canvas height: " + c.getHeight());
+//        Log.d("Debug Pussycat", "canvas width: " + c.getWidth());
 
         g.drawARGB(255,100,100,100);
         // First draw the game elements.

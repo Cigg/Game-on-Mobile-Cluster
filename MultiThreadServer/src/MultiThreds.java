@@ -60,11 +60,11 @@ public class MultiThreds {
 	    			
 	    			// Update ballz	
 		    		if(threads[0] != null) {
-		    			for(clientThread.Ballz ball : threads[0].ballz) {
+		    			for(Ball ball : threads[0].balls) {
 		    				//ball.printInfo();
 		    				ball.update(timeDelta);
 		    				if(ball.isDead()) {
-		    					threads[0].ballz.remove(ball);
+		    					threads[0].balls.remove(ball);
 		    				}
 		    			}		
 		    			
@@ -98,7 +98,7 @@ public class MultiThreds {
 			    				
 			    				short nBalls = 0;
 			    				
-			    				for(clientThread.Ballz ball : thread.ballz) {
+			    				for(Ball ball : thread.balls) {
 			    			
 			    					if(buffer.limit() - buffer.position() >= 5*4) {
 			    					

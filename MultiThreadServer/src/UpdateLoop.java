@@ -3,7 +3,7 @@ import java.util.ArrayList;
 
 public class UpdateLoop extends Thread{
 
-	private ArrayList<Ball> balls;
+	private ArrayList<OldBall> balls;
 	private clientThread[] threads;
 	private String[] data;
 	private int maxClientCount;
@@ -12,7 +12,7 @@ public class UpdateLoop extends Thread{
 	public UpdateLoop(clientThread[] threads, int maxClientCount) {
 		this.threads = threads;
 		this.maxClientCount = maxClientCount;
-		balls = new ArrayList<Ball>();
+		balls = new ArrayList<OldBall>();
 		data = new String[maxClientCount];
 	}
 	
@@ -28,7 +28,7 @@ public class UpdateLoop extends Thread{
 		}
 	}
 	
-	public void addBall(Ball ball) {
+	public void addBall(OldBall ball) {
 		balls.add(ball);
 	}
 	
