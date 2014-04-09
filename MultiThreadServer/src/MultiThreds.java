@@ -18,6 +18,7 @@ public class MultiThreds {
 	
 	public static PhysicsWorld physicsWorld;
 	
+	private static int ballCount = 0;
 	private static final int maxClientCount = 10;
 	private static final clientThread[] threads = new clientThread[maxClientCount];
 	private static final UpdateLoop updateLoop = new UpdateLoop(threads, maxClientCount);
@@ -190,5 +191,13 @@ public class MultiThreds {
 			}
 		}
 	}//End of Main
+	
+	public static int getBallCount() {
+		return ballCount;
+	}
+	
+	public static void incrementBallCount() {
+		ballCount++;
+	}
 	
 } // End of MultiThreds

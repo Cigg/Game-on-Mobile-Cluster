@@ -31,7 +31,6 @@ public class clientThread extends Thread{
 	private float posY = 0;
 	private float deltaX = 0;
 	private float deltaY = 0;
-	private int ballCount;
 	
 	private clientThread[] thread;
 	private UpdateLoop updateLoop;
@@ -57,7 +56,8 @@ public class clientThread extends Thread{
 		int id;
 		
 		public Ballz(int id,float xPos, float yPos, float xVel, float yVel) {
-			this.id = id;
+			MultiThreds.incrementBallCount();
+			this.id = id++;
 			this.xPos = xPos;
 			this.yPos = yPos;
 			this.xVel = xVel;
@@ -66,7 +66,8 @@ public class clientThread extends Thread{
 			
 			// old
 			// addBall(float x, float y, Object data, float density, float radius, float bounce, float friction)
-			MultiThreds.physicsWorld.addBall(xPos, yPos, xVel, yVel,  id, 0.03f, 0.2f, 0.8f, 0.3f);
+			
+			MultiThreds.physicsWorld.addBall(xPos, yPos, xVel, yVel,  this.id, 0.03f, 0.2f, 0.8f, 0.3f);
 			
 			System.out.println("Added ballz: " + xPos + ", " + yPos + "    " + xVel + ", " + yVel); // * Math.pow(10, 9) * 2.5
 		}
@@ -146,7 +147,6 @@ public class clientThread extends Thread{
 		this.threads = threads;
 		this.updateLoop = updateLoop;
 		maxClientCount = threads.length;
-		ballCount = 0;
 		
 		this.ip = ip;
 		internalState = LOCAL_STATE__.MAPPING_STEP1;
@@ -365,14 +365,15 @@ public class clientThread extends Thread{
 			        			float xG = deviceManager.localToGlobalX(ip, x2, y2);
 			        			float yG = deviceManager.localToGlobalY(ip, x2, y2);	
 			        			
-			        			ballCount++;
 			        			 synchronized (this) {
-			        				 ballz.add(new Ballz(ballCount,xG, yG, xVel, yVel));
-			        				 for (int j = 0; j < maxClientsCount; j++) {
-							              if (threads[j] != null) {
-							                threads[j].ballCount = ballCount;
-							              }
-							            }
+			        				 ballz.add(new Ballz(MultiThreds.getBallCount(),xG, yG, xVel, yVel));
+			        				 
+			        				 // Is this needed?
+//			        				 for (int j = 0; j < maxClientsCount; j++) {
+//							              if (threads[j] != null) {
+//							                threads[j].ballCount = ballCount;
+//							              }
+//							            }
 							        }
 		        			}
 		        			break;  

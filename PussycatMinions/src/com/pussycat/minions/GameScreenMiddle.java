@@ -331,25 +331,6 @@ public class GameScreenMiddle extends Screen {
     				case RUN_DEVICE:
     				{
     					Log.d("AppStates", "RUN_DEVICE");
-    					
-    					buffer = ByteBuffer.allocate(1*2 + 5*4);
-    		    		buffer.clear();
-    		    		
-    		    		buffer.putShort((short) GLOBAL_STATE__.RUN_DEVICE.ordinal());	// State: RUN_DEVICE
-
-    		    		buffer.putFloat(downX);											// x1
-    		    		buffer.putFloat(downY); 										// y1
-    		    		buffer.putFloat(currentX);										// x2
-    		    		buffer.putFloat(currentY);										// y2
-    		    		buffer.putFloat(deltaTimeT);									// t	
-    		    		
-    		    		Log.d("VEL", "xVel = " + ((currentX-downX)/deltaTimeT) * Math.pow(10, 9) * 2.5);
-    		    		Log.d("VEL", "yVel = " + ((currentY-downY)/deltaTimeT) * Math.pow(10, 9) * 2.5);
-    		    		
-    		    		ballHandler.addBall(currentX, currentY, 1,(currentX-downX)/deltaTimeT, (currentY-downY)/deltaTimeT, true);
-    		    		comm.sendData(buffer.array());
-    		    		
-    		    		Log.d("CLOCK", "RUNDEVICE ==== " + (System.nanoTime() + sendDelay) * Math.pow(10, -9));
     				}
     				break;
     				
