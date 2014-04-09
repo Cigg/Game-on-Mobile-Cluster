@@ -35,14 +35,7 @@ public class GameScreenPlayer extends Screen {
 
     // Variable Setup
     private BallHandler ballHandler;
-    private float ballSpeed = 20.0f;
-    private ArrayList<PointF> prevBallPositions;
-    private int numberBallPositions = 10;
-    
-    private int screenWidth;
-    private int screenHeight;
     private Paint paint;
-    private Ball mobileBall = null;
     private FPSCounter fpsCounter;
     Context context;
 
@@ -52,7 +45,7 @@ public class GameScreenPlayer extends Screen {
     
 	private float currentX, currentY;
 	private float downX, downY;
-	private float downTime, previousTime;
+	private float downTime;
 	private float timeBegin, timeEnd, timeDelta;
 	
 	private TCPClient comm;
@@ -60,10 +53,6 @@ public class GameScreenPlayer extends Screen {
 	// Constructor
     public GameScreenPlayer(Game game) {
         super(game);
-        
-        // Get screen dimensions
-        screenWidth = PussycatMinions.getScreenWidth();
-        screenHeight = PussycatMinions.getScreenHeight();
 
         // Initialize game objects here
         ballHandler = new BallHandler(1.5f);
@@ -77,9 +66,6 @@ public class GameScreenPlayer extends Screen {
 		fpsCounter = new FPSCounter();
 		Log.d("Debug Pussycat", "GameScreen constructor");
 		
-		prevBallPositions = new ArrayList<PointF>();
-		
-		previousTime = 0;
 		internalState = GLOBAL_STATE__.SYNCHRONIZE_DEVICE;
 		nClocks = 0;
 		reciveDelay = 0;
@@ -100,8 +86,6 @@ public class GameScreenPlayer extends Screen {
 		Thread t2 = new Thread() {
 			public void run() {
 				
-				DataPackage lastData = null;
-				
 				while(true) {
 					
 					if(comm != null){
@@ -120,7 +104,7 @@ public class GameScreenPlayer extends Screen {
 							actualState = GLOBAL_STATE__.REG;
 						}
 						
-			    		String ip = data.getIp();
+			    		data.getIp();
 			    		
 			    		switch(actualState) {
 			    		
@@ -141,21 +125,7 @@ public class GameScreenPlayer extends Screen {
 			    				Log.d("CLOCK", "CLock: " + nClocks + " = " + reciveDelay + " = " + reciveDelay * Math.pow(10, -9));
 			    				Log.d("CLOCK", "CLOCK ==== " + (System.nanoTime() + reciveDelay) * Math.pow(10, -9) );
 			    			}
-			    			break;
-			    			/*
-			    			case ADD_BALL:
-			    			{
-			    				int id = buffer.getInt();
-		    					float xPos = buffer.getInt();
-					        	float yPos = buffer.getInt();	
-			        			float xVel = buffer.getFloat();	
-			        			float yVel = buffer.getFloat();		
-			        			
-				        		//Log.d("GOT", "GOT from " + ip + "  :   " + xPos + ", " + yPos + "   " + xVel + ", " + yVel);
-			        			ballHandler.addBall(id, xPos, yPos, 1, xVel, yVel, false, reciveDelay);
-			    			}
-			    			break;
-			    			*/
+			    			break;	
 			    			
 			    			case ADD_BALLS:
 			    			{
@@ -492,7 +462,7 @@ public class GameScreenPlayer extends Screen {
     }
 
     private void drawRunningUI() {
-        Graphics g = game.getGraphics();
+        game.getGraphics();
         
     }
 
