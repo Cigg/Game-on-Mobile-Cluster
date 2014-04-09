@@ -4,12 +4,12 @@ import java.util.ArrayList;
 public class UpdateLoop extends Thread{
 
 	private ArrayList<OldBall> balls;
-	private clientThread[] threads;
+	private ClientThread[] threads;
 	private String[] data;
 	private int maxClientCount;
 	
 	
-	public UpdateLoop(clientThread[] threads, int maxClientCount) {
+	public UpdateLoop(ClientThread[] threads, int maxClientCount) {
 		this.threads = threads;
 		this.maxClientCount = maxClientCount;
 		balls = new ArrayList<OldBall>();

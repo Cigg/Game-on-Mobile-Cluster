@@ -39,14 +39,14 @@ import org.jbox2d.common.Vec2;
 		}
 		
 		public boolean isDead() {
-			if((this.lifeTime * Math.pow(10, -9)) > clientThread.MAX_LIFETIME || outOfBounds()) {
+			if((this.lifeTime * Math.pow(10, -9)) > ClientThread.MAX_LIFETIME || outOfBounds()) {
 				return true;
 			}
 			return false;
 		}
 		
 		public boolean outOfBounds() {
-			if(Math.abs(this.xPos) < clientThread.MAX_POSITION_X &&  Math.abs(this.yPos) < clientThread.MAX_POSITION_Y) {
+			if(Math.abs(this.xPos) < ClientThread.MAX_POSITION_X &&  Math.abs(this.yPos) < ClientThread.MAX_POSITION_Y) {
 				return false;
 			}
 			return true;

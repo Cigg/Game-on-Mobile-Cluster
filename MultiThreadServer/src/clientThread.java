@@ -14,16 +14,16 @@ import org.jbox2d.common.Vec2;
 
 
 /**
- * One clientThread for one device.
+ * One ClientThread for one device.
  * Adds and sends balls the balls.
  *
  */
 
-public class clientThread extends Thread{
+public class ClientThread extends Thread{
 	private PrintWriter out;
 	private BufferedReader in;
 	private Socket clientSocket = null;
-	private final clientThread[] threads;
+	private final ClientThread[] threads;
 	private int maxClientCount;
 	private boolean running = false;
 	
@@ -32,7 +32,7 @@ public class clientThread extends Thread{
 	private float deltaX = 0;
 	private float deltaY = 0;
 	
-	private clientThread[] thread;
+	private ClientThread[] thread;
 	private UpdateLoop updateLoop;
 	GlobalCoords globalCoords;
 
@@ -59,15 +59,15 @@ public class clientThread extends Thread{
 	}
 	
 	/**
-	 * Starts one clientThread
+	 * Starts one ClientThread
 	 * 
 	 * @param ip			 	The ip adress for the client
 	 * @param clientSocket	 	The socket on the server
-	 * @param threads			An array with all clientThreads
+	 * @param threads			An array with all ClientThreads
 	 * @param updateLoop		An update thread (not used at this moment)
 	 * @param deviceManager		Stores device information
 	 */
-	public clientThread(String ip, Socket clientSocket, clientThread[] threads, UpdateLoop updateLoop, DeviceManager deviceManager) {
+	public ClientThread(String ip, Socket clientSocket, ClientThread[] threads, UpdateLoop updateLoop, DeviceManager deviceManager) {
 		this.deviceManager = deviceManager;
 		this.clientSocket = clientSocket;
 		this.threads = threads;
@@ -350,4 +350,4 @@ public class clientThread extends Thread{
 	}
 	
 
-}//END OF clientThread
+}//END OF ClientThread

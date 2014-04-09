@@ -20,7 +20,7 @@ public class MultiThreds {
 	
 	private static int ballCount = 0;
 	private static final int maxClientCount = 10;
-	private static final clientThread[] threads = new clientThread[maxClientCount];
+	private static final ClientThread[] threads = new ClientThread[maxClientCount];
 	private static final UpdateLoop updateLoop = new UpdateLoop(threads, maxClientCount);
 	
 	volatile static DeviceManager deviceManager;
@@ -69,7 +69,7 @@ public class MultiThreds {
 		    			}		
 		    			
 		        		// Send data
-		    			for(clientThread thread : threads) {
+		    			for(ClientThread thread : threads) {
 		    				if (thread != null) {
 			    				while(deviceManager.hasMessagesToSend(thread.getIp())) {
 			    					byte[] data = deviceManager.getNextMessage(thread.getIp());
@@ -85,7 +85,7 @@ public class MultiThreds {
 		    			}
 		    			
 			    		// Send ballz
-			    		for(clientThread thread : threads) {
+			    		for(ClientThread thread : threads) {
 			    			if (thread != null) {
 			    				
 			    				byte[] arr = new byte[1024];
@@ -176,7 +176,7 @@ public class MultiThreds {
 				int i = 0;
 				for(i=0; i<maxClientCount; i++) {
 					if(threads[i] == null) {
-						(threads[i] = new clientThread(clientSocket.getInetAddress().toString(), clientSocket,threads,updateLoop, deviceManager)).start();
+						(threads[i] = new ClientThread(clientSocket.getInetAddress().toString(), clientSocket,threads,updateLoop, deviceManager)).start();
 						break;
 					}
 				}
