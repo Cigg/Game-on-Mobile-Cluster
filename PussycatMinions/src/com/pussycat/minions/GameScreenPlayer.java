@@ -300,6 +300,7 @@ public class GameScreenPlayer extends Screen {
     			ByteBuffer buffer; 
     			
     			// TODO: Fixa race condition på internalState
+    			// Flytta ut all kommunikationskod till något annat ställe?
     			switch(internalState) {
     			
 	    			case SYNCHRONIZE_DEVICE:
