@@ -4,23 +4,17 @@ import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.io.OutputStream;
-import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.net.InetAddress;
 import java.net.Socket;
 import java.nio.ByteBuffer;
-import java.util.ArrayList;
-import java.util.concurrent.LinkedBlockingQueue;
-
 
 import android.util.Log;
 
-public class TCPClient {
-	public static String SERVERIP = "192.168.43.122";
-	//public static String SERVERIP = "192.168.0.102";
+public class TCPClient extends Thread {
 	
+	public static String SERVERIP = "192.168.43.122";
 	public static final int SERVERPORT = 4444;
 	private boolean isRunning = false;
 	
@@ -30,28 +24,22 @@ public class TCPClient {
 	InputStream din;
 	BufferedWriter buffw;
 	
-	GLOBAL_STATE__ internalState;
-	BallHandler ballHandler;
-	//public volatile LinkedBlockingQueue<DataPackage> messages = new LinkedBlockingQueue <DataPackage>(); 	// Old legacy
-	//public volatile ArrayList<DataPackage> messages = new ArrayList<DataPackage>();
-	
-	public EndlessQueue messages;
-	
-	public TCPClient(GLOBAL_STATE__ internalState, BallHandler ballHandler) {
-		this.internalState = internalState;
-		this.ballHandler = ballHandler;
-		 messages = new EndlessQueue(new DataPackage[3]);
+	public EndlessQueue<DataPackage> messages;
+	private final int numberOfMessages = 64; 
+
+	public TCPClient() {
+		messages = new EndlessQueue<DataPackage>(new DataPackage[numberOfMessages]);
 	}
 
 	
 	public synchronized void sendData(byte[] buffer) {
-		if(buffer.length > 0) {	
+		if( buffer.length > 0 ) {	
 			try {
 				ByteBuffer header = ByteBuffer.allocate(8);
 				header.putInt(buffer.length);
 				header.putFloat(System.nanoTime());
 				
-				if(dout != null) {
+				if( dout != null ) {
 					dout.write(header.array());
 					dout.write(buffer);
 					dout.flush();
@@ -69,20 +57,22 @@ public class TCPClient {
 	public void run() {
 		isRunning = true;
 		
+		Thread.currentThread().setName("TCPClient");
+		
 		try {
 			InetAddress serverAddr = InetAddress.getByName(SERVERIP);
 			Socket socket = new Socket(serverAddr, SERVERPORT);
 			
 			socket.setTcpNoDelay(true);
-			//socket.setPerformancePreferences(connectionTime, latency, bandwidth)
+
 			try {
 				
 				dout = socket.getOutputStream();
 				din = socket.getInputStream();
 				byte[] headerBuffer = new byte[8];
 				
-				while(isRunning) {
-					
+				while( isRunning ) {
+				
 					din.read(headerBuffer);	
 					float reciveTime = System.nanoTime();
 					
@@ -93,7 +83,7 @@ public class TCPClient {
 				    
 				    float sendTime = header.getFloat();
 
-					if(length > 0) {
+					if( length > 0 ) {
 						
 						byte[] bytes = new byte[length];
 					
@@ -102,84 +92,10 @@ public class TCPClient {
 						
 						messages.add(dataPackageToAdd);
 						
-						synchronized (messages) {
+						synchronized( messages ) {
 							messages.notify();
 						};
-						
-						/*
-					
-			        		ByteBuffer buffer = ByteBuffer.wrap(bytes);
-			        		short state = buffer.getShort();
-							
-			        		GLOBAL_STATE__ actualState;
-							
-							try {
-								actualState = GLOBAL_STATE__.values()[state];
-							} catch(Exception e) {
-								actualState = GLOBAL_STATE__.ADD_BALL;
-							}
-						
-				    		
-				    		switch(actualState) {
-				    			case ADD_BALL:
-				    			{
-				    				int id = buffer.getInt();
-			    					float xPos = buffer.getInt();
-						        	float yPos = buffer.getInt();	
-				        			float xVel = buffer.getFloat();	
-				        			float yVel = buffer.getFloat();		
-				        			
-					        		//Log.d("GOT", "GOT from " + ip + "  :   " + xPos + ", " + yPos + "   " + xVel + ", " + yVel);
-				        			ballHandler.addBall(id, xPos, yPos, 1, xVel, yVel, false);
-				    			}
-				    			break;
-				    			
-				    			case ADD_BALLS:
-				    			{
-				    				final short nBalls = buffer.getShort();
-				    				//Log.d("NBALLS", "NBALLS: " + nBalls);
-				    				for(int i=0; i<nBalls; i++) {
-				    					int id = buffer.getInt();
-				    					float xPos = buffer.getFloat();
-							        	float yPos = buffer.getFloat();	
-					        			float xVel = buffer.getFloat();	
-					        			float yVel = buffer.getFloat();		
-					        			
-					        			Log.d("VEL", "GOT xVel = " + xVel * Math.pow(10, 9) * 2.5);
-					        			Log.d("VEL", "GOT yVel = " + yVel * Math.pow(10, 9) * 2.5);
-					        			
-					        			//Log.d("GOT", "GOT from " + ip + "  :   " + xPos + ", " + yPos + "   " + xVel + ", " + yVel);
-					        			ballHandler.addBall(id, xPos, yPos, 1, xVel, yVel, false);
-				    				}
-				    			}
-				    			break;
-				    			
-				    			case SET_STATE:
-				    			{
-				    				short newState = buffer.getShort();
-				    				
-				    				Log.d("FINGERS", "GOT: " + newState);
-				    				Log.d("GOT", "NEW STATE: " + newState);
-				    				
-				    				GLOBAL_STATE__ newInternalState;
-				    				
-			        				try {
-			        					newInternalState = GLOBAL_STATE__.values()[newState];
-									} catch(Exception e) {
-										newInternalState = internalState;
-										System.out.println("ERROR: Invalid state: " + newState);
-									}
-			        				
-			        				 internalState = newInternalState;
-				    			}
-				    			break;
-				    			
-				    			default:
-				    			break;
-				    		}*/
-			        	}
-						
-
+			        }
 				}
 				
 			} catch (Exception e) {

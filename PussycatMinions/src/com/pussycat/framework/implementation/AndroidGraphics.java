@@ -224,6 +224,7 @@ public class AndroidGraphics implements Graphics {
         /**
          * Improves resizing quality of bitmaps a lot, but possibly much heavier to calculate
          */
+        
         Paint paint = new Paint();
         paint.setAntiAlias(true);
         paint.setFilterBitmap(true);
@@ -241,5 +242,15 @@ public class AndroidGraphics implements Graphics {
     @Override
     public int getHeight() {
         return frameBuffer.getHeight();
+    }
+    
+    @Override
+    public Canvas getCanvas() {
+    	return this.canvas;
+    }
+    
+    @Override
+    public Paint getPaint() {
+    	return this.paint;
     }
 }

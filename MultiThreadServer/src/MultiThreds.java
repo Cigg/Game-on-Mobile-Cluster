@@ -4,6 +4,7 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.nio.ByteBuffer;
 
+
 /**
  * Main loop for the server.
  *
@@ -36,7 +37,7 @@ public class MultiThreds {
 		//updateLoop.start();
 		deviceManager = new DeviceManager();
 		
-	   final float tickRate = 20;
+	   final float tickRate = 128;
 		
 		Thread update = new Thread() {
 		    public void run() {
@@ -95,6 +96,10 @@ public class MultiThreds {
 					    				float yG = ball.getYPos();
 					    				
 					    				if(deviceManager.isOnDevice(thread.getIp(), xG, yG)) {
+					    					
+					    					
+					    					
+					    					
 					    					float xVelG = ball.getXVel();
 						    				float yVelG = ball.getYVel();
 						    				
@@ -104,18 +109,38 @@ public class MultiThreds {
 						    				float xVelL = deviceManager.globalToLocalVelX(thread.getIp(), xVelG, yVelG);
 						    				float yVelL = deviceManager.globalToLocalVelY(thread.getIp(), xVelG, yVelG);
 						    				
-						    				buffer.putInt(ball.id);
-						    				buffer.putFloat(xPosL);
-						    				buffer.putFloat(yPosL);
 						    				
-						    				buffer.putFloat(xVelL);
-						    				buffer.putFloat(yVelL);
-						    				
-						    				//buffer.putFloat((float) (xVelL*Math.pow(10, 9)));
-						    				//buffer.putFloat((float) -(yVelL*Math.pow(10, 9)));
-						    				
-						    				nBalls ++;
+					    					if( thread.ownBallz.containsKey(ball.id) ) {
+					    						
+					    						clientThread.Ballz ball2 = thread.ownBallz.get(ball.id);
+					    						
+					    						if( ball2.getXVel() != xVelG || ball2.getYVel() != yVelG ) {
+					    							buffer.putInt(ball.id);
+								    				buffer.putFloat(xPosL);
+								    				buffer.putFloat(yPosL);
+								    				
+								    				buffer.putFloat(xVelL);
+								    				buffer.putFloat(yVelL);
+				
+								    				nBalls ++;
+					    						}
+
+					    					} else {
+					    						
+					    						thread.ownBallz.put(ball.id, ball);
+					    						buffer.putInt(ball.id);
+							    				buffer.putFloat(xPosL);
+							    				buffer.putFloat(yPosL);
+							    				
+							    				buffer.putFloat(xVelL);
+							    				buffer.putFloat(yVelL);
+			
+							    				nBalls ++;
+					    					}
 					    					
+						    				
+					    				} else {
+					    					thread.ownBallz.remove(ball.id);
 					    				}
 				    				
 			    					} else {

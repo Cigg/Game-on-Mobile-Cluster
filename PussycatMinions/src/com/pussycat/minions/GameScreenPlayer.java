@@ -1,24 +1,15 @@
 package com.pussycat.minions;
 
 
-import java.io.ByteArrayOutputStream;
-import java.util.ArrayList;
-
-
 import java.nio.ByteBuffer;
-
 import java.util.List;
 
 import android.content.Context;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
-import android.graphics.PointF;
 import android.util.Log;
 
-import com.pussycat.framework.FPSCounter;
 import com.pussycat.framework.Game;
 import com.pussycat.framework.Graphics;
 
@@ -26,249 +17,88 @@ import com.pussycat.framework.Graphics;
 import com.pussycat.framework.Input.TouchEvent;
 import com.pussycat.framework.Screen;
 
+
+
 public class GameScreenPlayer extends Screen {
     enum GameState {
         Ready, Running, Paused, GameOver
     }
 
     private GameState state = GameState.Ready;
-
-    // Variable Setup
-    // You would create game objects here.
-    private BallHandler ballHandler;
-    private float ballSpeed = 20.0f;
-    private ArrayList<PointF> prevBallPositions;
-    private int numberBallPositions = 10;
     
-    private int screenWidth;
-    private int screenHeight;
     private Paint paint;
-    private Ball mobileBall = null;
-    private FPSCounter fpsCounter;
     Context context;
-
     
-
-    private GLOBAL_STATE__ internalState;
-    private int nClocks;
-    private float reciveDelay, sendDelay;
     
 	private float currentX, currentY;
 
 	private float downX, downY;
+	private float draggedX, draggedY;
+	private boolean dragged = false;
+	
 	private float downTime, previousTime;
-	private float timeBegin, timeEnd, timeDelta;
+	
+	float[] pts = new float[2048];
+	int index = 0;
+
 	
 	private TCPClient comm;
+	private BallzHandler ballzHandler;
 
 
     public GameScreenPlayer(Game game) {
         super(game);
         
-        // Get screen dimensions
-        screenWidth = PussycatMinions.getScreenWidth();
-        screenHeight = PussycatMinions.getScreenHeight();
-
-        // Initialize game objects here
-        ballHandler = new BallHandler(1.5f);
         
-        
-        // Defining a paint object
 		paint = new Paint();
 		paint.setTextSize(30);
 		paint.setTextAlign(Paint.Align.CENTER);
 		paint.setAntiAlias(true);
 		paint.setColor(Color.WHITE);
-		fpsCounter = new FPSCounter();
-		Log.d("Debug Pussycat", "GameScreen constructor");
 		
-		prevBallPositions = new ArrayList<PointF>();
+		
+		previousTime = 0;		
+		SharedVariables.getInstance().setInternalState(GLOBAL_STATE__.SYNCHRONIZE_DEVICE);		
 
 		
-		previousTime = 0;
-		internalState = GLOBAL_STATE__.SYNCHRONIZE_DEVICE;
-		nClocks = 0;
-		reciveDelay = 0;
-		sendDelay = 0;
-		
-		
-		// TODO: Fixa snyggt någonstans
-		Thread t = new Thread() {
-			public void run() {
-				comm = new TCPClient(internalState, ballHandler);
-				comm.run();
-			}
-		};
-		t.setName("TCPCLIENT");
-		t.start();
-		
+		comm = new TCPClient();
+		comm.start();
 
-		Thread t2 = new Thread() {
-			public void run() {
-				
-				DataPackage lastData = null;
-				
-				while(true) {
-					
-					if(comm != null){
-					DataPackage data = (DataPackage) comm.messages.popFront();
+		ballzHandler = new BallzHandler();
+		ServerCommunication t4 = new ServerCommunication(comm, ballzHandler);
+		t4.start();
 
-		        	if(data != null) {
-		        		ByteBuffer buffer = ByteBuffer.wrap(data.getData());
-		        		short state = buffer.getShort();
-						
-		        		GLOBAL_STATE__ actualState;
-						
-						try {
-							actualState = GLOBAL_STATE__.values()[state];
-						} catch(Exception e) {
-							// do nothing
-							actualState = GLOBAL_STATE__.REG;
-						}
-						
-			    		String ip = data.getIp();
-			    		
-			    		switch(actualState) {
-			    		
-				    		case SYNCHRONIZE_DEVICE:
-			    			{		    				
-			    				float t1 = buffer.getFloat();
-			    				float t2 = buffer.getFloat();
-			    				float t3 = data.getSendTime();
-			    				float t4 = data.getReciveTime();
-			    									
-			    				nClocks ++;
-			    				sendDelay = t2 - t1;
-			    				reciveDelay = -(t4 - t3);
-			    				Log.d("CLOCK", "DelayDifference = " + (reciveDelay - sendDelay)* Math.pow(10, -9));
-			    			    				
-			    				
-			    				Log.d("CLOCK", "reciveDelay = " + reciveDelay* Math.pow(10, -9) + " sendDelay = " + sendDelay* Math.pow(10, -9));
-			    				Log.d("CLOCK", "CLock: " + nClocks + " = " + reciveDelay + " = " + reciveDelay * Math.pow(10, -9));
-			    				Log.d("CLOCK", "CLOCK ==== " + (System.nanoTime() + reciveDelay) * Math.pow(10, -9) );
-			    			}
-			    			break;
-			    			/*
-			    			case ADD_BALL:
-			    			{
-			    				int id = buffer.getInt();
-		    					float xPos = buffer.getInt();
-					        	float yPos = buffer.getInt();	
-			        			float xVel = buffer.getFloat();	
-			        			float yVel = buffer.getFloat();		
-			        			
-				        		//Log.d("GOT", "GOT from " + ip + "  :   " + xPos + ", " + yPos + "   " + xVel + ", " + yVel);
-			        			ballHandler.addBall(id, xPos, yPos, 1, xVel, yVel, false, reciveDelay);
-			    			}
-			    			break;
-			    			*/
-			    			
-			    			case ADD_BALLS:
-			    			{
-			    				final short nBalls = buffer.getShort();
-					        			
-			    				for(int i=0; i<nBalls; i++) {
-			    					int id = buffer.getInt();
-			    					float xPos = buffer.getFloat();
-						        	float yPos = buffer.getFloat();	
-				        			float xVel = buffer.getFloat();	
-				        			float yVel = buffer.getFloat();					        			
-	
-				        			ballHandler.addBall(id, xPos, yPos, 1, xVel, yVel, false, /*System.nanoTime() + reciveDelay - data.getSendTime()*/ reciveDelay , data.getSendTime());
-			    				}
-			    			}
-			    			break;
-			    			
-			    			case SET_STATE:
-			    			{
-			    				short newState = buffer.getShort();
-			    				
-			    				Log.d("FINGERS", "GOT: " + newState);
-			    				Log.d("GOT", "NEW STATE: " + newState);
-			    				
-			    				GLOBAL_STATE__ newInternalState;
-			    				
-		        				try {
-		        					newInternalState = GLOBAL_STATE__.values()[newState];
-								} catch(Exception e) {
-									newInternalState = internalState;
-									System.out.println("ERROR: Invalid state: " + newState);
-								}
-		        				
-		        				 internalState = newInternalState;
-			    			}
-			    			break;
-			    			
-			    			case REG:
-			    			break;
-			    			
-			    			default:
-			    			break;
-			    		}
-		        	} else {
-		    			synchronized (comm.messages) {
-							try {
-								comm.messages.wait();
-							} catch (InterruptedException e) {
-								e.printStackTrace();
-							}
-						};
-		        	}
-				}
-		        }
-			
-			}
-		};
-		t2.setName("COMMUNICATION");
-		t2.start();
 		
     }
 
     @Override
     public void update(float deltaTime) {
         List<TouchEvent> touchEvents = game.getInput().getTouchEvents();
-       
-        // We have four separate update methods in this example.
-        // Depending on the state of the game, we call different update methods.
-        // Refer to Unit 3's code. We did a similar thing without separating the
-        // update methods.
         
-        if (state == GameState.Ready)
-            updateReady(touchEvents);
-        if (state == GameState.Running)
+        if (state == GameState.Running) {
             updateRunning(touchEvents, deltaTime);
-        if (state == GameState.Paused)
+        } else if (state == GameState.Ready) {
+            updateReady(touchEvents);
+    	} else if (state == GameState.Paused) {
             updatePaused(touchEvents);
-        if (state == GameState.GameOver)
+		} else if (state == GameState.GameOver) {
             updateGameOver(touchEvents);
+		}
+        
     }
     
     private void updateReady(List<TouchEvent> touchEvents) {
-        
-        // This example starts with a "Ready" screen.
-        // When the user touches the screen, the game begins. 
-        // state now becomes GameState.Running.
-        // Now the updateRunning() method will be called!
-        
-        if (touchEvents.size() > 0)
+        if (touchEvents.size() > 0) {
             state = GameState.Running;
+        }
     }
 
-    private void updateRunning(List<TouchEvent> touchEvents, float deltaTime) {
-    	timeBegin = System.nanoTime();
-    	timeDelta = timeBegin - timeEnd;
+    private void updateRunning(List<TouchEvent> touchEvents, float deltaTime) {   
     	
-    	Log.d("TIME", "deltaTime = " + deltaTime);
-    	Log.d("TIME2", "(float) Math.pow(10, 9) / 60 = " + (float) Math.pow(10, 9) / 60);
-    	Log.d("TIME", "timeDelta = " + timeDelta);
-    	 Log.d("FPS", "FPS: " +  Math.pow(10, 9) /timeDelta);
-    	 
-    	 
-       	// Update balls
-    	ballHandler.update(reciveDelay);
+    	// Thread.currentThread().setPriority(Thread.MAX_PRIORITY);
+    	
+    	ballzHandler.updateBalls(deltaTime);
         
-    	Thread.currentThread().setPriority(Thread.MAX_PRIORITY);
-
         int len = touchEvents.size();
         for (int i = 0; i < len; i++) {
         	
@@ -289,23 +119,36 @@ public class GameScreenPlayer extends Screen {
     			
     			comm.sendData(buffer.array());
     			
-    			internalState = GLOBAL_STATE__.MAP_DEVICE;
+    			SharedVariables.getInstance().setInternalState(GLOBAL_STATE__.MAP_DEVICE);
     			
     		} else if(event.type == TouchEvent.TOUCH_DOWN) {
     			downTime = currentTime;
+    			
     			downX = currentX;
     			downY = currentY;
-
+    			
+    			if(index < pts.length - 2) {
+	    			pts[index++] = currentX;
+	    			pts[index++] = currentY;
+    			}
+    			
     		} else if(event.type == TouchEvent.TOUCH_DRAGGED) {
+    			draggedX = currentX;
+    			draggedY = currentY;  		
+    			dragged = true;
+    			
+    			if(index < pts.length - 2) {
+	    			pts[index++] = currentX;
+	    			pts[index++] = currentY;
+    			}
     			
     		} else if(event.type == TouchEvent.TOUCH_UP) {
     			
-    			final float deltaTimeT = currentTime - downTime;
+    			final float deltaTimeDragged = currentTime - downTime;
 
     			ByteBuffer buffer; 
     			
-    			// TODO: Fixa race condition på internalState
-    			switch(internalState) {
+    			switch(SharedVariables.getInstance().getInternalState()) {
     			
 	    			case SYNCHRONIZE_DEVICE:
 	    			{
@@ -317,8 +160,7 @@ public class GameScreenPlayer extends Screen {
 	    				buffer.putShort((short) GLOBAL_STATE__.SYNCHRONIZE_DEVICE.ordinal()); 	// State: SYNCHRONZE_DEVICE
 	    				
 	    				comm.sendData(buffer.array());
-	    				
-	    				internalState = GLOBAL_STATE__.ADD_DEVICE;
+	    				SharedVariables.getInstance().setInternalState(GLOBAL_STATE__.ADD_DEVICE);
 	    			}
 	    			break;
     			
@@ -338,8 +180,7 @@ public class GameScreenPlayer extends Screen {
     		    		buffer.putInt(PussycatMinions.getScreenHeight());				// ResY
     		    		
     		     		comm.sendData(buffer.array());
-    		    		
-    					internalState = GLOBAL_STATE__.MAP_DEVICE;
+    		     		SharedVariables.getInstance().setInternalState(GLOBAL_STATE__.MAP_DEVICE);
     					
     				}
     				break;
@@ -357,12 +198,12 @@ public class GameScreenPlayer extends Screen {
     		    		buffer.putFloat(downY); 										// y1
     		    		buffer.putFloat(currentX);										// x2
     		    		buffer.putFloat(currentY);										// y2
-    		    		buffer.putFloat(deltaTimeT);    								// t
-    		    		buffer.putFloat(currentTime + sendDelay);	
+    		    		buffer.putFloat(deltaTimeDragged);    							// t
+    		    		buffer.putFloat(currentTime + SharedVariables.getInstance().getSendDelay());	
 
     		    		comm.sendData(buffer.array());
 
-    		    		internalState = GLOBAL_STATE__.RUN_DEVICE;
+    		    		SharedVariables.getInstance().setInternalState(GLOBAL_STATE__.RUN_DEVICE);
     				}
     				break;
     				
@@ -379,15 +220,11 @@ public class GameScreenPlayer extends Screen {
     		    		buffer.putFloat(downY); 										// y1
     		    		buffer.putFloat(currentX);										// x2
     		    		buffer.putFloat(currentY);										// y2
-    		    		buffer.putFloat(deltaTimeT);									// t	
+    		    		buffer.putFloat(deltaTimeDragged);								// t	
     		    		
-    		    		Log.d("VEL", "xVel = " + ((currentX-downX)/deltaTimeT) * Math.pow(10, 9) * 2.5);
-    		    		Log.d("VEL", "yVel = " + ((currentY-downY)/deltaTimeT) * Math.pow(10, 9) * 2.5);
-    		    		
-    		    		ballHandler.addBall(currentX, currentY, 1,(currentX-downX)/deltaTimeT, (currentY-downY)/deltaTimeT, true);
     		    		comm.sendData(buffer.array());
     		    		
-    		    		Log.d("CLOCK", "RUNDEVICE ==== " + (System.nanoTime() + sendDelay) * Math.pow(10, -9));
+    		    		Log.d("CLOCK", "RUNDEVICE ==== " + (System.nanoTime() + SharedVariables.getInstance().getSendDelay()) * Math.pow(10, -9));
     				}
     				break;
     				
@@ -395,14 +232,13 @@ public class GameScreenPlayer extends Screen {
     				break;
     			}
     			
-    		
+    			dragged = false;
+    			index = 0;
     		}
     		
     		
         }  
-        
-        timeEnd = timeBegin;
-        
+                
     }
 
     private void updatePaused(List<TouchEvent> touchEvents) {
@@ -415,13 +251,13 @@ public class GameScreenPlayer extends Screen {
         }
     }
 
+    
     private void updateGameOver(List<TouchEvent> touchEvents) {
         int len = touchEvents.size();
         for (int i = 0; i < len; i++) {
             TouchEvent event = touchEvents.get(i);
             if (event.type == TouchEvent.TOUCH_UP) {
-                if (event.x > 300 && event.x < 980 && event.y > 100
-                        && event.y < 500) {
+                if (event.x > 300 && event.x < 980 && event.y > 100 && event.y < 500) {
                     nullify();
                     game.setScreen(new MainMenuScreen(game));
                     return;
@@ -431,88 +267,95 @@ public class GameScreenPlayer extends Screen {
 
     }
 
+    
     @Override
     public void paint(float deltaTime) {
-        Graphics g = game.getGraphics();
+    	
+        Graphics graphics = game.getGraphics();
+        
+        graphics.drawImage(Assets.background, 0, 0);
 
-        g.drawARGB(255,100,100,100);
-        // First draw the game elements.
+        if( dragged ) {
+        	
+        	Canvas canvas = graphics.getCanvas();
+        	
+        	int radious = 50;
+        	
+        	//paint.setColor(Color.BLUE);
+        	//g.drawLine((int)downX, (int)downY, (int)currentX, (int)currentY, Color.RED);
+        	
+        	//paint.setStrokeWidth(3);
+        	
+        	paint.setColor(Color.YELLOW);
 
-        // Example:
-        //g.drawImage(Assets.menu, 0, 0);
-        g.drawImage(Assets.background, 0, 0);
-        drawBalls();
-     
-        // Secondly, draw the UI above the game elements.
-        if (state == GameState.Ready)
-            drawReadyUI();
-        if (state == GameState.Running)
+        	canvas.drawLines(pts, 0, index, paint);
+        	canvas.drawLines(pts, 2, index - 2, paint);
+        	
+        	//c.drawCircle(downX, downY, 5, paint);
+       
+        	graphics.drawScaledImage(	Assets.ball, 
+									 	(int)draggedX - radious, 
+									 	(int)draggedY - radious, 
+									 	100, 
+									 	100, 
+									 	0, 
+									 	0, 
+									 	128, 
+									 	128		);
+	        
+        }
+        
+        BallzHandler.drawBalls(graphics);
+   
+        if (state == GameState.Running) {
             drawRunningUI();
-        if (state == GameState.Paused)
+    	} else if (state == GameState.Ready) {
+            drawReadyUI();
+        } else if (state == GameState.Paused) {
             drawPausedUI();
-        if (state == GameState.GameOver)
-            drawGameOverUI();
-
+		} else if (state == GameState.GameOver) {
+			drawGameOverUI();
+		}
+        
     }
 
-    private void nullify() {
-
-        // Set all variables to null. You will be recreating them in the
-        // constructor.
-        paint = null;
-
-        // Call garbage collector to clean up memory.
-        System.gc();
-    }
-    
-    private void drawBalls(){
-    	Graphics g = game.getGraphics();
-    	
-    	//Log.d("Debug Pussycat", "balls.size(): " + ballHandler.balls.size());s
-    	//fpsCounter.logFrame();
-    	
-    	/*
-    	if(mobileBall != null){
-    		g.drawScaledImage(mobileBall.getImage(), (int)(mobileBall.getX()-mobileBall.getDiameter()/2), (int)(mobileBall.getY()-mobileBall.getDiameter()/2), (int)mobileBall.getDiameter(), (int)mobileBall.getDiameter(), 0, 0, 128, 128);
-    	}
-    	*/
-    	
-    	// Needs optimmiiiziziiziizzeing!
-    	for(int i = 0; i < ballHandler.balls.size(); i++){
-    	//	if(ballHandler.balls.get(i).getImage() == Assets.localBall) {
-    			g.drawScaledImage(ballHandler.balls.get(i).getImage(), (int)(ballHandler.balls.get(i).getX()-ballHandler.balls.get(i).getDiameter()/2), (int)(ballHandler.balls.get(i).getY()-ballHandler.balls.get(i).getDiameter()/2), (int)ballHandler.balls.get(i).getDiameter(), (int)ballHandler.balls.get(i).getDiameter(), 0, 0, 128, 128);
-    		//}
-    	}
-    }
-  
 
     private void drawReadyUI() {
         Graphics g = game.getGraphics();
         
         g.drawARGB(155, 0, 0, 0);
-        g.drawString("Tap to create a ball",
-                640, 300, paint);
-
+        g.drawString("Tap to create a ball", 640, 300, paint);
     }
 
+    
     private void drawRunningUI() {
         Graphics g = game.getGraphics();
-        
     }
 
+    
     private void drawPausedUI() {
         Graphics g = game.getGraphics();
         // Darken the entire screen so you can display the Paused screen.
         g.drawARGB(155, 0, 0, 0);
-
     }
 
+    
     private void drawGameOverUI() {
         Graphics g = game.getGraphics();
         g.drawRect(0, 0, 1281, 801, Color.BLACK);
         g.drawString("GAME OVER.", 640, 300, paint);
-
     }
+    
+    
+    private void nullify() {
+        // Set all variables to null. You will be recreating them in the constructor.
+        paint = null;
+
+        // Call garbage collector to clean up memory.
+        System.gc();
+    }
+     
+    
 
     @Override
     public void pause() {
@@ -521,26 +364,23 @@ public class GameScreenPlayer extends Screen {
 
     }
 
+    
     @Override
     public void resume() {
 
     }
 
+    
     @Override
     public void dispose() {
 
     }
 
+    
     @Override
     public void backButton() {
         pause();
     }
     
-    public FPSCounter getFPSCounter() {
-    	return fpsCounter;
-    }
     
-    public BallHandler getBallHandler(){
-    	return ballHandler;
-    }
 }

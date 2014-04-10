@@ -108,8 +108,8 @@ public class Ball {
 	}
 	
 	float cosineInterpolation(float x1, float x2, float scale) {
-		float scale2 = (float) ((1 - Math.cos(scale * Math.PI)) / 2);
-		return x1 * (1 - scale2) + x2 * scale2;
+		float scaleModified = (float) ((1 - Math.cos(scale * Math.PI)) / 2);
+		return x1 * (1 - scaleModified) + x2 * scaleModified;
 	}
 	
 	float cubicInterpolation(float x0, float x1, float x2, float x3, float scale) {

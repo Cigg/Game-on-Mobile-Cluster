@@ -8,6 +8,7 @@ import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.net.Socket;
 import java.nio.ByteBuffer;
+import java.util.Hashtable;
 import java.util.concurrent.LinkedBlockingQueue;
 
 
@@ -61,6 +62,7 @@ public class clientThread extends Thread{
 			this.xVel = xVel;
 			this.yVel = yVel;
 			this.lifeTime = 0;
+			System.out.println("NEW BALL: " + id);
 			System.out.println("Added ballz: " + xPos + ", " + yPos + "    " + xVel + ", " + yVel); // * Math.pow(10, 9) * 2.5
 		}
 		
@@ -108,6 +110,8 @@ public class clientThread extends Thread{
 	}
 	
 	public volatile static LinkedBlockingQueue<Ballz> ballz = new LinkedBlockingQueue <Ballz>();
+	
+	Hashtable<Integer, Ballz> ownBallz = new Hashtable<Integer, Ballz>();
 	
 	/**
 	 * Get the ip of the client
@@ -350,6 +354,11 @@ public class clientThread extends Thread{
 
 			        			float xG = deviceManager.localToGlobalX(ip, x2, y2);
 			        			float yG = deviceManager.localToGlobalY(ip, x2, y2);	
+			        			
+			        			float timeStep = System.nanoTime() - sendTime;
+			        			
+			        			xG = (float) (xG + xVel * timeStep * Math.pow(10, -9));
+			        			yG = (float) (yG + yVel * timeStep * Math.pow(10, -9));
 			        			
 			        			ballCount++;
 			        			 synchronized (this) {

@@ -1,6 +1,7 @@
 package com.pussycat.framework;
 
 
+import android.graphics.Canvas;
 import android.graphics.Paint;
 
 public interface Graphics {
@@ -33,4 +34,7 @@ public interface Graphics {
 
 	public void drawARGB(int i, int j, int k, int l);
 
+    public Canvas getCanvas();
+    
+    public Paint getPaint();
 }

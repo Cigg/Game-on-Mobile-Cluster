@@ -3,6 +3,7 @@ package com.pussycat.framework.implementation;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Rect;
+import android.util.Log;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 
@@ -24,38 +25,37 @@ public class AndroidFastRenderView extends SurfaceView implements Runnable {
         running = true;
         renderThread = new Thread(this);
         renderThread.start();   
-
     }      
     
     public void run() {
-        Thread.currentThread().setName("RENDER");
+    	
+        Thread.currentThread().setName("AndroidFastRenderView");
         
         Rect dstRect = new Rect();
-        long startTime = System.nanoTime();
+        
+        float beginTime = System.nanoTime();;
+        float frameTime;
+        
         while(running) {  
+        	
+        	frameTime = System.nanoTime() - beginTime; 	// length of previous frame in nanoseconds
+        	beginTime = System.nanoTime();
+        	
+        			
             if(!holder.getSurface().isValid())
                 continue;           
-            
+           
 
-            float deltaTime = (System.nanoTime() - startTime) / 10000000.000f;
-            startTime = System.nanoTime();
-            
-            if (deltaTime > 3.15){
-            	deltaTime = (float) 3.15;
-           }
-     
+            Log.d("RENDERFPS", "RENDERFPS: " + Math.pow(10, 9) / frameTime); 
+           
 
-            game.getCurrentScreen().update(deltaTime);
-            game.getCurrentScreen().paint(deltaTime);
+            game.getCurrentScreen().update(frameTime);
+            game.getCurrentScreen().paint(frameTime);
           
-            
-            
             Canvas canvas = holder.lockCanvas();
             canvas.getClipBounds(dstRect);
             canvas.drawBitmap(framebuffer, null, dstRect, null);                           
             holder.unlockCanvasAndPost(canvas);
-            
-            
         }
     }
 

@@ -15,4 +15,5 @@ public interface Game {
     public Screen getCurrentScreen();
 
     public Screen getInitScreen();
+   
 }
