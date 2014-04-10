@@ -2,9 +2,11 @@ package com.pussycat.minions;
 
 
 import java.nio.ByteBuffer;
+import java.util.ArrayList;
 import java.util.List;
 
 import android.content.Context;
+import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
@@ -38,8 +40,8 @@ public class GameScreenPlayer extends Screen {
 	private float downTime, previousTime;
 	
 	float[] pts = new float[2048];
+	float[] tms = new float[1024];
 	int index = 0;
-
 
 	
 	private TCPClient comm;
@@ -90,7 +92,152 @@ public class GameScreenPlayer extends Screen {
             state = GameState.Running;
         }
     }
+    
+    
+    /*
+    
+    float lastVelocity;
+    float lastWidth;
+    
+    
+    public class Point {
+    	private final float x;
+    	private final float y;
+    	private final float time;
+    	
+    	Point(float x, float y, float time) {
+    		this.x = x;
+    		this.y = y;
+    		this.time = time;
+    	}
+    	
+    	private float distanceTo(Point start)  {
+    		return (float) Math.sqrt( Math.pow(this.x - start.x, 2) + Math.pow(this.y - start.y, 2) );
+    	}
+    	
+    	public float velocityFrom(Point start) {
+    		return distanceTo(start) / (this.time - start.time);
+    	}
+    }
+    
+    public class Control {
+    	float x;
+    	float y;
+    	
+    	Control(float x, float y) {
+    		this.x = x;
+    		this.y = y;
+    	}
+    }
+    
+    public class Bezier {
+    	
+    	private final Point startPoint;
+    	private final Point endPoint;
+    	
+    	private Control control1;
+    	private Control control2; 
+    	
+    	Bezier(Point lastPoint, Point newPoint) {
+    		this.startPoint = lastPoint;
+    		this.endPoint = newPoint;
+    		
+    		control1 = new Control(0.5f, 0.5f);
+    		control2 = new Control(0.5f, 0.5f);
+    	}
+    	
+    	// Draws a variable-width Bezier curve. 
+    	public void draw(Canvas canvas, Paint paint, float startWidth, float endWidth) {
+    	  float originalWidth = paint.getStrokeWidth();
+    	  float widthDelta = endWidth - startWidth;
+    	  
+    	  int drawSteps = 2;
+    	  
+    	  
+    	  for (int i = 0; i < drawSteps; i++) {
+    	    // Calculate the Bezier (x, y) coordinate for this step.
+    	    float t = ((float) i) / drawSteps;
+    	    float tt = t * t;
+    	    float ttt = tt * t;
+    	    float u = 1 - t;
+    	    float uu = u * u;
+    	    float uuu = uu * u;
 
+    	    float x = uuu * startPoint.x;
+    	    x += 3 * uu * t * control1.x;
+    	    x += 3 * u * tt * control2.x;
+    	    x += ttt * endPoint.x;
+
+    	    float y = uuu * startPoint.y;
+    	    y += 3 * uu * t * control1.y;
+    	    y += 3 * u * tt * control2.y;
+    	    y += ttt * endPoint.y;
+
+    	    // Set the incremental stroke width and draw.
+    	    paint.setStrokeWidth(startWidth + ttt * widthDelta);
+    	    canvas.drawPoint(startPoint.x, startPoint.y, paint);
+    	  }
+
+    	  paint.setStrokeWidth(originalWidth);
+    	}
+    }
+    
+    ArrayList<Bezier> bezier = new ArrayList<Bezier>();
+    
+    
+    public float strokeWidth(float velocity) {
+    	return 5;
+    }
+
+    ArrayList<Point> points = new ArrayList<Point>();
+    
+    float VELOCITY_FILTER_WEIGHT = 0.5f;
+    
+    Bitmap bitmap = null;
+    Canvas bitmapCanvas = null;
+    
+    private void addBezier(Bezier curve, float startWidth, float endWidth) {
+    	if(bitmap == null) {
+    		//bitmap = Bitmap.createBitmap(getWidth(), getHeight(), Bitmap.Config.ARGB_8888);
+    		bitmap = Bitmap.createBitmap(500, 500, Bitmap.Config.ARGB_8888);
+    		bitmapCanvas = new Canvas(bitmap);
+    	}
+    	curve.draw(game.getGraphics().getCanvas(), paint, startWidth, endWidth);
+    }
+    
+    
+
+    public void addPoint(Point newPoint) {
+      points.add(newPoint);
+      Point lastPoint = points.get(points.size() - 1);
+      Bezier bezier = new Bezier(lastPoint, newPoint);
+
+      float velocity = newPoint.velocityFrom(lastPoint);
+
+      // A simple lowpass filter to mitigate velocity aberrations.
+      velocity = VELOCITY_FILTER_WEIGHT * velocity
+          + (1 - VELOCITY_FILTER_WEIGHT) * lastVelocity;
+
+      // The new width is a function of the velocity. Higher velocities
+      // correspond to thinner strokes.
+      float newWidth = strokeWidth(velocity);
+
+      // The Bezier's width starts out as last curve's final width, and
+      // gradually changes to the stroke width just calculated. The new
+      // width calculation is based on the velocity between the Bezier's
+      // start and end points.
+      addBezier(bezier, lastWidth, newWidth);
+
+      lastVelocity = velocity;
+      lastWidth = newWidth;
+    }
+
+    
+    
+    */
+    
+    
+    
     private void updateRunning(List<TouchEvent> touchEvents, float deltaTime) {   
     	
     	// Thread.currentThread().setPriority(Thread.MAX_PRIORITY);
@@ -125,8 +272,10 @@ public class GameScreenPlayer extends Screen {
     			downY = currentY;
     			
     			if(index < pts.length - 2) {
+    				tms[(int)Math.ceil(index / 2)] = currentTime;
 	    			pts[index++] = currentX;
 	    			pts[index++] = currentY;
+	    			//points.add(new Point(currentX, currentY, currentTime));
     			}
     			
     		} else if(event.type == TouchEvent.TOUCH_DRAGGED) {
@@ -135,8 +284,10 @@ public class GameScreenPlayer extends Screen {
     			dragged = true;
     			
     			if(index < pts.length - 2) {
+    				tms[(int)Math.ceil(index / 2)] = currentTime;
 	    			pts[index++] = currentX;
 	    			pts[index++] = currentY;
+	    			//addPoint(new Point(currentX, currentY, currentTime));
     			}
     			
     		} else if(event.type == TouchEvent.TOUCH_UP) {
@@ -171,7 +322,7 @@ public class GameScreenPlayer extends Screen {
     		    		
     		    		buffer.putShort((short) GLOBAL_STATE__.ADD_DEVICE.ordinal());	// State: ADD_DEVICE
 
-    		    		buffer.putShort((short) 1);										// type, 0 är hårdkodat till main-device - sätt 1 för alla andra devices
+    		    		buffer.putShort((short) 0);										// type, 0 är hårdkodat till main-device - sätt 1 för alla andra devices
     		    		buffer.putInt(PussycatMinions.getXDPI());						// XDPI
     		    		buffer.putInt(PussycatMinions.getYDPI());						// YDPI
     		    		buffer.putInt(PussycatMinions.getScreenWidth());				// ResX
@@ -275,7 +426,9 @@ public class GameScreenPlayer extends Screen {
 
         if( dragged ) {
         	
+        	
         	Canvas canvas = graphics.getCanvas();
+        	        
         	
         	int radious = 50;
         	
@@ -285,7 +438,6 @@ public class GameScreenPlayer extends Screen {
         	//paint.setStrokeWidth(3);
         	
         	paint.setColor(Color.YELLOW);
-
         	canvas.drawLines(pts, 0, index, paint);
         	canvas.drawLines(pts, 2, index - 2, paint);
         	

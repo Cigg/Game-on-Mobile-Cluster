@@ -26,9 +26,7 @@ public class BallzHandler {
 	
 	
 	public void addBall(Ballz ball) {
-		if( !(ball.vx == 0 && ball.vy == 0) ) {
-			ballz.put(ball.id, ball);
-		}
+		ballz.put(ball.id, ball);
 	}
 	
 	

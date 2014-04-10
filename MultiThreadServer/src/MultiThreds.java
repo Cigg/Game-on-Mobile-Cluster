@@ -4,6 +4,8 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.nio.ByteBuffer;
 
+import org.jbox2d.common.Vec2;
+
 
 /**
  * Main loop for the server.
@@ -14,13 +16,28 @@ public class MultiThreds {
 	private static ServerSocket serverSocket = null;
 	private static Socket clientSocket = null;
 	
+	static PhysicsWorld physicsWorld;
+	
+	
 	private static final int maxClientCount = 10;
 	private static final ClientThread[] threads = new ClientThread[maxClientCount];
 	private static final UpdateLoop updateLoop = new UpdateLoop(threads, maxClientCount);
 	
 	volatile static DeviceManager deviceManager;
 	
+	
+	public static PhysicsWorld getPhysicsWorld() {
+			return physicsWorld;
+	}
+	
+	
 	public static void main(String args[]) {
+		
+		// Initiate Physics
+		physicsWorld = new PhysicsWorld();
+		physicsWorld.create(new Vec2(0.0f, 0.0f));
+		 
+		 
 		int portNumber = 4444;
 		if(args.length < 1) {
 			System.out.println("Now using portnumber=" + portNumber);
@@ -47,10 +64,12 @@ public class MultiThreds {
 		    		//System.out.println("Update-----------------------------------------------");
 		    		timeBegin = System.nanoTime();
 		    		
+		    		// Update physics
+		    		physicsWorld.update(timeDelta);
+		    		
 	    			// Update ballz	
 		    		if(threads[0] != null) {
 		    			for(ClientThread.Ballz ball : threads[0].ballz) {
-		    				//ball.printInfo();
 		    				ball.update(timeDelta);
 		    				if(ball.isDead()) {
 		    					threads[0].ballz.remove(ball);
@@ -91,14 +110,11 @@ public class MultiThreds {
 			    				for(ClientThread.Ballz ball : thread.ballz) {
 			    			
 			    					if(buffer.limit() - buffer.position() >= 5*4) {
-			    					
+			    						
 				    					float xG = ball.getXPos();
 					    				float yG = ball.getYPos();
 					    				
 					    				if(deviceManager.isOnDevice(thread.getIp(), xG, yG)) {
-					    					
-					    					
-					    					
 					    					
 					    					float xVelG = ball.getXVel();
 						    				float yVelG = ball.getYVel();
@@ -109,10 +125,12 @@ public class MultiThreds {
 						    				float xVelL = deviceManager.globalToLocalVelX(thread.getIp(), xVelG, yVelG);
 						    				float yVelL = deviceManager.globalToLocalVelY(thread.getIp(), xVelG, yVelG);
 						    				
-						    				
+						    				/*
 					    					if( thread.ownBallz.containsKey(ball.id) ) {
 					    						
 					    						ClientThread.Ballz ball2 = thread.ownBallz.get(ball.id);
+					    						
+					    						System.out.println("OOOOOOOOOOOOOOOOOOO___SAMMMME___OOOOOOOOOOOOOOOOOOO");
 					    						
 					    						if( ball2.getXVel() != xVelG || ball2.getYVel() != yVelG ) {
 					    							buffer.putInt(ball.id);
@@ -123,6 +141,7 @@ public class MultiThreds {
 								    				buffer.putFloat(yVelL);
 				
 								    				nBalls ++;
+								    				System.out.println("OOOOOOOOOOOOOOOOOOO___BALL_UPDATE___OOOOOOOOOOOOOOOOOOO");
 					    						}
 
 					    					} else {
@@ -137,6 +156,15 @@ public class MultiThreds {
 			
 							    				nBalls ++;
 					    					}
+					    					*/
+					    					buffer.putInt(ball.id);
+						    				buffer.putFloat(xPosL);
+						    				buffer.putFloat(yPosL);
+						    				
+						    				buffer.putFloat(xVelL);
+						    				buffer.putFloat(yVelL);
+		
+						    				nBalls ++;
 					    					
 						    				
 					    				} else {

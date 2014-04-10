@@ -1,4 +1,5 @@
 import java.util.HashMap;
+import java.util.Hashtable;
 import java.util.Map;
 
 import org.jbox2d.collision.shapes.CircleShape;
@@ -12,7 +13,7 @@ import org.jbox2d.dynamics.World;
 
 public class PhysicsWorld {
 
-	private Map<Integer, Body> bodies = new HashMap<Integer, Body>(); // HashMap with bodyID and Body
+	private Hashtable<Integer, Body> bodies = new Hashtable<Integer, Body>(); 
 
 	private World world;
 
@@ -26,7 +27,12 @@ public class PhysicsWorld {
 	public void addBall(float xPos, float yPos, float xVel, float yVel, int id, float density, float radius, float bounce, float friction) {
 		// Create Shape with Properties
 		CircleShape circleShape = new CircleShape();
-		circleShape.m_radius = radius;
+		circleShape.m_radius = 0.24f;
+		
+		//MultiThreds.getPhysicsWorld().addBall(xPos, yPos, xVel, yVel,  id, 0.03f, 0.75f, 0.8f, 0.3f);
+		bounce = 0;
+		density = 1;
+		friction = 0;
 		
 		addItem(xPos, yPos, xVel, yVel, circleShape, bounce, id, density, friction);
 	}
@@ -39,8 +45,9 @@ public class PhysicsWorld {
 		bodyDef.userData = id;
 		bodyDef.type = BodyType.DYNAMIC;
 		Body body = world.createBody(bodyDef);
+		
 		bodies.put(id, body);
-
+		
 		// Assign shape to Body
 		FixtureDef fixtureDef = new FixtureDef();
 		fixtureDef.shape = shape;
@@ -52,7 +59,7 @@ public class PhysicsWorld {
 
 	public void update(float deltaTime) {
 		// Update Physics World
-		world.step(deltaTime, 6, 6); // vilka värden bör de 2 sista parametrarna ha?
+		world.step(deltaTime, 128, 128); // vilka värden bör de 2 sista parametrarna ha?
 	}
 
 	public World getWorld() {
@@ -61,5 +68,9 @@ public class PhysicsWorld {
 	
 	public Vec2 getPositionFromId(int id) {
 		return bodies.get(id).getPosition();
+	}
+	
+	public Vec2 getVelocityFromId(int id) {
+		return bodies.get(id).getLinearVelocity();
 	}
 }

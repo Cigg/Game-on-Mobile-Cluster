@@ -100,12 +100,13 @@ public class ServerCommunication extends Thread {
 
 
 	private void addBalls(DataPackage incomingData) {
-			
 		ByteBuffer buffer = ByteBuffer.wrap(incomingData.getData());
 		short state = buffer.getShort();
 		
 		final short nBalls = buffer.getShort();
-			
+		Log.d("FYSIK", "GOT NEW BALLS UPDATE: " + nBalls);
+		
+		
 		for(int i=0; i<nBalls; i++) {
 			int id = buffer.getInt();
 			float x = buffer.getFloat();
