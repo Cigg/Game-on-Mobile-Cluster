@@ -18,11 +18,11 @@ import java.util.concurrent.LinkedBlockingQueue;
  *
  */
 
-public class clientThread extends Thread{
+public class ClientThread extends Thread{
 	private PrintWriter out;
 	private BufferedReader in;
 	private Socket clientSocket = null;
-	private final clientThread[] threads;
+	private final ClientThread[] threads;
 	private int maxClientCount;
 	private boolean running = false;
 	
@@ -32,7 +32,7 @@ public class clientThread extends Thread{
 	private float deltaY = 0;
 	private int ballCount;
 	
-	private clientThread[] thread;
+	private ClientThread[] thread;
 	private UpdateLoop updateLoop;
 	GlobalCoords globalCoords;
 
@@ -130,7 +130,7 @@ public class clientThread extends Thread{
 	 * @param updateLoop		An update thread (not used at this moment)
 	 * @param deviceManager		Stores device information
 	 */
-	public clientThread(String ip, Socket clientSocket, clientThread[] threads, UpdateLoop updateLoop, DeviceManager deviceManager) {
+	public ClientThread(String ip, Socket clientSocket, ClientThread[] threads, UpdateLoop updateLoop, DeviceManager deviceManager) {
 		this.deviceManager = deviceManager;
 		this.clientSocket = clientSocket;
 		this.threads = threads;

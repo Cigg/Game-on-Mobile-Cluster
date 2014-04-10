@@ -25,14 +25,13 @@ public class GameScreenPlayer extends Screen {
     }
 
     private GameState state = GameState.Ready;
-    
+
     private Paint paint;
     Context context;
-    
-    
-	private float currentX, currentY;
 
+	private float currentX, currentY;
 	private float downX, downY;
+
 	private float draggedX, draggedY;
 	private boolean dragged = false;
 	
@@ -41,21 +40,21 @@ public class GameScreenPlayer extends Screen {
 	float[] pts = new float[2048];
 	int index = 0;
 
+
 	
 	private TCPClient comm;
 	private BallzHandler ballzHandler;
 
-
+	// Constructor
     public GameScreenPlayer(Game game) {
         super(game);
-        
-        
+
 		paint = new Paint();
 		paint.setTextSize(30);
 		paint.setTextAlign(Paint.Align.CENTER);
 		paint.setAntiAlias(true);
 		paint.setColor(Color.WHITE);
-		
+
 		
 		previousTime = 0;		
 		SharedVariables.getInstance().setInternalState(GLOBAL_STATE__.SYNCHRONIZE_DEVICE);		
@@ -67,7 +66,6 @@ public class GameScreenPlayer extends Screen {
 		ballzHandler = new BallzHandler();
 		ServerCommunication t4 = new ServerCommunication(comm, ballzHandler);
 		t4.start();
-
 		
     }
 
@@ -103,7 +101,6 @@ public class GameScreenPlayer extends Screen {
         for (int i = 0; i < len; i++) {
         	
             TouchEvent event = touchEvents.get(i);
-           
         	currentX = event.x;
     		currentY = event.y;
     		final float currentTime = event.time;
@@ -149,6 +146,7 @@ public class GameScreenPlayer extends Screen {
     			ByteBuffer buffer; 
     			
     			switch(SharedVariables.getInstance().getInternalState()) {
+
     			
 	    			case SYNCHRONIZE_DEVICE:
 	    			{
@@ -329,7 +327,9 @@ public class GameScreenPlayer extends Screen {
 
     
     private void drawRunningUI() {
+
         Graphics g = game.getGraphics();
+
     }
 
     

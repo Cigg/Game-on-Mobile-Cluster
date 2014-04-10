@@ -40,8 +40,11 @@ public class DeviceManager {
 			this.type = type;
 			
 			
-			if(type == 0) {
+			if(type == 0) { // type == 0 is middle device
 				needsMapping = false;
+				
+				// Add middle object here?
+				
 			} else {
 				needsMapping = true;
 			}
