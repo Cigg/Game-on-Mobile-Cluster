@@ -8,10 +8,10 @@ public class ServerCommunication extends Thread {
 
 	private volatile boolean communicate;
 	private TCPClient tcp;
-	private BallzHandler ballzHandler;
+	private BallHandler ballzHandler;
 	
 	
-	ServerCommunication(TCPClient stcp, BallzHandler ballzHandler ) {
+	ServerCommunication(TCPClient stcp, BallHandler ballzHandler ) {
 		this.ballzHandler = ballzHandler;
 		this.tcp = stcp;
 		communicate = true;
@@ -116,7 +116,7 @@ public class ServerCommunication extends Thread {
 			
 			Log.d("BALLINFO", "ADD: " + id + "  " + x + "  " + y + "  " + vx + "  " + vy);
 			
-			ballzHandler.addBall(new Ballz(id, 0, x, y, vx, vy));
+			ballzHandler.addBall(new Ball(id, 0, x, y, vx, vy));
 		}
 	}
 

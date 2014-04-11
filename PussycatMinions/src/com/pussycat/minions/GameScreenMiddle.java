@@ -31,7 +31,6 @@ public class GameScreenMiddle extends Screen {
     private GameState state = GameState.Ready;
 
     // Variable Setup
-    private BallHandler ballHandler;
     private Paint paint;
     private FPSCounter fpsCounter;
     Context context;
@@ -52,7 +51,6 @@ public class GameScreenMiddle extends Screen {
         super(game);
 
         // Initialize game objects here
-        ballHandler = new BallHandler(1.5f);
         
         // Defining a paint object
 		paint = new Paint();
@@ -135,7 +133,7 @@ public class GameScreenMiddle extends Screen {
 				        			float xVel = buffer.getFloat();	
 				        			float yVel = buffer.getFloat();					        			
 	
-				        			ballHandler.addBall(id, xPos, yPos, 1, xVel, yVel, false, /*System.nanoTime() + reciveDelay - data.getSendTime()*/ reciveDelay , data.getSendTime());
+				        		//	ballHandler.addBall(id, xPos, yPos, 1, xVel, yVel, false, /*System.nanoTime() + reciveDelay - data.getSendTime()*/ reciveDelay , data.getSendTime());
 			    				}
 			    			}
 			    			break;
@@ -226,7 +224,7 @@ public class GameScreenMiddle extends Screen {
     	 
     	 
        	// Update balls
-    	ballHandler.update(reciveDelay);
+    //	ballHandler.update(reciveDelay);
         
         // All touch input is handled here:
        // Update touch events
@@ -425,11 +423,6 @@ public class GameScreenMiddle extends Screen {
     	*/
     	
     	// Needs optimmiiiziziiziizzeing!
-    	for(int i = 0; i < ballHandler.balls.size(); i++){
-    	//	if(ballHandler.balls.get(i).getImage() == Assets.localBall) {
-    			g.drawScaledImage(ballHandler.balls.get(i).getImage(), (int)(ballHandler.balls.get(i).getX()-ballHandler.balls.get(i).getDiameter()/2), (int)(ballHandler.balls.get(i).getY()-ballHandler.balls.get(i).getDiameter()/2), (int)ballHandler.balls.get(i).getDiameter(), (int)ballHandler.balls.get(i).getDiameter(), 0, 0, 128, 128);
-    		//}
-    	}
     }
   
 
@@ -487,7 +480,4 @@ public class GameScreenMiddle extends Screen {
     	return fpsCounter;
     }
     
-    public BallHandler getBallHandler(){
-    	return ballHandler;
-    }
 }

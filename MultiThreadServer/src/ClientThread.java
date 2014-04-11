@@ -386,8 +386,10 @@ public class ClientThread extends Thread{
 			        			yG = (float) (yG + yVel * timeStep * Math.pow(10, -9));
 			        			
 			        			ballCount++;
+			        		//	MultiThreds.sharedVariables.getInstance().incrementBallCounter();
 			        			 synchronized (this) {
-			        				 ballz.add(new Ballz(ballCount,xG, yG, xVel, yVel));
+			        				// ballz.add(new Ballz(MultiThreds.sharedVariables.getInstance().getBallCounter(),xG, yG, xVel, yVel));
+			        				 ballz.add(new Ballz(ballCount, xG, yG, xVel, yVel));
 			        				 for (int j = 0; j < maxClientsCount; j++) {
 							              if (threads[j] != null) {
 							                threads[j].ballCount = ballCount;

@@ -51,7 +51,7 @@ public class GameScreenPlayer extends Screen {
 
 	
 	private TCPClient comm;
-	private BallzHandler ballzHandler;
+	private BallHandler ballzHandler;
 
 	// Constructor
     public GameScreenPlayer(Game game) {
@@ -71,7 +71,7 @@ public class GameScreenPlayer extends Screen {
 		comm = new TCPClient();
 		comm.start();
 
-		ballzHandler = new BallzHandler();
+		ballzHandler = new BallHandler();
 		ServerCommunication t4 = new ServerCommunication(comm, ballzHandler);
 		t4.start();
 		
@@ -244,11 +244,11 @@ public class GameScreenPlayer extends Screen {
 	    		    		buffer.putFloat(currentY);										// y2
 	    		    		buffer.putFloat(deltaTimeDragged);								// t	
     		    		} else {
-    		    			buffer.putFloat(ptx[index-8]);											// x1
-	    		    		buffer.putFloat(pty[index-8]); 										// y1
+    		    			buffer.putFloat(ptx[index-8]);									// x1
+	    		    		buffer.putFloat(pty[index-8]); 									// y1
 	    		    		buffer.putFloat(currentX);										// x2
 	    		    		buffer.putFloat(currentY);										// y2
-	    		    		buffer.putFloat(currentTime - tms[index-8]);								// t	
+	    		    		buffer.putFloat(currentTime - tms[index-8]);					// t	
     		    		}
     		    		
     		    		comm.sendData(buffer.array());
@@ -350,7 +350,7 @@ public class GameScreenPlayer extends Screen {
         
         
         // TODO: OPTIMERA!!
-        boolean tail = false;
+        boolean tail = true;
         if( dragged && tail) {
         	
         	  if (bitmap == null) {
@@ -457,7 +457,7 @@ public class GameScreenPlayer extends Screen {
 	        
         }
         
-        BallzHandler.drawBalls(graphics);
+        BallHandler.drawBalls(graphics);
    
         if (state == GameState.Running) {
             drawRunningUI();

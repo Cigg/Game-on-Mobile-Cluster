@@ -25,6 +25,7 @@ public class MultiThreds {
 	
 	volatile static DeviceManager deviceManager;
 	
+	public static volatile SharedVariables sharedVariables;
 	
 	public static PhysicsWorld getPhysicsWorld() {
 			return physicsWorld;
@@ -32,6 +33,7 @@ public class MultiThreds {
 	
 	
 	public static void main(String args[]) {
+		
 		
 		// Initiate Physics
 		physicsWorld = new PhysicsWorld();
@@ -54,7 +56,7 @@ public class MultiThreds {
 		//updateLoop.start();
 		deviceManager = new DeviceManager();
 		
-	   final float tickRate = 80;
+	   final float tickRate = 128;
 		
 		Thread update = new Thread() {
 		    public void run() {
@@ -192,7 +194,7 @@ public class MultiThreds {
 					    				buffer.clear();
 					    				
 					    				buffer.putShort((short)5);			// State: Add balls
-					    				buffer.putShort((short)0);			// nBalls, byte 2 och 3
+					    						buffer.putShort((short)0);			// nBalls, byte 2 och 3
 			    					}
 			    					
 			    				}
