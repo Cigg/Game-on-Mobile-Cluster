@@ -54,7 +54,7 @@ public class MultiThreds {
 		//updateLoop.start();
 		deviceManager = new DeviceManager();
 		
-	   final float tickRate = 128;
+	   final float tickRate = 80;
 		
 		Thread update = new Thread() {
 		    public void run() {
@@ -62,6 +62,7 @@ public class MultiThreds {
 		    	float timeBegin, timeEnd = 0, timeDelta = 1 / tickRate, timeDelay;
 		    	while(true) {
 		    		//System.out.println("Update-----------------------------------------------");
+		    		//System.out.println("FPS: " + Math.pow(10, 9) / timeDelta);
 		    		timeBegin = System.nanoTime();
 		    		
 		    		// Update physics
@@ -125,20 +126,29 @@ public class MultiThreds {
 						    				float xVelL = deviceManager.globalToLocalVelX(thread.getIp(), xVelG, yVelG);
 						    				float yVelL = deviceManager.globalToLocalVelY(thread.getIp(), xVelG, yVelG);
 						    				
-						    				/*
+						    				
 					    					if( thread.ownBallz.containsKey(ball.id) ) {
 					    						
 					    						ClientThread.Ballz ball2 = thread.ownBallz.get(ball.id);
+					    					
+					    						//System.out.println("OOOOOOOOOOOOOOOOOOO___SAMMMME___OOOOOOOOOOOOOOOOOOO");
 					    						
-					    						System.out.println("OOOOOOOOOOOOOOOOOOO___SAMMMME___OOOOOOOOOOOOOOOOOOO");
+					    						Vec2 vella = physicsWorld.getVelocityFromId(ball.id);
 					    						
-					    						if( ball2.getXVel() != xVelG || ball2.getYVel() != yVelG ) {
+					    						if( ball2.getXVel() != vella.x || ball2.getYVel() != vella.y) {   // Don't Work
+					    						
+					    							ball2.setXVel(vella.x);
+					    							ball2.setYVel(vella.y);
+					    							
+					    							float xVelL2 = deviceManager.globalToLocalVelX(thread.getIp(), ball2.getXVel(), ball2.getYVel());
+								    				float yVelL2 = deviceManager.globalToLocalVelY(thread.getIp(), ball2.getXVel(), ball2.getYVel());
+								    				
 					    							buffer.putInt(ball.id);
 								    				buffer.putFloat(xPosL);
 								    				buffer.putFloat(yPosL);
 								    				
-								    				buffer.putFloat(xVelL);
-								    				buffer.putFloat(yVelL);
+								    				buffer.putFloat(xVelL2);
+								    				buffer.putFloat(yVelL2);
 				
 								    				nBalls ++;
 								    				System.out.println("OOOOOOOOOOOOOOOOOOO___BALL_UPDATE___OOOOOOOOOOOOOOOOOOO");
@@ -156,15 +166,17 @@ public class MultiThreds {
 			
 							    				nBalls ++;
 					    					}
-					    					*/
+					    					
+					    					/*
 					    					buffer.putInt(ball.id);
 						    				buffer.putFloat(xPosL);
 						    				buffer.putFloat(yPosL);
 						    				
 						    				buffer.putFloat(xVelL);
 						    				buffer.putFloat(yVelL);
-		
+						    			
 						    				nBalls ++;
+						    				*/
 					    					
 						    				
 					    				} else {

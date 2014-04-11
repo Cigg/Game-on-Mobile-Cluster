@@ -83,11 +83,11 @@ public class ClientThread extends Thread{
 			this.xPos = position.x;
 			this.yPos = position.y;
 			
-			Vec2 velocity = MultiThreds.getPhysicsWorld().getVelocityFromId(this.id);
+		/*	Vec2 velocity = MultiThreds.getPhysicsWorld().getVelocityFromId(this.id);
 			this.xVel = velocity.x;
 			this.yVel = velocity.y;
-			
-			
+		*/	
+			//System.out.println("AngVel: " + MultiThreds.getPhysicsWorld().getAngularVelocityFromId(id));
 		}
 		
 		public boolean isDead() {
@@ -123,6 +123,14 @@ public class ClientThread extends Thread{
 		
 		public float getYVel() {
 			return this.yVel;
+		}
+		
+		public void setXVel(float xVel) {
+			 this.xVel = xVel;
+		}
+		
+		public void setYVel(float yVel) {
+			 this.yVel = yVel;
 		}
 	}
 	

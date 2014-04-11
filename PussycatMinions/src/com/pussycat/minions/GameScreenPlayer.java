@@ -41,7 +41,13 @@ public class GameScreenPlayer extends Screen {
 	
 	float[] pts = new float[2048];
 	float[] tms = new float[1024];
+	float[] vel = new float[1024];
+	float[] ptx = new float[1024];
+	float[] pty = new float[1024];
 	int index = 0;
+	int beginIndex = 1;
+	public Bitmap bitmap = null;
+	public Canvas bitmapCanvas = null;	  
 
 	
 	private TCPClient comm;
@@ -94,150 +100,6 @@ public class GameScreenPlayer extends Screen {
     }
     
     
-    /*
-    
-    float lastVelocity;
-    float lastWidth;
-    
-    
-    public class Point {
-    	private final float x;
-    	private final float y;
-    	private final float time;
-    	
-    	Point(float x, float y, float time) {
-    		this.x = x;
-    		this.y = y;
-    		this.time = time;
-    	}
-    	
-    	private float distanceTo(Point start)  {
-    		return (float) Math.sqrt( Math.pow(this.x - start.x, 2) + Math.pow(this.y - start.y, 2) );
-    	}
-    	
-    	public float velocityFrom(Point start) {
-    		return distanceTo(start) / (this.time - start.time);
-    	}
-    }
-    
-    public class Control {
-    	float x;
-    	float y;
-    	
-    	Control(float x, float y) {
-    		this.x = x;
-    		this.y = y;
-    	}
-    }
-    
-    public class Bezier {
-    	
-    	private final Point startPoint;
-    	private final Point endPoint;
-    	
-    	private Control control1;
-    	private Control control2; 
-    	
-    	Bezier(Point lastPoint, Point newPoint) {
-    		this.startPoint = lastPoint;
-    		this.endPoint = newPoint;
-    		
-    		control1 = new Control(0.5f, 0.5f);
-    		control2 = new Control(0.5f, 0.5f);
-    	}
-    	
-    	// Draws a variable-width Bezier curve. 
-    	public void draw(Canvas canvas, Paint paint, float startWidth, float endWidth) {
-    	  float originalWidth = paint.getStrokeWidth();
-    	  float widthDelta = endWidth - startWidth;
-    	  
-    	  int drawSteps = 2;
-    	  
-    	  
-    	  for (int i = 0; i < drawSteps; i++) {
-    	    // Calculate the Bezier (x, y) coordinate for this step.
-    	    float t = ((float) i) / drawSteps;
-    	    float tt = t * t;
-    	    float ttt = tt * t;
-    	    float u = 1 - t;
-    	    float uu = u * u;
-    	    float uuu = uu * u;
-
-    	    float x = uuu * startPoint.x;
-    	    x += 3 * uu * t * control1.x;
-    	    x += 3 * u * tt * control2.x;
-    	    x += ttt * endPoint.x;
-
-    	    float y = uuu * startPoint.y;
-    	    y += 3 * uu * t * control1.y;
-    	    y += 3 * u * tt * control2.y;
-    	    y += ttt * endPoint.y;
-
-    	    // Set the incremental stroke width and draw.
-    	    paint.setStrokeWidth(startWidth + ttt * widthDelta);
-    	    canvas.drawPoint(startPoint.x, startPoint.y, paint);
-    	  }
-
-    	  paint.setStrokeWidth(originalWidth);
-    	}
-    }
-    
-    ArrayList<Bezier> bezier = new ArrayList<Bezier>();
-    
-    
-    public float strokeWidth(float velocity) {
-    	return 5;
-    }
-
-    ArrayList<Point> points = new ArrayList<Point>();
-    
-    float VELOCITY_FILTER_WEIGHT = 0.5f;
-    
-    Bitmap bitmap = null;
-    Canvas bitmapCanvas = null;
-    
-    private void addBezier(Bezier curve, float startWidth, float endWidth) {
-    	if(bitmap == null) {
-    		//bitmap = Bitmap.createBitmap(getWidth(), getHeight(), Bitmap.Config.ARGB_8888);
-    		bitmap = Bitmap.createBitmap(500, 500, Bitmap.Config.ARGB_8888);
-    		bitmapCanvas = new Canvas(bitmap);
-    	}
-    	curve.draw(game.getGraphics().getCanvas(), paint, startWidth, endWidth);
-    }
-    
-    
-
-    public void addPoint(Point newPoint) {
-      points.add(newPoint);
-      Point lastPoint = points.get(points.size() - 1);
-      Bezier bezier = new Bezier(lastPoint, newPoint);
-
-      float velocity = newPoint.velocityFrom(lastPoint);
-
-      // A simple lowpass filter to mitigate velocity aberrations.
-      velocity = VELOCITY_FILTER_WEIGHT * velocity
-          + (1 - VELOCITY_FILTER_WEIGHT) * lastVelocity;
-
-      // The new width is a function of the velocity. Higher velocities
-      // correspond to thinner strokes.
-      float newWidth = strokeWidth(velocity);
-
-      // The Bezier's width starts out as last curve's final width, and
-      // gradually changes to the stroke width just calculated. The new
-      // width calculation is based on the velocity between the Bezier's
-      // start and end points.
-      addBezier(bezier, lastWidth, newWidth);
-
-      lastVelocity = velocity;
-      lastWidth = newWidth;
-    }
-
-    
-    
-    */
-    
-    
-    
     private void updateRunning(List<TouchEvent> touchEvents, float deltaTime) {   
     	
     	// Thread.currentThread().setPriority(Thread.MAX_PRIORITY);
@@ -271,10 +133,15 @@ public class GameScreenPlayer extends Screen {
     			downX = currentX;
     			downY = currentY;
     			
-    			if(index < pts.length - 2) {
-    				tms[(int)Math.ceil(index / 2)] = currentTime;
-	    			pts[index++] = currentX;
-	    			pts[index++] = currentY;
+    			if(index < ptx.length) {
+    				//tms[(int)Math.ceil(index / 2)] = currentTime;
+	    			//pts[index++] = currentX;
+	    			//pts[index++] = currentY;
+    				tms[index] = currentTime;
+    				ptx[index] = currentX;
+    				pty[index] = currentY;
+    				index++;
+    				
 	    			//points.add(new Point(currentX, currentY, currentTime));
     			}
     			
@@ -283,10 +150,15 @@ public class GameScreenPlayer extends Screen {
     			draggedY = currentY;  		
     			dragged = true;
     			
-    			if(index < pts.length - 2) {
-    				tms[(int)Math.ceil(index / 2)] = currentTime;
-	    			pts[index++] = currentX;
-	    			pts[index++] = currentY;
+    			if(index < ptx.length) {
+    				//tms[(int)Math.ceil(index / 2)] = currentTime;
+	    			//pts[index++] = currentX;
+	    			//pts[index++] = currentY;
+    				tms[index] = currentTime;
+    				ptx[index] = currentX;
+    				pty[index] = currentY;
+    				index++;
+    				
 	    			//addPoint(new Point(currentX, currentY, currentTime));
     			}
     			
@@ -364,12 +236,20 @@ public class GameScreenPlayer extends Screen {
     		    		buffer.clear();
     		    		
     		    		buffer.putShort((short) GLOBAL_STATE__.RUN_DEVICE.ordinal());	// State: RUN_DEVICE
-
-    		    		buffer.putFloat(downX);											// x1
-    		    		buffer.putFloat(downY); 										// y1
-    		    		buffer.putFloat(currentX);										// x2
-    		    		buffer.putFloat(currentY);										// y2
-    		    		buffer.putFloat(deltaTimeDragged);								// t	
+    		    			
+    		    		if(index < 8) {
+	    		    		buffer.putFloat(downX);											// x1
+	    		    		buffer.putFloat(downY); 										// y1
+	    		    		buffer.putFloat(currentX);										// x2
+	    		    		buffer.putFloat(currentY);										// y2
+	    		    		buffer.putFloat(deltaTimeDragged);								// t	
+    		    		} else {
+    		    			buffer.putFloat(ptx[index-8]);											// x1
+	    		    		buffer.putFloat(pty[index-8]); 										// y1
+	    		    		buffer.putFloat(currentX);										// x2
+	    		    		buffer.putFloat(currentY);										// y2
+	    		    		buffer.putFloat(currentTime - tms[index-8]);								// t	
+    		    		}
     		    		
     		    		comm.sendData(buffer.array());
     		    		
@@ -383,6 +263,8 @@ public class GameScreenPlayer extends Screen {
     			
     			dragged = false;
     			index = 0;
+    			beginIndex = 1;
+    			bitmap = null;
     		}
     		
     		
@@ -417,31 +299,151 @@ public class GameScreenPlayer extends Screen {
     }
 
     
+    
+    float linearInterpolation(float x1, float x2, float scale) {
+		return x1 * (1 - scale) + x2 * scale;
+	}
+	
+	float cosineInterpolation(float x1, float x2, float scale) {
+		float scaleModified = (float) ((1 - Math.cos(scale * Math.PI)) / 2);
+		return x1 * (1 - scaleModified) + x2 * scaleModified;
+	}
+	
+	float cubicInterpolation(float x0, float x1, float x2, float x3, float scale) {
+		float a0, a1, a2, a3, scale2;
+		scale2 = scale * scale;
+		a0 = x3 - x2 - x0 + x1;
+		a1 = x0 - x1 - a0;
+		a2 = x2 - x0;
+		a3 = x1;
+		return (a0*scale*scale2 + a1*scale2 + a2*scale + a3); 
+	}
+	
+	
+
+	public float x1 = ptx[0];
+	public float y1 = pty[0];
+	public float t1 = tms[0];
+	public float v1 = 0;
+
+	
+
+ 	public float xk = 0;
+ 	public float yk = 0;
+	
+ 	public float xz = 0;
+ 	public float yz = 0;
+	
+ 	public float vk = 0;
+ 	public float vz = 0;
+	
+ 	
     @Override
     public void paint(float deltaTime) {
     	
         Graphics graphics = game.getGraphics();
+        Canvas canvas = graphics.getCanvas();
+        
         
         graphics.drawImage(Assets.background, 0, 0);
-
-        if( dragged ) {
+       
+        
+        
+        // TODO: OPTIMERA!!
+        boolean tail = false;
+        if( dragged && tail) {
+        	
+        	  if (bitmap == null) {
+        		    bitmap = Bitmap.createBitmap(PussycatMinions.getScreenWidth(), PussycatMinions.getScreenHeight(), Bitmap.Config.ARGB_8888);
+        		    bitmapCanvas = new Canvas(bitmap);
+        		  }
         	
         	
-        	Canvas canvas = graphics.getCanvas();
-        	        
+  			paint.setColor(Color.YELLOW);
+        	
         	
         	int radious = 50;
-        	
-        	//paint.setColor(Color.BLUE);
-        	//g.drawLine((int)downX, (int)downY, (int)currentX, (int)currentY, Color.RED);
-        	
-        	//paint.setStrokeWidth(3);
-        	
         	paint.setColor(Color.YELLOW);
-        	canvas.drawLines(pts, 0, index, paint);
-        	canvas.drawLines(pts, 2, index - 2, paint);
+        
         	
-        	//c.drawCircle(downX, downY, 5, paint);
+        	for(int i = beginIndex ; i<index ; i += 4) {
+        		
+        		float x2 = ptx[i];
+        		float y2 = pty[i];        		
+        		float t2 = tms[i];
+        		
+        		float dx = x2 - x1;
+        		float dy = y2 - y1;
+        		float dt = t2 - t1;
+        		
+        		vel[i] = (float) (Math.sqrt( Math.pow(dx, 2) + Math.pow(dy, 2) ) / dt);
+        		
+        		
+        		float v2 = vel[i];
+
+        		
+        		if( i > 7 ) {
+	        		int steps = 512;
+	        		
+	        		float scale;
+	        		float ix;
+	        		float iy;
+	        		float iv;
+	        		
+	        		for(int j=0 ; j<steps; j++) {
+	        			
+	        			scale = j / (float) steps;  // Kan räknas ut i förväg
+	            	    ix = cubicInterpolation(xk, xz, x1, x2, scale);
+	            	    iy = cubicInterpolation(yk, yz, y1, y2, scale);
+	        			//float iv = cubicInterpolation(vk, vz, v1, v2, scale);
+	        			
+	        			//float ix = cosineInterpolation(x1, x2, scale);
+	        			//float iy = cosineInterpolation(y1, y2, scale);
+	            	    iv = linearInterpolation(v1, v2, scale);
+	        			
+	        			//float iv = cosineInterpolation(v1, v2, scale);
+	            	    
+	            	    // Går att förenkla
+	            	    iv = (float) (iv * Math.pow(10, 6));
+	            	    iv = Math.max(iv, 1);
+	            	    iv = Math.max(1, 6 / iv);
+	            	    
+	            	    paint.setStrokeWidth( iv ) ;
+	      
+	        			bitmapCanvas.drawPoint(ix, iy, paint);
+	        			
+	        		}
+	        		
+	        		beginIndex = i + 4;
+        		}
+        		
+        		
+        		
+        		/*
+        		paint.setStrokeWidth(10);
+        		paint.setColor(Color.RED);
+        		canvas.drawPoint(ptx[i], pty[i], paint);
+        		*/
+        		
+        		t1 = t2;
+        		
+        		vk = vz;
+        		vz = v1;
+        		v1 = v2;
+        		
+        		xk = xz;
+        		yk = yz;
+        		
+        		xz = x1;
+        		yz = y1;
+        		
+        		x1 = x2;
+        		y1 = y2;
+	
+        		
+        	}
+        	
+        	canvas.drawBitmap(bitmap, 0, 0, paint);
        
         	graphics.drawScaledImage(	Assets.ball, 
 									 	(int)draggedX - radious, 

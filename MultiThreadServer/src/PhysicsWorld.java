@@ -13,7 +13,7 @@ import org.jbox2d.dynamics.World;
 
 public class PhysicsWorld {
 
-	private Hashtable<Integer, Body> bodies = new Hashtable<Integer, Body>(); 
+	public static Hashtable<Integer, Body> bodies = new Hashtable<Integer, Body>(); 
 
 	private World world;
 
@@ -32,7 +32,7 @@ public class PhysicsWorld {
 		//MultiThreds.getPhysicsWorld().addBall(xPos, yPos, xVel, yVel,  id, 0.03f, 0.75f, 0.8f, 0.3f);
 		bounce = 0;
 		density = 1;
-		friction = 0;
+		friction = 0.1f;
 		
 		addItem(xPos, yPos, xVel, yVel, circleShape, bounce, id, density, friction);
 	}
@@ -45,7 +45,7 @@ public class PhysicsWorld {
 		bodyDef.userData = id;
 		bodyDef.type = BodyType.DYNAMIC;
 		Body body = world.createBody(bodyDef);
-		
+		body.setAngularVelocity(5); // la till
 		bodies.put(id, body);
 		
 		// Assign shape to Body
@@ -72,5 +72,9 @@ public class PhysicsWorld {
 	
 	public Vec2 getVelocityFromId(int id) {
 		return bodies.get(id).getLinearVelocity();
+	}
+	
+	public float getAngularVelocityFromId(int id) {
+		return bodies.get(id).getAngularVelocity();
 	}
 }
