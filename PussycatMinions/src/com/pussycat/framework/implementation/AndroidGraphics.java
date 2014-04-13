@@ -21,7 +21,7 @@ import com.pussycat.framework.Image;
 import com.pussycat.minions.PussycatMinions;
 
 public class AndroidGraphics implements Graphics {
-    AssetManager assets;
+    static AssetManager assets;
     Bitmap frameBuffer;
     Canvas canvas;
     Paint paint;
@@ -36,6 +36,14 @@ public class AndroidGraphics implements Graphics {
         this.paint = new Paint();
     }
 
+    public Bitmap getFrameBuffer() {
+    	return this.frameBuffer;
+    }
+    
+    public static AssetManager getAssets() {
+    	return assets;
+    }
+    
     @Override
     public Image newImage(String fileName, ImageFormat format) {
         Config config = null;

@@ -41,10 +41,10 @@ public class AndroidFastRenderView extends SurfaceView implements Runnable {
         	frameTime = System.nanoTime() - beginTime; 	// length of previous frame in nanoseconds
         	beginTime = System.nanoTime();
         	
-        			
-            if(!holder.getSurface().isValid())
+  
+            if(!holder.getSurface().isValid()) {
                 continue;           
-           
+            }
 
             Log.d("RENDERFPS", "RENDERFPS: " + Math.pow(10, 9) / frameTime); 
            

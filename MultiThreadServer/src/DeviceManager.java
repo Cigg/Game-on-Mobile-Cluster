@@ -61,19 +61,80 @@ public class DeviceManager {
 	public float pos2x;
 	public float pos2y;
 	
+	
 	DeviceManager() {
 		this.devices = new ArrayList<Device>();
 	}
 	
 	
+	public String getMiddleIp() {
+		for (Device device : this.devices) {
+		    if (device.type == 0) {
+		    	return device.ip;
+		    }
+		}
+		return null;
+	}
+	
+	
+	public float getMidX(String ip) {
+		for (Device device : this.devices) {
+		    if (device.ip.equals(ip)) {
+		    	return device.resX / 2;
+		    }
+		}
+		return 0;
+	}
+	
+	
+	public float getMidY(String ip) {
+		for (Device device : this.devices) {
+		    if (device.ip.equals(ip)) {
+		    	return device.resY / 2;
+		    }
+		}
+		return 0;
+	}
+	
+	
+	public float getPosX(String ip) {
+		for (Device device : this.devices) {
+		    if (device.ip.equals(ip)) {
+		    	return device.posX;
+		    }
+		}
+		return 0;
+	}
+	
+	
+	public float getPosY(String ip) {
+		for (Device device : this.devices) {
+		    if (device.ip.equals(ip)) {
+		    	return device.posX;
+		    }
+		}
+		return 0;
+	}
+	
+	
+	public float getRotZ(String ip) {
+		for (Device device : this.devices) {
+		    if (device.ip.equals(ip)) {
+		    	return device.rotZ;
+		    }
+		}
+		return 0;
+	}
+	
+	
 	public void addDevice(String ip, short type, int xDPI, int yDPI, int resX, int resY) {
 		if(deviceIsAdded(ip)) {	
-			System.out.println("Device is already addedd: " + ip + " " + xDPI + " " + yDPI + " " + resX + " " +resY);
+			System.out.println("Device is already addedd: " + ip +  " TYPE: " + type + " " + xDPI + " " + yDPI + " " + resX + " " +resY);
 			return;
 		}
 		
 		this.devices.add(new Device(ip, type, xDPI, yDPI, resX, resY));
-		System.out.println("Added device: " + ip + " " + xDPI + " " + yDPI + " " + resX + " " +resY);
+		System.out.println("Added device: " + ip + " TYPE: " + type + "  "+ xDPI + " " + yDPI + " " + resX + " " +resY );
 	}
 
 	
@@ -374,13 +435,15 @@ public class DeviceManager {
 	}
 	
 	
-	public boolean isOnDevice(String ip, float xG, float yG) {
+	public boolean isOnDevice(String ip, float xG, float yG, float rG) {
 		for (Device device : this.devices) {
 		    if (device.ip.equals(ip)) {
+		    	float rL = rG * device.xDPI;
+		    	
 		    	float xL = globalToLocalX(ip, xG, yG);
 		    	float yL = globalToLocalY(ip, xG, yG);
 		    	
-				if(xL >= 0 && yL >= 0 && xL <= device.resX && yL <= device.resY) {
+				if(xL >= 0 - rL && yL >= 0 - rL && xL <= device.resX + rL && yL <= device.resY + rL) {
 					return true;
 				}
 				return false;
@@ -477,6 +540,7 @@ public class DeviceManager {
 		    	System.out.println("--------------------------");
 		    	
 		    	//System.out.println("device on: " + localToGlobal(ip, x2, y2));
+		    	System.out.println("device.rotZ = " + device.rotZ);
 		     	System.out.println("device.posX = " + device.posX + " eller " + device.posX*2.5);
 		    	System.out.println("device.posY = " + device.posY + " eller " + device.posY*2.5);
 		    	System.out.println("--------------------------");

@@ -22,7 +22,7 @@ import com.pussycat.framework.Screen;
 import com.pussycat.minions.PussycatMinions;
 
 public abstract class AndroidGame extends Activity implements Game {
-    AndroidFastRenderView renderView;
+	AndroidFastRenderView renderView;
     Graphics graphics;
     Audio audio;
     Input input;

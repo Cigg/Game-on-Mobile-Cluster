@@ -19,6 +19,23 @@ public class SharedVariables {
 	private static Object theOnlyInstanceMutex = new Object();
 	
 	
+	private float deviceAngle;
+	private Object deviceAngleMutex = new Object();
+	
+	private float deviceMiddleX;
+	private Object deviceMiddleXMutex = new Object();
+	
+	private float deviceMiddleY;
+	private Object deviceMiddleYMutex = new Object();
+
+	private float mainMiddleX;
+	private Object mainMiddleXMutex = new Object();
+	
+	private float mainMiddleY;
+	private Object mainMiddleYMutex = new Object();
+	
+	
+	
 	// Singleton design pattern
 	public static SharedVariables getInstance() {
 		if( theOnlyInstance == null ) {
@@ -47,6 +64,27 @@ public class SharedVariables {
 	// =========================================
 	
 	
+	public float getDeviceAngle() {
+		synchronized( this.deviceAngleMutex ) {
+			return this.deviceAngle;
+		}
+	}
+	
+	
+	public float getDeviceMiddleX() {
+		synchronized( this.deviceMiddleXMutex ) {
+			return this.deviceMiddleX;
+		}
+	}
+	
+	
+	public float getDeviceMiddleY() {
+		synchronized( this.deviceMiddleYMutex ) {
+			return this.deviceMiddleY;
+		}
+	}
+	
+	
 	public GLOBAL_STATE__ getInternalState() {
 		synchronized( this.internalStateMutex ) {
 			return this.internalState;
@@ -71,13 +109,62 @@ public class SharedVariables {
 		return this.nClocks.get();
 	}
 	
+
+	public float getMainMiddleX() {
+		synchronized( this.mainMiddleXMutex ) {
+			return this.mainMiddleX;
+		}
+	}
+
+
+	public float getMainMiddleY() {
+		synchronized( this.mainMiddleYMutex ) {
+			return this.mainMiddleY;
+		}
+	}
+	
 	
 	// =========================================
 	// Set methods
 	// =========================================
 	
 	
-	public void setInternalState( GLOBAL_STATE__ newInternalState ) {
+	public void setDeviceAngle(float newDeviceAngle) {
+		synchronized( this.deviceAngleMutex ) {
+			this.deviceAngle = newDeviceAngle;
+		}
+	}
+	
+	
+	public void setDeviceMiddleX(float newDeviceMiddleX) {
+		synchronized( this.deviceMiddleXMutex ) {
+			this.deviceMiddleX = newDeviceMiddleX;
+		}
+	}
+	
+	
+	public void setDeviceMiddleY(float newDeviceMiddleY) {
+		synchronized( this.deviceMiddleYMutex ) {
+			this.deviceMiddleY = newDeviceMiddleY;
+		}
+	}
+	
+	
+	public void setMainMiddleX(float newMainMiddleX) {
+		synchronized( this.mainMiddleXMutex ) {
+			this.mainMiddleX = newMainMiddleX;
+		}
+	}
+	
+	
+	public void setMainMiddleY(float newMainMiddleY) {
+		synchronized( this.mainMiddleYMutex ) {
+			this.mainMiddleY = newMainMiddleY;
+		}
+	}
+	
+	
+	public void setInternalState(GLOBAL_STATE__ newInternalState) {
 		synchronized( this.internalStateMutex ) {
 			this.internalState = newInternalState;
 		}
@@ -106,5 +193,7 @@ public class SharedVariables {
 	public void incrementNClocks() {
 		this.nClocks.incrementAndGet();
 	}
+
+
 
 }

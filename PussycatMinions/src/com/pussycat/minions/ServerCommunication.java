@@ -8,11 +8,11 @@ public class ServerCommunication extends Thread {
 
 	private volatile boolean communicate;
 	private TCPClient tcp;
-	private BallHandler ballzHandler;
+	private BallHandler ballHandler;
 	
 	
-	ServerCommunication(TCPClient stcp, BallHandler ballzHandler ) {
-		this.ballzHandler = ballzHandler;
+	ServerCommunication(TCPClient stcp, BallHandler ballHandler ) {
+		this.ballHandler = ballHandler;
 		this.tcp = stcp;
 		communicate = true;
 	}
@@ -59,6 +59,9 @@ public class ServerCommunication extends Thread {
 							setState( incomingData );
 						} break;
 		    			
+						case ADD_MAP: {
+							addMap( incomingData );
+						} break;
 
 		    			default:
 		    			break;
@@ -77,6 +80,29 @@ public class ServerCommunication extends Thread {
 			} 	
 			
 		}
+	}
+	
+	private void addMap(DataPackage incomingData) {
+		ByteBuffer buffer = ByteBuffer.wrap(incomingData.getData());
+		short state = buffer.getShort();
+		
+		float angle = buffer.getFloat();
+		angle = (float) (angle * 180 / Math.PI);
+		
+		float deviceMiddleX = buffer.getFloat();
+		float deviceMiddleY = buffer.getFloat();
+		float mainMiddleX = buffer.getFloat();
+		float mainMiddleY = buffer.getFloat();
+		
+		SharedVariables.getInstance().setDeviceAngle(angle);
+		SharedVariables.getInstance().setDeviceMiddleX(deviceMiddleX);
+		SharedVariables.getInstance().setDeviceMiddleY(deviceMiddleY);
+		SharedVariables.getInstance().setMainMiddleX(mainMiddleX);
+		SharedVariables.getInstance().setMainMiddleY(mainMiddleY);
+		
+		//SharedVariables.getInstance().setInternalState(GLOBAL_STATE__.REG);
+		Device.setOnce();
+		Log.d("ADDMAP", "GOT: " + angle + "  " + deviceMiddleX + "  " + deviceMiddleY + "  " + mainMiddleX + "  " + mainMiddleY);
 	}
 	
 	
@@ -104,8 +130,6 @@ public class ServerCommunication extends Thread {
 		short state = buffer.getShort();
 		
 		final short nBalls = buffer.getShort();
-		Log.d("FYSIK", "GOT NEW BALLS UPDATE: " + nBalls);
-		
 		
 		for(int i=0; i<nBalls; i++) {
 			int id = buffer.getInt();
@@ -116,7 +140,7 @@ public class ServerCommunication extends Thread {
 			
 			Log.d("BALLINFO", "ADD: " + id + "  " + x + "  " + y + "  " + vx + "  " + vy);
 			
-			ballzHandler.addBall(new Ball(id, 0, x, y, vx, vy));
+			ballHandler.addBall(new Ball(id, 0, x, y, vx, vy));
 		}
 	}
 

@@ -46,8 +46,11 @@ public class GameScreenPlayer extends Screen {
 	float[] pty = new float[1024];
 	int index = 0;
 	int beginIndex = 1;
+	boolean up = false;
 	public Bitmap bitmap = null;
 	public Canvas bitmapCanvas = null;	  
+
+	public boolean drawTraceAfter = false;
 
 	
 	private TCPClient comm;
@@ -105,61 +108,40 @@ public class GameScreenPlayer extends Screen {
     	// Thread.currentThread().setPriority(Thread.MAX_PRIORITY);
     	
     	ballzHandler.updateBalls(deltaTime);
-        
-        int len = touchEvents.size();
-        for (int i = 0; i < len; i++) {
-        	
+    	up = false;
+    	
+        for (int i = 0; i < touchEvents.size(); i++) {
             TouchEvent event = touchEvents.get(i);
+            
         	currentX = event.x;
     		currentY = event.y;
     		final float currentTime = event.time;
     		
-    		//Log.d("FINGERS", "FINGERS: " + event.pointer);
-    		if(event.pointer >= 2) {
-    			Log.d("AppStates", "SEND SET_STATE");
-    			
-    			ByteBuffer buffer = ByteBuffer.allocate(2*2);
-    			
-    			buffer.putShort((short) GLOBAL_STATE__.SET_STATE.ordinal());	// State: SET_STATE
-    			buffer.putShort((short) 6);										// New state: MAP_MAIN
-    			
-    			comm.sendData(buffer.array());
-    			
-    			SharedVariables.getInstance().setInternalState(GLOBAL_STATE__.MAP_DEVICE);
-    			
-    		} else if(event.type == TouchEvent.TOUCH_DOWN) {
-    			downTime = currentTime;
-    			
-    			downX = currentX;
-    			downY = currentY;
-    			
-    			if(index < ptx.length) {
-    				//tms[(int)Math.ceil(index / 2)] = currentTime;
-	    			//pts[index++] = currentX;
-	    			//pts[index++] = currentY;
-    				tms[index] = currentTime;
-    				ptx[index] = currentX;
-    				pty[index] = currentY;
-    				index++;
-    				
-	    			//points.add(new Point(currentX, currentY, currentTime));
-    			}
-    			
-    		} else if(event.type == TouchEvent.TOUCH_DRAGGED) {
+    	
+    		  if(event.pointer >= 2) {
+     			Log.d("AppStates", "SEND SET_STATE");
+     			
+     			ByteBuffer buffer = ByteBuffer.allocate(2*2);
+     			
+     			buffer.putShort((short) GLOBAL_STATE__.SET_STATE.ordinal());	// State: SET_STATE
+     			buffer.putShort((short) 6);										// New state: MAP_MAIN
+     			
+     			comm.sendData(buffer.array());
+     			
+     			SharedVariables.getInstance().setInternalState(GLOBAL_STATE__.MAP_DEVICE);
+     			
+     		} 
+    		  else if(event.type == TouchEvent.TOUCH_DRAGGED) {
     			draggedX = currentX;
-    			draggedY = currentY;  		
+    			draggedY = currentY;  	
+    		
     			dragged = true;
-    			
+
     			if(index < ptx.length) {
-    				//tms[(int)Math.ceil(index / 2)] = currentTime;
-	    			//pts[index++] = currentX;
-	    			//pts[index++] = currentY;
     				tms[index] = currentTime;
     				ptx[index] = currentX;
     				pty[index] = currentY;
     				index++;
-    				
-	    			//addPoint(new Point(currentX, currentY, currentTime));
     			}
     			
     		} else if(event.type == TouchEvent.TOUCH_UP) {
@@ -202,7 +184,7 @@ public class GameScreenPlayer extends Screen {
     		    		
     		     		comm.sendData(buffer.array());
     		     		SharedVariables.getInstance().setInternalState(GLOBAL_STATE__.MAP_DEVICE);
-    					
+ 
     				}
     				break;
     				
@@ -254,6 +236,7 @@ public class GameScreenPlayer extends Screen {
     		    		comm.sendData(buffer.array());
     		    		
     		    		Log.d("CLOCK", "RUNDEVICE ==== " + (System.nanoTime() + SharedVariables.getInstance().getSendDelay()) * Math.pow(10, -9));
+    		    		
     				}
     				break;
     				
@@ -262,16 +245,34 @@ public class GameScreenPlayer extends Screen {
     			}
     			
     			dragged = false;
-    			index = 0;
-    			beginIndex = 1;
+    			up = true;
+    			drawTraceAfter = true;
+    			    			
+    		} else if(event.type == TouchEvent.TOUCH_DOWN) {
+    			downTime = currentTime;
+    			
+    			downX = currentX;
+    			downY = currentY;
+    			
+    			if(index < ptx.length) {
+    				tms[index] = currentTime;
+    				ptx[index] = currentX;
+    				pty[index] = currentY;
+    				index++;
+       			}
+    			
     			bitmap = null;
+				lastAlpha = 255;
+				index = 0;
+    			beginIndex = 1;
+    			drawTraceAfter = false;
     		}
-    		
     		
         }  
                 
     }
 
+    
     private void updatePaused(List<TouchEvent> touchEvents) {
         int len = touchEvents.size();
         for (int i = 0; i < len; i++) {
@@ -299,17 +300,18 @@ public class GameScreenPlayer extends Screen {
     }
 
     
-    
-    float linearInterpolation(float x1, float x2, float scale) {
+    private float linearInterpolation(float x1, float x2, float scale) {
 		return x1 * (1 - scale) + x2 * scale;
 	}
 	
-	float cosineInterpolation(float x1, float x2, float scale) {
+    
+    private float cosineInterpolation(float x1, float x2, float scale) {
 		float scaleModified = (float) ((1 - Math.cos(scale * Math.PI)) / 2);
 		return x1 * (1 - scaleModified) + x2 * scaleModified;
 	}
 	
-	float cubicInterpolation(float x0, float x1, float x2, float x3, float scale) {
+    
+	private float cubicInterpolation(float x0, float x1, float x2, float x3, float scale) {
 		float a0, a1, a2, a3, scale2;
 		scale2 = scale * scale;
 		a0 = x3 - x2 - x0 + x1;
@@ -319,14 +321,15 @@ public class GameScreenPlayer extends Screen {
 		return (a0*scale*scale2 + a1*scale2 + a2*scale + a3); 
 	}
 	
-	
 
+	
+	
+	// För trace/trigger - ska fixa fint
+	// TODO: ska fixa fint och städa
 	public float x1 = ptx[0];
 	public float y1 = pty[0];
 	public float t1 = tms[0];
 	public float v1 = 0;
-
-	
 
  	public float xk = 0;
  	public float yk = 0;
@@ -337,6 +340,10 @@ public class GameScreenPlayer extends Screen {
  	public float vk = 0;
  	public float vz = 0;
 	
+ 	public int lastAlpha = 255;
+ 	
+ 	Device device = new Device();
+ 	
  	
     @Override
     public void paint(float deltaTime) {
@@ -344,29 +351,36 @@ public class GameScreenPlayer extends Screen {
         Graphics graphics = game.getGraphics();
         Canvas canvas = graphics.getCanvas();
         
-        
-        graphics.drawImage(Assets.background, 0, 0);
+        //graphics.drawImage(Assets.background, 0, 0);
+       // graphics.drawRect(0, 0, PussycatMinions.getScreenWidth(),  PussycatMinions.getScreenHeight(), Color.BLACK);
        
+       // device.drawBackground(graphics);
+       
+       /*
+        switch (SharedVariables.getInstance().getInternalState()) {
+        	case REG:
+        		device.drawBackground(graphics);
+        	break;
+        	
+        	default:
+        		graphics.drawImage(Assets.background, 0, 0);
+        	break;
+        }
+        */
+    	device.drawBackground(graphics);
+       // graphics.drawImage(Assets.background, 0, 0);
+      //  device.drawBackground(graphics);
+        
         
         
         // TODO: OPTIMERA!!
-        boolean tail = true;
+        boolean tail = false;
         if( dragged && tail) {
-        	
-        	  if (bitmap == null) {
-        		    bitmap = Bitmap.createBitmap(PussycatMinions.getScreenWidth(), PussycatMinions.getScreenHeight(), Bitmap.Config.ARGB_8888);
-        		    bitmapCanvas = new Canvas(bitmap);
-        		  }
-        	
-        	
+
   			paint.setColor(Color.YELLOW);
-        	
-        	
-        	int radious = 50;
-        	paint.setColor(Color.YELLOW);
-        
-        	
-        	for(int i = beginIndex ; i<index ; i += 4) {
+               
+        	int jump = 4;
+        	for(int i = beginIndex ; i<index ; i += jump) {
         		
         		float x2 = ptx[i];
         		float y2 = pty[i];        		
@@ -378,23 +392,23 @@ public class GameScreenPlayer extends Screen {
         		
         		vel[i] = (float) (Math.sqrt( Math.pow(dx, 2) + Math.pow(dy, 2) ) / dt);
         		
-        		
         		float v2 = vel[i];
-
         		
         		if( i > 7 ) {
 	        		int steps = 512;
-	        		
+
 	        		float scale;
 	        		float ix;
 	        		float iy;
 	        		float iv;
 	        		
+	        	
 	        		for(int j=0 ; j<steps; j++) {
 	        			
 	        			scale = j / (float) steps;  // Kan räknas ut i förväg
 	            	    ix = cubicInterpolation(xk, xz, x1, x2, scale);
 	            	    iy = cubicInterpolation(yk, yz, y1, y2, scale);
+	            	    
 	        			//float iv = cubicInterpolation(vk, vz, v1, v2, scale);
 	        			
 	        			//float ix = cosineInterpolation(x1, x2, scale);
@@ -410,14 +424,14 @@ public class GameScreenPlayer extends Screen {
 	            	    
 	            	    paint.setStrokeWidth( iv ) ;
 	      
-	        			bitmapCanvas.drawPoint(ix, iy, paint);
-	        			
+	            	    bitmapCanvas.drawPoint(ix, iy, paint);
+	  	            	    
 	        		}
 	        		
-	        		beginIndex = i + 4;
+	 
+	        		
+	        		beginIndex = i + jump;
         		}
-        		
-        		
         		
         		/*
         		paint.setStrokeWidth(10);
@@ -443,18 +457,174 @@ public class GameScreenPlayer extends Screen {
         		
         	}
         	
-        	canvas.drawBitmap(bitmap, 0, 0, paint);
-       
-        	graphics.drawScaledImage(	Assets.ball, 
-									 	(int)draggedX - radious, 
-									 	(int)draggedY - radious, 
-									 	100, 
-									 	100, 
-									 	0, 
-									 	0, 
-									 	128, 
-									 	128		);
+        	
 	        
+        }
+        
+        
+       
+    	//Log.d("deltaTime", "deltaTime = " + deltaTime * Math.pow(10, -7));
+    	
+    	
+    	
+    	if( drawTraceAfter ) {
+
+    		//lastAlpha = Math.max(0, lastAlpha - (int)(0.5 * deltaTime * Math.pow(10, -6)));
+        	//Log.d("NANO", "System.nanoTime() - tms[index] = " + (System.nanoTime() - tms[index]));
+        	
+        	//Log.d("NANO","index = " + index);
+        	
+        	float timeElapsed = (float) ((System.nanoTime() - tms[Math.max(0, index-1)]) *  Math.pow(10, -9));
+        	Log.d("timeElapsed", "timeElapsed = " + timeElapsed);
+        	float seconds = 1.0f;
+        	
+        	int alpha = Math.max(0, (int) cosineInterpolation(255, 0 , (float) (timeElapsed / seconds )));
+        		        	
+        	paint.setAlpha( alpha );
+        	
+        	if( alpha == 0 ) {
+        		drawTraceAfter = false;
+        	}
+        	
+    	}
+    	
+    	if (bitmap == null) {
+		    bitmap = Bitmap.createBitmap(PussycatMinions.getScreenWidth(), PussycatMinions.getScreenHeight(), Bitmap.Config.ARGB_8888);
+		    bitmapCanvas = new Canvas(bitmap);
+		}
+    	
+	
+        canvas.drawBitmap(bitmap, 0, 0, paint);
+        
+        int beginIndexBefore = beginIndex;
+    	float x1b = x1;
+    	float y1b = y1;
+    	float t1b = t1;
+    	float v1b = v1;
+
+    	
+
+    	float xkb = xk;
+    	float ykb = yk;
+    	
+    	float xzb = xz;
+    	float yzb = yz;
+    	
+    	float vkb = vk;
+    	float vzb = vz;
+     	
+     	boolean tail2 = false;
+        if( (dragged || up ) && tail2 && beginIndex > 7) {
+        	
+        	beginIndex = beginIndex - 2 ;
+
+        	paint.setColor(Color.YELLOW);
+               
+        	int jump = 1;
+        	for(int i = beginIndex ; i<index ; i += jump) {
+        		
+        		float x2 = ptx[i];
+        		float y2 = pty[i];        		
+        		float t2 = tms[i];
+        		
+        		float dx = x2 - x1;
+        		float dy = y2 - y1;
+        		float dt = t2 - t1;
+        		
+        		vel[i] = (float) (Math.sqrt( Math.pow(dx, 2) + Math.pow(dy, 2) ) / dt);
+        		
+        		float v2 = vel[i];
+        		
+        		if( i > 7 ) {
+	        		int steps = 512;
+
+	        		float scale;
+	        		float ix;
+	        		float iy;
+	        		float iv;
+	        		
+	        		for(int j=0 ; j<steps; j++) {
+	        			
+	        			scale = j / (float) steps;  // Kan räknas ut i förväg
+	            	    ix = cubicInterpolation(xk, xz, x1, x2, scale);
+	            	    iy = cubicInterpolation(yk, yz, y1, y2, scale);
+	            	    
+	        			//float iv = cubicInterpolation(vk, vz, v1, v2, scale);
+	        			
+	        			//float ix = cosineInterpolation(x1, x2, scale);
+	        			//float iy = cosineInterpolation(y1, y2, scale);
+	            	    iv = linearInterpolation(v1, v2, scale);
+	        			
+	        			//float iv = cosineInterpolation(v1, v2, scale);
+	            	    
+	            	    // Går att förenkla
+	            	    iv = (float) (iv * Math.pow(10, 6));
+	            	    iv = Math.max(iv, 1);
+	            	    iv = Math.max(1, 6 / iv);
+	            	    
+	            	    paint.setStrokeWidth( iv ) ;
+	      
+	            	    if(up) {
+	            	    	bitmapCanvas.drawPoint(ix, iy, paint);
+	            	    } else {
+	            	    	canvas.drawPoint(ix, iy, paint);
+	            	    }
+	        		}	
+	 
+	        		//beginIndex = i + jump;
+        		}
+
+        		/*
+        		paint.setStrokeWidth(10);
+        		paint.setColor(Color.RED);
+        		canvas.drawPoint(ptx[i], pty[i], paint);
+        		*/
+        		
+        		t1 = t2;
+        		
+        		vk = vz;
+        		vz = v1;
+        		v1 = v2;
+        		
+        		xk = xz;
+        		yk = yz;
+        		
+        		xz = x1;
+        		yz = y1;
+        		
+        		x1 = x2;
+        		y1 = y2;
+	
+        		
+        	}
+        	 
+        }
+        
+        beginIndex = beginIndexBefore;
+        x1 = x1b;
+        y1 = y1b;
+        t1 = t1b;
+        v1 = v1b;
+
+        xk = xkb;
+        yk = ykb;
+    	
+        xz = xzb;
+        yz = yzb;
+    	
+        vk = vkb;
+        vz = vzb;
+    	
+        if( dragged ) {
+        	graphics.drawScaledImage(	Assets.ball, 
+				 	(int)draggedX - 50, 
+				 	(int)draggedY - 50, 
+				 	100, 
+				 	100, 
+				 	0, 
+				 	0, 
+				 	128, 
+				 	128		);
         }
         
         BallHandler.drawBalls(graphics);

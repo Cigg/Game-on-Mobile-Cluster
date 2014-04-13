@@ -22,7 +22,7 @@ public class Ball {
 		
 		this.vx = vx;
 		this.vy = vy;
-		
+
 	}
 	
 }

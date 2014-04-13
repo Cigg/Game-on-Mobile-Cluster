@@ -26,8 +26,9 @@ public class TCPClient extends Thread {
 	BufferedWriter buffw;
 	
 	public EndlessQueue<DataPackage> messages;
-	private final int numberOfMessages = 64; 
+	private final int numberOfMessages = 3; 
 
+	
 	public TCPClient() {
 		messages = new EndlessQueue<DataPackage>(new DataPackage[numberOfMessages]);
 	}
@@ -51,9 +52,11 @@ public class TCPClient extends Thread {
 		}
 	}
 
+	
 	public void stopCommuinication() {
 		isRunning = false;
 	}
+	
 	
 	public void run() {
 		isRunning = true;

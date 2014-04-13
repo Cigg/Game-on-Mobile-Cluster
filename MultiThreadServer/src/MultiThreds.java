@@ -117,7 +117,7 @@ public class MultiThreds {
 				    					float xG = ball.getXPos();
 					    				float yG = ball.getYPos();
 					    				
-					    				if(deviceManager.isOnDevice(thread.getIp(), xG, yG)) {
+					    				if(deviceManager.isOnDevice(thread.getIp(), xG, yG, ball.radious)) {
 					    					
 					    					float xVelG = ball.getXVel();
 						    				float yVelG = ball.getYVel();
@@ -137,8 +137,8 @@ public class MultiThreds {
 					    						
 					    						Vec2 vella = physicsWorld.getVelocityFromId(ball.id);
 					    						
-					    						if( ball2.getXVel() != vella.x || ball2.getYVel() != vella.y) {   // Don't Work
-					    						
+					    						if( ball2.getXVel() != vella.x || ball2.getYVel() != vella.y || ball.shouldUpdate() ) {   // Don't Work
+					    	
 					    							ball2.setXVel(vella.x);
 					    							ball2.setYVel(vella.y);
 					    							
@@ -153,7 +153,7 @@ public class MultiThreds {
 								    				buffer.putFloat(yVelL2);
 				
 								    				nBalls ++;
-								    				System.out.println("OOOOOOOOOOOOOOOOOOO___BALL_UPDATE___OOOOOOOOOOOOOOOOOOO");
+								    				//System.out.println("OOOOOOOOOOOOOOOOOOO___BALL_UPDATE___OOOOOOOOOOOOOOOOOOO");
 					    						}
 
 					    					} else {
@@ -167,19 +167,7 @@ public class MultiThreds {
 							    				buffer.putFloat(yVelL);
 			
 							    				nBalls ++;
-					    					}
-					    					
-					    					/*
-					    					buffer.putInt(ball.id);
-						    				buffer.putFloat(xPosL);
-						    				buffer.putFloat(yPosL);
-						    				
-						    				buffer.putFloat(xVelL);
-						    				buffer.putFloat(yVelL);
-						    			
-						    				nBalls ++;
-						    				*/
-					    					
+					    					}				
 						    				
 					    				} else {
 					    					thread.ownBallz.remove(ball.id);
@@ -194,7 +182,7 @@ public class MultiThreds {
 					    				buffer.clear();
 					    				
 					    				buffer.putShort((short)5);			// State: Add balls
-					    						buffer.putShort((short)0);			// nBalls, byte 2 och 3
+					    				buffer.putShort((short)0);			// nBalls, byte 2 och 3
 			    					}
 			    					
 			    				}

@@ -56,6 +56,9 @@ public class ClientThread extends Thread{
 		float xVel, yVel;
 		float  mass, radious, lifeTime;
 		int id;
+		boolean isMoved;
+		
+		float lx, ly;
 		
 		public Ballz(int id,float xPos, float yPos, float xVel, float yVel) {
 			
@@ -65,12 +68,21 @@ public class ClientThread extends Thread{
 			this.xVel = xVel;
 			this.yVel = yVel;
 			this.lifeTime = 0;
+			this.radious = 1;
+			this.isMoved = false;
+			
+			lx = xPos;
+			ly = yPos;
+			
 			System.out.println("NEW BALL: " + id);
 			System.out.println("Added ballz: " + xPos + ", " + yPos + "    " + xVel + ", " + yVel); // * Math.pow(10, 9) * 2.5
 			
-			//MultiThreds.incrementBallCount();
 			MultiThreds.getPhysicsWorld().addBall(xPos, yPos, xVel, yVel,  id, 0.03f, 0.75f, 0.8f, 0.3f);
 
+		}
+		
+		public boolean shouldUpdate() {
+			return this.isMoved;
 		}
 		
 		public void update(float deltaTime) {
@@ -78,16 +90,22 @@ public class ClientThread extends Thread{
 			this.yPos += this.yVel * deltaTime;
 			this.lifeTime += deltaTime;
 			
-			
 			Vec2 position = MultiThreds.getPhysicsWorld().getPositionFromId(this.id);
 			this.xPos = position.x;
 			this.yPos = position.y;
 			
-		/*	Vec2 velocity = MultiThreds.getPhysicsWorld().getVelocityFromId(this.id);
-			this.xVel = velocity.x;
-			this.yVel = velocity.y;
-		*/	
-			//System.out.println("AngVel: " + MultiThreds.getPhysicsWorld().getAngularVelocityFromId(id));
+			
+			Vec2 velocity = MultiThreds.getPhysicsWorld().getVelocityFromId(this.id);
+			if( Math.abs(lx - (position.x - velocity.x * deltaTime)) > 0.01 || 
+				Math.abs(ly - (position.y - velocity.y * deltaTime)) > 0.01 ) {
+				System.out.println("OOOOOOOOOOOOOOOOOOO___BALL_SHOUDL-.UPDATE___OOOOOOOOOOOOOOOOOOO");
+				this.isMoved = true;
+			} else {
+				this.isMoved = false;
+			}
+			
+			lx = xPos;
+			ly = yPos;
 		}
 		
 		public boolean isDead() {
@@ -186,17 +204,6 @@ public class ClientThread extends Thread{
 	public void sendData(byte[] buffer) {
 		if(buffer.length > 0) {	
 			try {
-				/*
-				Log.d("AppWrite", "Writes: " + buffer.toString());
-				byte[] arr = new byte[500];
-				ByteBuffer bf = ByteBuffer.wrap(arr);
-				bf.putShort((short)16);
-				bf.putFloat((float) 17.17);
-				bf.putFloat((float) 18.18);
-				bf.putFloat((float) 19.19);
-				bf.putFloat((float) 2000.20);
-				dout.write(bf.array());
-				*/
 				ByteBuffer headerBuffer = ByteBuffer.allocate(8);
 				headerBuffer.clear();
 				headerBuffer.putInt(buffer.length);
@@ -221,26 +228,10 @@ public class ClientThread extends Thread{
 		running = true;
 		int maxClientsCount = this.maxClientCount;
 		thread = this.threads;
-		
-		/*
-        for (int j = 0; j < maxClientsCount; j++) {
-            if (thread[j] != null) {
-            	globalCoords = new GlobalCoords(800*j,800*(j+1),0,1250);
-            	System.out.println(globalCoords.minX + " " + globalCoords.maxX + " " + globalCoords.minY + " " + globalCoords.maxY);
-            }
-          }
-        */
-		
+				
 		try{
 			dout = clientSocket.getOutputStream();
 			clientSocket.setTcpNoDelay(true);
-			/*
-			out = 	new PrintWriter(
-					new BufferedWriter(
-					new OutputStreamWriter(clientSocket.getOutputStream())),true);
-			in = 	new BufferedReader(
-					new InputStreamReader(clientSocket.getInputStream()));
-			*/
 
 			while(running) {
 
@@ -324,10 +315,7 @@ public class ClientThread extends Thread{
 				        			float x22 = buffer.getFloat();	
 				        			float y22 = buffer.getFloat();	
 				        			float t1 = buffer.getFloat();	
-				        			
-				        		//	float time2 = buffer.getFloat();
-				        		//	float deltaTime = time2 - time1;
-				        			
+							        			
 				        			System.out.println("STEP2: " + ip + ", " + x11 + ", " + y11 + ", " + x22 + ", " + y22 + ", " + t1 + ", " + deltaTime);
 				        			
 				        			deviceManager.devicePointMappingStep2(ip, x11, y11, x22, y22, t1, deltaTime);
@@ -336,6 +324,40 @@ public class ClientThread extends Thread{
 				        			System.out.println("MAPPING_STEP2 DONE");
 				        			
 				        			deviceManager.setNeedsMapping(ip, false);
+				        			
+				        			float rotZ = deviceManager.getRotZ(ip);
+				        			
+				        			float posX = deviceManager.getPosX(ip);
+				        			float posY = deviceManager.getPosY(ip);
+				        			
+				        			ByteBuffer sendBuffer = ByteBuffer.allocate(1*2 + 5*4);
+				        			sendBuffer.clear();
+				    				
+				        			// Send response - for drawing background
+				        			sendBuffer.putShort((short) GLOBAL_STATE__.ADD_MAP.ordinal()); 	// State: ADD_MAP
+				        				
+				        			float l_midX = deviceManager.getMidX(ip);
+				        			float l_midY = deviceManager.getMidY(ip);
+				        			
+				        			float g_midX = deviceManager.localToGlobalX(ip, l_midX, l_midY);
+				        			float g_midY = deviceManager.localToGlobalY(ip, l_midX, l_midY);
+				        			
+				        			String ipOfMiddle = deviceManager.getMiddleIp();
+				        			
+				        			float l_main_midX = deviceManager.getMidX(ipOfMiddle);
+				        			float l_main_midY = deviceManager.getMidY(ipOfMiddle);
+				        			
+				        			float g_main_midX = deviceManager.localToGlobalX(ipOfMiddle, l_main_midX, l_main_midY);
+				        			float g_main_midY = deviceManager.localToGlobalY(ipOfMiddle, l_main_midX, l_main_midY);
+				        			
+				        			sendBuffer.putFloat(rotZ);			
+				        			sendBuffer.putFloat(g_midX);												
+							        sendBuffer.putFloat(g_midY);	
+							        sendBuffer.putFloat(g_main_midX);												
+							        sendBuffer.putFloat(g_main_midY);	
+					    				
+				    				sendData(sendBuffer.array());
+				        			
 				        		} else {
 				        			System.out.println("MAPPING_STEP1");
 				        			
@@ -346,7 +368,6 @@ public class ClientThread extends Thread{
 				        			float x2 = buffer.getFloat();	
 				        			float y2 = buffer.getFloat();	
 				        			float t  = buffer.getFloat();	
-				        		//	time1 = buffer.getFloat() + t;
 				  
 				        			System.out.println("STEP1: " + ip + ", " + x1 + ", " + y1 + ", " + x2 + ", " + y2 + ", " + t);
 				        			
@@ -365,18 +386,10 @@ public class ClientThread extends Thread{
 					        	float x2 = buffer.getFloat();
 					        	float y2 = buffer.getFloat();
 			        			float t  = buffer.getFloat();	
-
-			        			//float xVel = deviceManager.computeVelX(ip, x1, x2, t);
-			        			//float yVel = deviceManager.computeVelY(ip, y1, y2, t);	
 			        			
 			        			float xVel = deviceManager.computeVelocityX(ip, x1, y1, x2, y2, t);
 			        			float yVel = deviceManager.computeVelocityY(ip, x1, y1, x2, y2, t);
 			        			
-			        			
-			        		
-			        			System.out.println("GLOBAL xVel = " + xVel);
-			        			System.out.println("GLOBAL yVel = " + yVel);
-
 			        			float xG = deviceManager.localToGlobalX(ip, x2, y2);
 			        			float yG = deviceManager.localToGlobalY(ip, x2, y2);	
 			        			

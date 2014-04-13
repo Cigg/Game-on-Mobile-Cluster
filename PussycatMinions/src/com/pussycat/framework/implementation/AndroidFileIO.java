@@ -16,7 +16,7 @@ import android.preference.PreferenceManager;
 import com.pussycat.framework.FileIO;
 
 public class AndroidFileIO implements FileIO {
-	Context context;
+	static Context context;
     AssetManager assets;
     String externalStoragePath;
 
@@ -28,6 +28,10 @@ public class AndroidFileIO implements FileIO {
         
  
     
+    }
+    
+    public static Context getContext() {
+    	return context;
     }
 
     @Override

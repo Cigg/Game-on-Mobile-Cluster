@@ -10,7 +10,6 @@ public class EndlessQueue<T> {
 
 	
 	public EndlessQueue(T[] queue) {	
-		
 		if(queue.length < 3) {
 			Log.e("Android", "FATAL ERROR: Size of EndlessQueue is too small.");
 		}
@@ -22,46 +21,16 @@ public class EndlessQueue<T> {
 	
 	
 	private int increment(int index) {
-		
-		// if  index < last_index
-		// 		return next_index
-		// else 
-		//		// We are at the last index so
-		//      return first_index
-		
-		/*
-		if(index <  queue.length - 1) {
-			return index + 1;
-		} else {
-			return 0;
-		}
-		*/
-		
-		return (++index)%(queue.length - 1);
-		
+		return (++index) % (queue.length - 1);
 	}
 	
 	
-	private int decrement(int index) {
-		
-		// if  index > first_index
-		// 		return previous_index
-		// else
-		//      // we are at the first index
-		//      return last_index
-		
-		
-		if(index > 0) {
-			return index - 1;
-		} else {
-			return queue.length - 1;
-		}
-	
+	private int decrement(int index) {		
+		return (queue.length + --index) % queue.length;
 	}
 	
 	
 	private int getNextIndex() {
-
 		if(begin == next) {
 			// The queue is empty
 			next = increment(next);
@@ -69,7 +38,6 @@ public class EndlessQueue<T> {
 		}
 		
 		int nextIndex = next;
-		
 		next = increment(next);
 		
 		if(next == begin) {
@@ -81,14 +49,11 @@ public class EndlessQueue<T> {
 	
 	
 	private int getFirstIndex() {
-		
-		if(begin == next) {
-			// the queue is empty
-			return -1;
+		if(begin == next) {		
+			return -1; // the queue is empty
 		}
 		
 		int firstIndex = begin;
-		
 		begin = increment(begin);
 		
 		return firstIndex;
@@ -96,14 +61,11 @@ public class EndlessQueue<T> {
 	
 	
 	private int getLastIndex() {
-		
 		if(begin == next) {
-			// the queue is empty
-			return -1;
+			return -1; // the queue is empty
 		}
 		
 		int lastIndex = decrement(next);
-		
 		next = lastIndex;
 		
 		return lastIndex;
@@ -111,45 +73,37 @@ public class EndlessQueue<T> {
 	
 	
 	public void add(T elementToAdd) {
-		
 		synchronized(this) {
 			int index = getNextIndex();
 		
 			queue[index] = elementToAdd;
 		}
-		
 	}
 	
 	
 	public T popFront() {
-		
 		synchronized(this) {
 			int index = getFirstIndex();
 			
-			if(index < 0) {
-				// The queue is empty
-				return null;
+			if(index == -1) {
+				return null; // The queue is empty
 			}
 			
 			return queue[index];
 		}
-		
 	}
 	
 	
 	public T popEnd() {
-		
 		synchronized(this) {
 			int index = getLastIndex();
 			
-			if(index < 0) {
-				// The queue is empty
-				return null;
+			if(index == -1) {
+				return null; // The queue is empty
 			}
 			
 			return queue[index];
 		}
-		
 	}
 	
 	

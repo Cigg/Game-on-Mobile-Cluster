@@ -1,6 +1,7 @@
 package com.pussycat.framework;
 
 
+import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Paint;
 
@@ -37,4 +38,6 @@ public interface Graphics {
     public Canvas getCanvas();
     
     public Paint getPaint();
+
+	public Bitmap getFrameBuffer();
 }
