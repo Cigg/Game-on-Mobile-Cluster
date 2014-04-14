@@ -137,7 +137,7 @@ public class MultiThreds {
 					    						
 					    						Vec2 vella = physicsWorld.getVelocityFromId(ball.id);
 					    						
-					    						if( ball2.getXVel() != vella.x || ball2.getYVel() != vella.y || ball.shouldUpdate() ) {   // Don't Work
+					    						if( ball.shouldUpdate() || ball2.getXVel() != vella.x || ball2.getYVel() != vella.y ) {   // Don't Work
 					    	
 					    							ball2.setXVel(vella.x);
 					    							ball2.setYVel(vella.y);

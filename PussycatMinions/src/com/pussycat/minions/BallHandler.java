@@ -19,8 +19,10 @@ public class BallHandler {
 		this.screenHeight = PussycatMinions.getScreenHeight();
 		this.screenWidth = PussycatMinions.getScreenWidth();
 		
+		
+		float xdpi = PussycatMinions.getXDPI();
 		ballTypes = new BallType[32];
-		ballTypes[0] = new BallType(Assets.localBall, 50);
+		ballTypes[0] = new BallType(Assets.localBall, (int)(xdpi / 2.5));
 	}
 	
 	

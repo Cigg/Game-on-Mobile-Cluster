@@ -7,7 +7,7 @@ public class BallType {
 	public final Image image;
 	public final int radius;
 	
-	public BallType(Image image, int radius) {
+	public BallType(final Image image, final int radius) {
 		
 		this.image = image;
 		this.radius = radius;

@@ -25,8 +25,6 @@ public class BackgroundHandler {
 																				4000,							// Height
 																				96,								// ppix
 																				96						);		// ppiy
-																					
-		
 		
 		backgrounds [BACKGROUNDS.COORDINATES_LOW_RES_3.ordinal()] = new Background(		"coordinates_lowres3.png", 		// file
 																						2962, 							// Width
