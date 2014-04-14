@@ -32,6 +32,7 @@ import com.pussycat.framework.implementation.AndroidFileIO;
 import com.pussycat.framework.implementation.AndroidGame;
 import com.pussycat.framework.implementation.AndroidGraphics;
 import com.pussycat.framework.implementation.AndroidImage;
+import com.pussycat.minions.BackgroundHandler.BACKGROUNDS;
 
 public class Device {
 	
@@ -50,6 +51,7 @@ public class Device {
 	private static int l_half;
 	private static int l_side;
 	
+	private static Background bg;
 	
 	public Device() {
 		this.screenHeight = PussycatMinions.getScreenHeight();
@@ -59,30 +61,20 @@ public class Device {
 		this.density = PussycatMinions.getDensity();
 		this.xdpi = PussycatMinions.getXDPI();
 		this.ydpi = PussycatMinions.getYDPI();
+	
+		BackgroundHandler bgh = new BackgroundHandler();
+		
+		this.bg = bgh.backgrounds[BACKGROUNDS.COORDINATES_LOW_RES_3.ordinal()];
 	}
 	
 	
 	public static void tileBitmap(final int tx, final int ty, final int displayImageCenterX, final int displayImageCenterY) {
 		
-		/*
-		final String file = "colorspectrum.jpg";
-		final int width = 5000;
-		final int height = 4000;
-			*/
-		
-		/*
-		final String file = "hole.png";
-		final int width = 128;
-		final int height = 128;
-		*/
-		
 		// TODO: Create Picture class and PictureHandler 
-		final String file = "coordinates.png";
-		final int width = 16540; // Image width
-		final int height = 16540; // Image height
+		final String file = bg.file; // "coordinates.png";
+		final int width = bg.width; // 16540; // Image width
+		final int height = bg.height; //16540; // Image height
 
-		
-	
 		// TODO: Set number of threads with regards to number available
 		final int k = 64;
 		
@@ -266,10 +258,10 @@ public class Device {
 		
 		if(once) {
 		
-			final float ppix = 295.35714285714285714285714285714f; // Image ppi
-			final float ppiy = 295.35714285714285714285714285714f; // Image ppi
-			final int width = 16540; // Image width
-			final int height = 16540; // Image height
+			final float ppix = bg.ppix; // 295.35714285714285714285714285714f; // Image ppi
+			final float ppiy = bg.ppiy; // 295.35714285714285714285714285714f; // Image ppi
+			final int width = bg.width; // 16540; // Image width
+			final int height = bg.height; // 16540; // Image height
 
 
 			final float angle = SharedVariables.getInstance().getDeviceAngle();
