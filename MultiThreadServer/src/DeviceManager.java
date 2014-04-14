@@ -447,6 +447,7 @@ public class DeviceManager {
 		for (Device device : this.devices) {
 		    if (device.ip.equals(ip)) {
 		    	float rL = rG * device.xDPI;
+		    	rL = 0;
 		    	
 		    	float xL = globalToLocalX(ip, xG, yG);
 		    	float yL = globalToLocalY(ip, xG, yG);

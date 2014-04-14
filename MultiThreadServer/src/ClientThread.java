@@ -96,13 +96,13 @@ public class ClientThread extends Thread {
 					this.id);
 			this.xPos = position.x;
 			this.yPos = position.y;
+			
+			
+			Vec2 velocity = MultiThreds.getPhysicsWorld().getVelocityFromId(this.id);
 
-			Vec2 velocity = MultiThreds.getPhysicsWorld().getVelocityFromId(
-					this.id);
-			if (Math.abs(lx - (position.x - velocity.x * deltaTime)) > 0.01
-					|| Math.abs(ly - (position.y - velocity.y * deltaTime)) > 0.01) {
-				System.out
-						.println("OOOOOOOOOOOOOOOOOOO___BALL_SHOUDL-.UPDATE___OOOOOOOOOOOOOOOOOOO");
+			if( Math.abs(lx - (position.x - velocity.x * deltaTime)) > 0.01 || 
+				Math.abs(ly - (position.y - velocity.y * deltaTime)) > 0.01 ) {
+				System.out.println("OOOOOOOOOOOOOOOOOOO___BALL_SHOUDL-.UPDATE___OOOOOOOOOOOOOOOOOOO");
 				this.isMoved = true;
 			} else {
 				this.isMoved = false;

@@ -26,7 +26,7 @@ public class TCPClient extends Thread {
 	BufferedWriter buffw;
 	
 	public EndlessQueue<DataPackage> messages;
-	private final int numberOfMessages = 3; 
+	private final int numberOfMessages = 64; 
 
 	
 	public TCPClient() {

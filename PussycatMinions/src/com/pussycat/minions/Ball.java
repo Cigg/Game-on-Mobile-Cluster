@@ -2,7 +2,7 @@ package com.pussycat.minions;
 
 public class Ball {
 
-	public int id;
+	public final int id;
 	public int type;
 	
 	public float x;
@@ -10,9 +10,9 @@ public class Ball {
 	
 	public float vx;
 	public float vy;
+
 	
-	
-	Ball(int id, int type, float x, float y, float vx, float vy) {
+	Ball(final int id, final int type, final float x, final float y, final float vx, final float vy) {
 		
 		this.id = id;
 		this.type = type;
