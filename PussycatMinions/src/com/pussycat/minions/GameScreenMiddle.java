@@ -44,7 +44,7 @@ public class GameScreenMiddle extends Screen {
 	private float downTime;
 	private float timeBegin, timeEnd, timeDelta;
 	
-	private TCPClient comm;
+	private  TCPClient comm;
 
 	// Constructor
     public GameScreenMiddle(Game game) {

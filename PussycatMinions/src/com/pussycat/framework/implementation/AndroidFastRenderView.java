@@ -46,7 +46,7 @@ public class AndroidFastRenderView extends SurfaceView implements Runnable {
                 continue;           
             }
 
-            Log.d("RENDERFPS", "RENDERFPS: " + Math.pow(10, 9) / frameTime); 
+            //Log.d("RENDERFPS", "RENDERFPS: " + Math.pow(10, 9) / frameTime); 
            
 
             game.getCurrentScreen().update(frameTime);
