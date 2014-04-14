@@ -22,7 +22,7 @@ public class BallHandler {
 		
 		float xdpi = PussycatMinions.getXDPI();
 		ballTypes = new BallType[32];
-		ballTypes[0] = new BallType(Assets.localBall, (int)(xdpi / 2.5));
+		ballTypes[0] = new BallType(Assets.localBall, 50);
 	}
 	
 	
