@@ -52,7 +52,6 @@ public class GameScreenMiddle extends Screen {
 
 	public boolean drawTraceAfter = false;
 
-	
 	private TCPClient comm;
 	private BallHandler ballzHandler;
 

@@ -43,8 +43,8 @@ public class Device {
 	private final int screenHeight;
 	private final int screenWidth;
 	
-	private final float xdpi;
-	private final float ydpi;
+	public final float xdpi;
+	public final float ydpi;
 	private final float densityDpi;
 	private final float density;
 	
@@ -63,7 +63,6 @@ public class Device {
 		this.ydpi = PussycatMinions.getYDPI();
 	
 		BackgroundHandler bgh = new BackgroundHandler();
-		
 		this.bg = bgh.backgrounds[BACKGROUNDS.COORDINATES_LOW_RES_3.ordinal()];
 	}
 	

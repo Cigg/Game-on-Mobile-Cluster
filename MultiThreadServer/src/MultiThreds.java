@@ -137,7 +137,7 @@ public class MultiThreds {
 					    						
 					    						Vec2 vella = physicsWorld.getVelocityFromId(ball.id);
 					    						
-					    						if( ball2.getXVel() != vella.x || ball2.getYVel() != vella.y || ball.shouldUpdate() ) {   // Don't Work
+					    						if( ball.shouldUpdate() || ball2.getXVel() != vella.x || ball2.getYVel() != vella.y ) {   // Don't Work
 					    	
 					    							ball2.setXVel(vella.x);
 					    							ball2.setYVel(vella.y);
@@ -217,18 +217,23 @@ public class MultiThreds {
 		while(true) {
 			try {
 				clientSocket = serverSocket.accept();
-				int i = 0;
-				for(i=0; i<maxClientCount; i++) {
-					if(threads[i] == null) {
-						(threads[i] = new ClientThread(clientSocket.getInetAddress().toString(), clientSocket,threads,updateLoop, deviceManager)).start();
-						break;
+				int j = deviceManager.getDeviceThread(clientSocket.getInetAddress().toString());
+				if(j >= 0){
+					(threads[j] = new ClientThread(clientSocket.getInetAddress().toString(), clientSocket,threads,updateLoop, deviceManager)).start();
+				} else {
+					int i = 0;
+					for(i=0; i<maxClientCount; i++) {
+						if(threads[i] == null) {
+							(threads[i] = new ClientThread(clientSocket.getInetAddress().toString(), clientSocket,threads,updateLoop, deviceManager)).start();
+							break;
+						}
 					}
-				}
-				if(i == maxClientCount) {
-					PrintStream os = new PrintStream(clientSocket.getOutputStream());
-					os.println("Server too busy. Try later");
-					os.close();
-					clientSocket.close();
+					if(i == maxClientCount) {
+						PrintStream os = new PrintStream(clientSocket.getOutputStream());
+						os.println("Server too busy. Try later");
+						os.close();
+						clientSocket.close();
+					}
 				}
 			} catch (IOException e) {
 				System.out.println(e);
