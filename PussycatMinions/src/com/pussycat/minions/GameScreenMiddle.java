@@ -12,6 +12,8 @@ import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
+import android.graphics.Path;
+import android.graphics.Point;
 import android.graphics.PointF;
 import android.util.Log;
 
@@ -44,7 +46,7 @@ public class GameScreenMiddle extends Screen {
 	private float downTime;
 	private float timeBegin, timeEnd, timeDelta;
 	
-	private  TCPClient comm;
+	private TCPClient comm;
 
 	// Constructor
     public GameScreenMiddle(Game game) {
@@ -67,7 +69,7 @@ public class GameScreenMiddle extends Screen {
 		sendDelay = 0;
 		
 		
-		// TODO: Fixa snyggt någonstans
+		// TODO: Fixa snyggt nï¿½gonstans
 		Thread t = new Thread() {
 			public void run() {
 				comm = new TCPClient();
@@ -266,8 +268,8 @@ public class GameScreenMiddle extends Screen {
 
     			ByteBuffer buffer; 
     			
-    			// TODO: Fixa race condition på internalState
-    			// Flytta ut all kommunikationskod till något annat ställe?
+    			// TODO: Fixa race condition pï¿½ internalState
+    			// Flytta ut all kommunikationskod till nï¿½got annat stï¿½lle?
     			switch(internalState) {
     			
 	    			case SYNCHRONIZE_DEVICE:
@@ -294,7 +296,7 @@ public class GameScreenMiddle extends Screen {
     		    		
     		    		buffer.putShort((short) GLOBAL_STATE__.ADD_DEVICE.ordinal());	// State: ADD_DEVICE
 
-    		    		buffer.putShort((short) 0);										// type, 0 är hårdkodat till main-device - sätt 1 för alla andra devices
+    		    		buffer.putShort((short) 0);										// type, 0 ï¿½r hï¿½rdkodat till main-device - sï¿½tt 1 fï¿½r alla andra devices
     		    		buffer.putInt(PussycatMinions.getXDPI());						// XDPI
     		    		buffer.putInt(PussycatMinions.getYDPI());						// YDPI
     		    		buffer.putInt(PussycatMinions.getScreenWidth());				// ResX
@@ -435,7 +437,16 @@ public class GameScreenMiddle extends Screen {
         g.drawARGB(155, 0, 0, 0);
         g.drawString("Tap to create a ball",
                 640, 300, paint); */
-
+        
+        /*
+        // Draw frog image outline
+        g.drawLine(4,0, 2,1, Color.RED);
+        g.drawLine(2,1, 7,0, Color.RED);
+        g.drawLine(6,1, 6,6, Color.RED);
+        g.drawLine(6,7, 7,8, Color.RED);
+        g.drawLine(7,8, 2,1, Color.RED);
+        g.drawLine(2,1, 4,0, Color.RED);
+        */
     }
 
     private void drawRunningUI() {

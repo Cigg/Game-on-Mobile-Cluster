@@ -1,16 +1,11 @@
 import java.io.BufferedReader;
-import java.io.BufferedWriter;
-import java.io.DataInputStream;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.io.OutputStream;
-import java.io.OutputStreamWriter;
-import java.io.PrintStream;
 import java.io.PrintWriter;
 import java.net.Socket;
-import java.net.SocketException;
 import java.nio.ByteBuffer;
 import java.util.Hashtable;
+import java.util.Random;
 import java.util.concurrent.LinkedBlockingQueue;
 
 import org.jbox2d.common.Vec2;
@@ -44,7 +39,6 @@ public class ClientThread extends Thread {
 	private String ip;
 	private DeviceManager deviceManager;
 	private OutputStream dout;
-	private boolean closed = false;
 
 	static final int MAX_LIFETIME = 15;
 	static final float MAX_POSITION_X = (float) (100 / 2.5);
@@ -192,10 +186,10 @@ public class ClientThread extends Thread {
 		this.threads = threads;
 		this.updateLoop = updateLoop;
 		maxClientCount = threads.length;
-		ballCount = 0;
-
+		ballCount = MultiThreds.getPhysicsWorld().bodies2.size();
 		this.ip = ip;
 		internalState = LOCAL_STATE__.MAPPING_STEP1;
+		System.out.println("Ballz size is: " + ballz.size());
 	}
 
 	/**
@@ -257,7 +251,7 @@ public class ClientThread extends Thread {
 
 				// Onödig loop?
 				for (int i = 0; i < maxClientsCount; i++) {
-					if (thread[i] != null && thread[i] == this) {
+					if (thread[i] != null && thread[i] == this && !clientSocket.isClosed()) {
 
 						byte[] headerBuffer = new byte[8];
 						
@@ -279,9 +273,6 @@ public class ClientThread extends Thread {
 
 							System.out.println("In thread: " + i);
 							short state = buffer.getShort();
-							if(state == 12){
-								System.out.println("I got it!");
-							}
 							GLOBAL_STATE__ actualState;
 
 							try {
@@ -292,7 +283,7 @@ public class ClientThread extends Thread {
 
 							String ip = clientSocket.getInetAddress()
 									.toString();
-
+							
 							switch (actualState) {
 
 							case SYNCHRONIZE_DEVICE: {
@@ -310,7 +301,7 @@ public class ClientThread extends Thread {
 								System.out.println("delta1 = " + delta1);
 								sendBuffer.putFloat(sendTime); // t1
 								sendBuffer.putFloat(reciveTime);
-
+								
 								sendData(sendBuffer.array());
 								System.out.println("CLOCK === "
 										+ System.nanoTime() * Math.pow(10, -9));
@@ -464,6 +455,8 @@ public class ClientThread extends Thread {
 										}
 									}
 								}
+								System.out.println("Ball count: " + ballCount);
+								System.out.println("Ballz size: " + ballz.size());
 							}
 								break;
 
@@ -511,5 +504,40 @@ public class ClientThread extends Thread {
 			e.printStackTrace();
 		}
 	}
+	public void closeClientSocket(){
+		try {
+			clientSocket.close();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
 
+	public void addBalls() {
+		
+			for(int i = 0; i < 100; i++) {
+				ballCount++;
+				ballz.add(new Ballz(ballCount, 0, 0,0, 0));
+			}
+			synchronized (this) {
+			for (int j = 0; j < 10; j++) {
+				if (threads[j] != null) {
+					threads[j].ballCount = ballCount;
+				}
+			}
+		}
+		
+	}
+	
+	public void clearBalls() {
+		ballz.clear();
+		synchronized (this) {
+			ballCount = 0;
+			for (int j = 0; j < 10; j++) {
+				if (threads[j] != null) {
+					threads[j].ballCount = ballCount;
+				}
+			}
+		}
+	}
 }// END OF clientThread
