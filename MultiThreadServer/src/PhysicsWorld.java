@@ -5,12 +5,14 @@ import java.util.Map;
 
 import org.jbox2d.collision.shapes.CircleShape;
 import org.jbox2d.collision.shapes.Shape;
+import org.jbox2d.collision.shapes.PolygonShape;
 import org.jbox2d.common.Vec2;
-import org.jbox2d.dynamics.Body;
+import org.jbox2d.dynamics.Body;	
 import org.jbox2d.dynamics.BodyDef;
 import org.jbox2d.dynamics.BodyType;
 import org.jbox2d.dynamics.FixtureDef;
 import org.jbox2d.dynamics.World;
+
 
 
 public class PhysicsWorld {
@@ -66,6 +68,33 @@ public class PhysicsWorld {
 		friction = 0.1f;
 		
 		addItem(xPos, yPos, xVel, yVel, circleShape, bounce, id, density, friction);
+	}
+	
+	public void addTarget(float xPos, float yPos, int id, float bounce) {
+		// Create Shape with Properties
+		CircleShape circleShape = new CircleShape();
+		
+		
+		circleShape.m_radius = 0.24f;
+		
+		//MultiThreds.getPhysicsWorld().addBall(xPos, yPos, xVel, yVel,  id, 0.03f, 0.75f, 0.8f, 0.3f);
+		BodyDef bodyDef = new BodyDef();
+		bodyDef.position.set(xPos, yPos);
+		bodyDef.type = BodyType.STATIC;
+		Body body = null;
+		
+		while (body == null) {
+			body = world.createBody(bodyDef);
+			System.out.println("NULLL BODYYY LOOP");
+		}
+		
+		PolygonShape polyDef = new PolygonShape();
+		polyDef.m_vertices[0].set(0,-1);
+        polyDef.m_vertices[1].set(1,1);
+        polyDef.m_vertices[2].set(-1,1);
+        polyDef.setAsBox(0.5f,0.5f);
+		body.createFixture(polyDef, 1.0f);
+		body.resetMassData();
 	}
 	
 	private void addItem(float xPos, float yPos, float xVel, float yVel, Shape shape, float bounce, int id, float density, float friction) {
