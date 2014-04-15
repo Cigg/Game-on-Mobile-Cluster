@@ -55,6 +55,9 @@ public class GameScreenMiddle extends Screen {
 	
 	private TCPClient comm;
 	private BallHandler ballzHandler;
+	
+	// Game objects
+	private Target middleTarget;
 
 	// Constructor
     public GameScreenMiddle(Game game) {
@@ -66,6 +69,7 @@ public class GameScreenMiddle extends Screen {
 		paint.setAntiAlias(true);
 		paint.setColor(Color.WHITE);
 
+		middleTarget = new Target(PussycatMinions.getScreenWidth()/2, PussycatMinions.getScreenHeight()/2, 0.04f);
 		
 		previousTime = 0;		
 		SharedVariables.getInstance().setInternalState(GLOBAL_STATE__.SYNCHRONIZE_DEVICE);		
@@ -627,6 +631,8 @@ public class GameScreenMiddle extends Screen {
 				 	128		);
         }
         
+        drawTarget();
+        
         BallHandler.drawBalls(graphics);
    
         if (state == GameState.Running) {
@@ -640,10 +646,18 @@ public class GameScreenMiddle extends Screen {
 		}
         
     }
+    
+    private void drawTarget() {
+        Graphics g = game.getGraphics();
+        
+        g.drawImage(middleTarget.getImage(), (int)middleTarget.getX(), (int)middleTarget.getY());
+    }
 
 
     private void drawReadyUI() {
         Graphics g = game.getGraphics();
+        
+        
         
         g.drawARGB(155, 0, 0, 0);
         g.drawString("Tap to create a ball", 640, 300, paint);
