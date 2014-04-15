@@ -393,6 +393,9 @@ public class ClientThread extends Thread {
 									float g_main_midY = deviceManager
 											.localToGlobalY(ipOfMiddle,
 													l_main_midX, l_main_midY);
+									
+									
+									MultiThreds.getPhysicsWorld().addTarget(g_main_midX, g_main_midY, 0.8f);
 
 									sendBuffer.putFloat(rotZ);
 									sendBuffer.putFloat(g_midX);

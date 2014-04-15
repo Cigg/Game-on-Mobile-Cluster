@@ -70,7 +70,7 @@ public class PhysicsWorld {
 		addItem(xPos, yPos, xVel, yVel, circleShape, bounce, id, density, friction);
 	}
 	
-	public void addTarget(float xPos, float yPos, int id, float bounce) {
+	public void addTarget(float xPos, float yPos, float bounce) {
 		// Create Shape with Properties
 		CircleShape circleShape = new CircleShape();
 		
@@ -87,6 +87,9 @@ public class PhysicsWorld {
 			body = world.createBody(bodyDef);
 			System.out.println("NULLL BODYYY LOOP");
 		}
+		
+		System.out.println("ADDING TARGET");
+		System.out.println("Target pos: " + xPos + " " + yPos);
 		
 		PolygonShape polyDef = new PolygonShape();
 		polyDef.m_vertices[0].set(0,-1);

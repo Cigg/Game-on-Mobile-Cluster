@@ -52,6 +52,7 @@ public class GameScreenMiddle extends Screen {
 
 	public boolean drawTraceAfter = false;
 
+	
 	private TCPClient comm;
 	private BallHandler ballzHandler;
 
@@ -474,7 +475,7 @@ public class GameScreenMiddle extends Screen {
         	//Log.d("NANO","index = " + index);
         	
         	float timeElapsed = (float) ((System.nanoTime() - tms[Math.max(0, index-1)]) *  Math.pow(10, -9));
-        	Log.d("timeElapsed", "timeElapsed = " + timeElapsed);
+        	//Log.d("timeElapsed", "timeElapsed = " + timeElapsed);
         	float seconds = 1.0f;
         	
         	int alpha = Math.max(0, (int) cosineInterpolation(255, 0 , (float) (timeElapsed / seconds )));
