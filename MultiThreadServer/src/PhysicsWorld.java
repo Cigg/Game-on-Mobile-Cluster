@@ -1,7 +1,7 @@
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Hashtable;
-import java.util.Map;
+//import java.util.HashMap;
+//import java.util.Hashtable;
+//import java.util.Map;
 
 import org.jbox2d.collision.shapes.CircleShape;
 import org.jbox2d.collision.shapes.Shape;
@@ -14,35 +14,9 @@ import org.jbox2d.dynamics.FixtureDef;
 import org.jbox2d.dynamics.World;
 
 public class PhysicsWorld {
+	//public volatile static Hashtable<Integer, Body> bodies = new Hashtable<Integer, Body>();
 
-	public class Pair {
-
-		Body body;
-		int id;
-
-		Pair(int id, Body body) {
-			if (body == null) {
-				System.out.println("Added NULL BODYYYY");
-			}
-
-			this.body = body;
-			this.id = id;
-		}
-
-		public Vec2 getPosition() {
-
-			return body.getPosition();
-		}
-
-		public Vec2 getLinearVelocity() {
-			return body.getLinearVelocity();
-		}
-
-	}
-
-	public volatile static Hashtable<Integer, Body> bodies = new Hashtable<Integer, Body>();
-
-	public volatile static ArrayList<Pair> bodies2 = new ArrayList<Pair>();
+	public volatile static ArrayList<PhysicsBody> bodies = new ArrayList<PhysicsBody>();
 
 	private World world;
 
@@ -92,11 +66,9 @@ public class PhysicsWorld {
 		System.out.println("Target pos: " + xPos + " " + yPos);
 
 		PolygonShape polyDef = new PolygonShape();
-		// polyDef.m_vertices[0].set(-3,0);
-		// polyDef.m_vertices[1].set(-1,3);
-		// polyDef.m_vertices[2].set(4,4);
 
 		// Define vertices
+		//TODO: read from textfile
 		float vert1X = -0.015f;
 		float vert1Y = 0.0f;
 		float vert2X = 0.01f;
@@ -142,11 +114,6 @@ public class PhysicsWorld {
 		polyDef.m_normals[2].set(calculateNormalX(vert3X, vert3Y, vert1X, vert1Y), calculateNormalY(vert3X, vert3Y, vert1X, vert1Y));
 		body.createFixture(polyDef, 1.0f);
 
-		// polyDef.friction = 0.3;
-		// polyDef.restitution = 0.1;
-		// polyDef.m_vertices[5].set(-4,-4);
-		// polyDef.m_vertices[6].set(-1,-3);
-		// polyDef.m_vertices[7].set(-3,0);
 		// Fyra centimeter kvadrat
 		// polyDef.setAsBox(0.02f*39.37f,0.02f*39.37f);
 		// FixtureDef fixtureDef = new FixtureDef();
@@ -177,7 +144,7 @@ public class PhysicsWorld {
 
 		// bodies.put(id, body);
 
-		bodies2.add(new Pair(id - 1, body));
+		bodies.add(new PhysicsBody(id - 1, body));
 
 		// Assign shape to Body
 		FixtureDef fixtureDef = new FixtureDef();
@@ -208,12 +175,12 @@ public class PhysicsWorld {
 	}
 
 	public Vec2 getPositionFromId(int id) {
-		return bodies2.get(id - 1).getPosition();
+		return bodies.get(id - 1).getPosition();
 
 	}
 
 	public Vec2 getVelocityFromId(int id) {
-		return bodies2.get(id - 1).getLinearVelocity();
+		return bodies.get(id - 1).getLinearVelocity();
 	}
 
 	public float getAngularVelocityFromId(int id) {

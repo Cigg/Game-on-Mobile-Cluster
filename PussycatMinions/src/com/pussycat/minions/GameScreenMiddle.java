@@ -2,7 +2,6 @@ package com.pussycat.minions;
 
 
 import java.nio.ByteBuffer;
-import java.util.ArrayList;
 import java.util.List;
 
 import android.content.Context;
@@ -26,7 +25,7 @@ public class GameScreenMiddle extends Screen {
         Ready, Running, Paused, GameOver
     }
 
-    private GameState state = GameState.Ready;
+    private GameState state = GameState.Running; //used to be ready, but we want to start immediately
 
     private Paint paint;
     Context context;
@@ -74,6 +73,15 @@ public class GameScreenMiddle extends Screen {
 		previousTime = 0;		
 		SharedVariables.getInstance().setInternalState(GLOBAL_STATE__.SYNCHRONIZE_DEVICE);		
 
+		// TODO: Fixa snyggt nï¿½gonstans
+		Thread t = new Thread() {
+			public void run() {
+				comm = new TCPClient();
+				comm.run();
+			}
+		};
+		t.setName("TCPCLIENT");
+		t.start();
 		
 		comm = new TCPClient();
 		comm.start();
@@ -101,9 +109,14 @@ public class GameScreenMiddle extends Screen {
     }
     
     private void updateReady(List<TouchEvent> touchEvents) {
-        if (touchEvents.size() > 0) {
+        
+        // This example starts with a "Ready" screen.
+        // When the user touches the screen, the game begins. 
+        // state now becomes GameState.Running.
+        // Now the updateRunning() method will be called!
+        
+        //if (touchEvents.size() > 0)
             state = GameState.Running;
-        }
     }
     
     
@@ -153,10 +166,8 @@ public class GameScreenMiddle extends Screen {
     			final float deltaTimeDragged = currentTime - downTime;
 
     			ByteBuffer buffer; 
-    			
-    			switch(SharedVariables.getInstance().getInternalState()) {
-
-    			
+    		
+    			switch(SharedVariables.getInstance().getInternalState()) {    			
 	    			case SYNCHRONIZE_DEVICE:
 	    			{
 	    				Log.d("AppStates", "SYNCHRONZE_DEVICE");
@@ -169,7 +180,7 @@ public class GameScreenMiddle extends Screen {
 	    				comm.sendData(buffer.array());
 	    				SharedVariables.getInstance().setInternalState(GLOBAL_STATE__.ADD_DEVICE);
 	    			}
-	    			break;
+	    			//break;
     			
     				case ADD_DEVICE:
     				{
@@ -180,7 +191,7 @@ public class GameScreenMiddle extends Screen {
     		    		
     		    		buffer.putShort((short) GLOBAL_STATE__.ADD_DEVICE.ordinal());	// State: ADD_DEVICE
 
-    		    		buffer.putShort((short) 0);										// type, 0 är hårdkodat till main-device - sätt 1 för alla andra devices
+    		    		buffer.putShort((short) 0);										// type, 0 ï¿½r hï¿½rdkodat till main-device - sï¿½tt 1 fï¿½r alla andra devices
     		    		buffer.putInt(PussycatMinions.getXDPI());						// XDPI
     		    		buffer.putInt(PussycatMinions.getYDPI());						// YDPI
     		    		buffer.putInt(PussycatMinions.getScreenWidth());				// ResX
@@ -656,11 +667,13 @@ public class GameScreenMiddle extends Screen {
 
     private void drawReadyUI() {
         Graphics g = game.getGraphics();
+       /* state = GameState.Running;
         
         
         
         g.drawARGB(155, 0, 0, 0);
         g.drawString("Tap to create a ball", 640, 300, paint);
+        */
     }
 
     

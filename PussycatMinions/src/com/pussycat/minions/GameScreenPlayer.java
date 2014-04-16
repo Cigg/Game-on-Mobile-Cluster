@@ -26,7 +26,7 @@ public class GameScreenPlayer extends Screen {
         Ready, Running, Paused, GameOver
     }
 
-    private GameState state = GameState.Ready;
+    private GameState state = GameState.Running; //We don't need to start at GameState.Ready now. Changed to Running instead.
 
     private Paint paint;
     Context context;
@@ -165,7 +165,7 @@ public class GameScreenPlayer extends Screen {
 	    				comm.sendData(buffer.array());
 	    				SharedVariables.getInstance().setInternalState(GLOBAL_STATE__.ADD_DEVICE);
 	    			}
-	    			break;
+	    			//break;
     			
     				case ADD_DEVICE:
     				{

@@ -20,45 +20,40 @@ public class MultiThreds {
 	
 	
 	private static final int maxClientCount = 10;
-	private static final ClientThread[] threads = new ClientThread[maxClientCount];
+	private  static final ClientThread[] threads = new ClientThread[maxClientCount];
 	private static final UpdateLoop updateLoop = new UpdateLoop(threads, maxClientCount);
 	
 	volatile static DeviceManager deviceManager;
 	
 	public static volatile SharedVariables sharedVariables;
 	
+	public Thread update;
+	public Thread deviceUpdate;
+	
 	public static PhysicsWorld getPhysicsWorld() {
 			return physicsWorld;
 	}
 	
 	
-	public static void main(String args[]) {
+	public MultiThreds() {
 		
-		
+		int portNumber = 4444;
 		// Initiate Physics
 		physicsWorld = new PhysicsWorld();
 		physicsWorld.create(new Vec2(0.0f, 0.0f));
 		 
-		 
-		int portNumber = 4444;
-		if(args.length < 1) {
-			System.out.println("Now using portnumber=" + portNumber);
-		}else {
-			portNumber = Integer.valueOf(args[0]).intValue();
-		}
 		
 		try {
 			serverSocket = new ServerSocket(portNumber);
 		} catch (IOException e) {
 			System.out.println(e);
 		}
-		
 		//updateLoop.start();
 		deviceManager = new DeviceManager();
 		
 	   final float tickRate = 128;
 		
-		Thread update = new Thread() {
+		update = new Thread() {
 		    public void run() {
 		    	
 		    	float timeBegin, timeEnd = 0, timeDelta = 1 / tickRate, timeDelay;
@@ -212,32 +207,63 @@ public class MultiThreds {
 		    }
 		};
 		
-		update.start();
-		
-		while(true) {
-			try {
-				clientSocket = serverSocket.accept();
-				int j = deviceManager.getDeviceThread(clientSocket.getInetAddress().toString());
-				if(j >= 0){
-					(threads[j] = new ClientThread(clientSocket.getInetAddress().toString(), clientSocket,threads,updateLoop, deviceManager)).start();
-				} else {
-					int i = 0;
-					for(i=0; i<maxClientCount; i++) {
-						if(threads[i] == null) {
-							(threads[i] = new ClientThread(clientSocket.getInetAddress().toString(), clientSocket,threads,updateLoop, deviceManager)).start();
-							break;
+		deviceUpdate = new Thread(){ 
+			 public void run() {
+				while(true) {
+					try {
+						clientSocket = serverSocket.accept();
+						int j = deviceManager.getDeviceThread(clientSocket.getInetAddress().toString());
+						if(j >= 0){
+							(threads[j] = new ClientThread(clientSocket.getInetAddress().toString(), clientSocket,threads,updateLoop, deviceManager)).start();
+						} else {
+							int i = 0;
+							for(i=0; i<maxClientCount; i++) {
+								if(threads[i] == null) {
+									(threads[i] = new ClientThread(clientSocket.getInetAddress().toString(), clientSocket,threads,updateLoop, deviceManager)).start();
+									break;
+								}
+							}
+							if(i == maxClientCount) {
+								PrintStream os = new PrintStream(clientSocket.getOutputStream());
+								os.println("Server too busy. Try later");
+								os.close();
+								clientSocket.close();
+							}
 						}
-					}
-					if(i == maxClientCount) {
-						PrintStream os = new PrintStream(clientSocket.getOutputStream());
-						os.println("Server too busy. Try later");
-						os.close();
-						clientSocket.close();
+					} catch (IOException e) {
+						System.out.println(e);
 					}
 				}
-			} catch (IOException e) {
-				System.out.println(e);
+			}
+		};
+	}//End of Main
+	
+	public void stopClientThreads(){
+		for(int i = 0; i < maxClientCount; i++) {
+			if(threads[i] != null){
+				threads[i].closeClientSocket();
+				threads[i].stop();
+				threads[i] = null;
 			}
 		}
-	}//End of Main
+	}
+	
+	public void clearDeviceManeger(){
+		deviceManager.devices.clear();
+	}
+	
+	public void clearBalls(){
+		if(threads[0] != null){
+			threads[0].clearBalls();
+		}
+		physicsWorld.bodies.clear();
+		//physicsWorld.bodies.clear();
+		
+	}
+	
+	public void addBalls(){
+		if(threads[0] != null){
+			threads[0].addBalls();
+		}
+	}
 } // End of MultiThreds
