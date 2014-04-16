@@ -26,11 +26,12 @@ public class MainMenuScreen extends Screen {
 		paint.setTextSize(30);
 		paint.setTextAlign(Paint.Align.CENTER);
 		paint.setAntiAlias(true);
-		paint.setColor(Color.WHITE);
+		paint.setColor(Color.BLACK);
 		
-		playerButton = new Button(Assets.button_player, Assets.button_player_pressed, PussycatMinions.getScreenWidth()/2 - Assets.button_middle.getWidth()/2, PussycatMinions.getScreenHeight()/2-100);
-		middleButton = new Button(Assets.button_middle, Assets.button_middle_pressed, PussycatMinions.getScreenWidth()/2 - Assets.button_middle.getWidth()/2, PussycatMinions.getScreenHeight()/2+100);
-        
+		playerButton = new Button(Assets.button, Assets.button_pressed, PussycatMinions.getScreenWidth()/2 - Assets.button.getWidth()/2, PussycatMinions.getScreenHeight()/2-100, paint);
+		playerButton.setText("PLAYER");
+		middleButton = new Button(Assets.button, Assets.button_pressed, PussycatMinions.getScreenWidth()/2 - Assets.button.getWidth()/2, PussycatMinions.getScreenHeight()/2+100, paint);
+		middleButton.setText("MIDDLE");
     }
     
     @Override
