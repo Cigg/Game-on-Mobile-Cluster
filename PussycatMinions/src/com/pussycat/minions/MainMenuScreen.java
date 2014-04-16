@@ -16,6 +16,8 @@ public class MainMenuScreen extends Screen {
 	
 	Button playerButton;
 	Button middleButton;
+	Button aboutButton;
+	
 	Paint paint;
 	
     public MainMenuScreen(Game game) {
@@ -32,6 +34,8 @@ public class MainMenuScreen extends Screen {
 		playerButton.setText("PLAYER");
 		middleButton = new Button(Assets.button, Assets.button_pressed, PussycatMinions.getScreenWidth()/2 - Assets.button.getWidth()/2, PussycatMinions.getScreenHeight()/2+100, paint);
 		middleButton.setText("MIDDLE");
+        aboutButton = new Button(Assets.button, Assets.button_pressed, PussycatMinions.getScreenWidth()/2 - Assets.button.getWidth()/2, PussycatMinions.getScreenHeight()/2+200, paint);
+        aboutButton.setText("ABOUT");
     }
     
     @Override
@@ -49,6 +53,9 @@ public class MainMenuScreen extends Screen {
             	if(middleButton.inBounds(event.x, event.y)){
             		middleButton.setPressed(true);
             	}
+            	if(aboutButton.inBounds(event.x, event.y)){
+            		aboutButton.setPressed(true);
+            	}
             }
             
             if(event.type == TouchEvent.TOUCH_DRAGGED){
@@ -58,11 +65,15 @@ public class MainMenuScreen extends Screen {
             	if(!middleButton.inBounds(event.x, event.y)){
             		middleButton.setPressed(false);
             	}
+            	if(!aboutButton.inBounds(event.x, event.y)){
+            		aboutButton.setPressed(false);
+            	}
             }
             
             if (event.type == TouchEvent.TOUCH_UP) {
             	playerButton.setPressed(false);
             	middleButton.setPressed(false);
+            	aboutButton.setPressed(false);
 
             	
             	// TODO: Should go to SetupScreen instead
@@ -72,6 +83,9 @@ public class MainMenuScreen extends Screen {
             	if(middleButton.inBounds(event.x, event.y)){
             		game.setScreen(new GameScreenMiddle(game));
             	}
+            	if(aboutButton.inBounds(event.x, event.y)){
+            		game.setScreen(new GameScreenMiddle(game));
+            	}            	
             }
         }
     }
@@ -89,6 +103,7 @@ public class MainMenuScreen extends Screen {
         
         playerButton.drawButton(g);
         middleButton.drawButton(g);
+        aboutButton.drawButton(g);
     }
 
 

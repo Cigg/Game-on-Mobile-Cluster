@@ -52,6 +52,13 @@ public class GameScreenMiddle extends Screen {
 	public boolean drawTraceAfter = false;
 
 	
+	Button menuButton;
+	Button resumeButton;
+	Button restartButton;
+	Button remapButton;
+	Button addButton;
+	Button exitButton;
+	
 	private TCPClient comm;
 	private BallHandler ballzHandler;
 	
@@ -679,9 +686,10 @@ public class GameScreenMiddle extends Screen {
 
     
     private void drawRunningUI() {
-
-        Graphics g = game.getGraphics();
-
+    	Graphics g = game.getGraphics();     
+    	//TODO: create button on init. use drawButton here
+        menuButton = new Button(Assets.button, Assets.button_pressed, PussycatMinions.getScreenWidth() - 100, PussycatMinions.getScreenHeight()-30, paint);
+        menuButton.setText("MENU");
     }
 
     
@@ -689,6 +697,20 @@ public class GameScreenMiddle extends Screen {
         Graphics g = game.getGraphics();
         // Darken the entire screen so you can display the Paused screen.
         g.drawARGB(155, 0, 0, 0);
+
+        int width = PussycatMinions.getScreenWidth()/2 - Assets.button.getWidth()/2;
+        
+        //TODO: create button on init. use drawButton here
+        resumeButton = new Button(Assets.button, Assets.button_pressed, width, PussycatMinions.getScreenHeight()/2-100, paint);
+        resumeButton.setText("RESUME");
+        restartButton = new Button(Assets.button, Assets.button_pressed, width, PussycatMinions.getScreenHeight()/2, paint);
+        restartButton.setText("RESTART");
+        remapButton = new Button(Assets.button, Assets.button_pressed, width, PussycatMinions.getScreenHeight()/2+100, paint);
+        remapButton.setText("RE-MAP");
+        addButton = new Button(Assets.button, Assets.button_pressed, width, PussycatMinions.getScreenHeight()/2+200, paint);
+        addButton.setText("ADD");
+        exitButton = new Button(Assets.button, Assets.button_pressed, width, PussycatMinions.getScreenHeight()/2+300, paint);
+        exitButton.setText("EXIT");
     }
 
     
