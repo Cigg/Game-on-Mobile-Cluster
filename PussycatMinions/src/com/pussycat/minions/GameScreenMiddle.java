@@ -73,7 +73,22 @@ public class GameScreenMiddle extends Screen {
 		paint.setTextSize(30);
 		paint.setTextAlign(Paint.Align.CENTER);
 		paint.setAntiAlias(true);
-		paint.setColor(Color.WHITE);
+		paint.setColor(Color.BLACK);
+		
+		int width = PussycatMinions.getScreenWidth()/2 - Assets.button.getWidth()/2;
+		
+		menuButton = new Button(Assets.button, Assets.button_pressed, PussycatMinions.getScreenWidth() - 200, PussycatMinions.getScreenHeight()-70, paint);
+        menuButton.setText("MENU");
+        resumeButton = new Button(Assets.button, Assets.button_pressed, width, PussycatMinions.getScreenHeight()/2-100, paint);
+        resumeButton.setText("RESUME");
+        restartButton = new Button(Assets.button, Assets.button_pressed, width, PussycatMinions.getScreenHeight()/2, paint);
+        restartButton.setText("RESTART");
+        remapButton = new Button(Assets.button, Assets.button_pressed, width, PussycatMinions.getScreenHeight()/2+100, paint);
+        remapButton.setText("RE-MAP");
+        addButton = new Button(Assets.button, Assets.button_pressed, width, PussycatMinions.getScreenHeight()/2+200, paint);
+        addButton.setText("ADD");
+        exitButton = new Button(Assets.button, Assets.button_pressed, width, PussycatMinions.getScreenHeight()/2+300, paint);
+        exitButton.setText("EXIT");
 
 		middleTarget = new Target(PussycatMinions.getScreenWidth()/2, PussycatMinions.getScreenHeight()/2, 0.04f);
 		
@@ -688,8 +703,8 @@ public class GameScreenMiddle extends Screen {
     private void drawRunningUI() {
     	Graphics g = game.getGraphics();     
     	//TODO: create button on init. use drawButton here
-        menuButton = new Button(Assets.button, Assets.button_pressed, PussycatMinions.getScreenWidth() - 100, PussycatMinions.getScreenHeight()-30, paint);
-        menuButton.setText("MENU");
+        
+        menuButton.drawButton(g);
     }
 
     
@@ -697,20 +712,12 @@ public class GameScreenMiddle extends Screen {
         Graphics g = game.getGraphics();
         // Darken the entire screen so you can display the Paused screen.
         g.drawARGB(155, 0, 0, 0);
-
-        int width = PussycatMinions.getScreenWidth()/2 - Assets.button.getWidth()/2;
-        
-        //TODO: create button on init. use drawButton here
-        resumeButton = new Button(Assets.button, Assets.button_pressed, width, PussycatMinions.getScreenHeight()/2-100, paint);
-        resumeButton.setText("RESUME");
-        restartButton = new Button(Assets.button, Assets.button_pressed, width, PussycatMinions.getScreenHeight()/2, paint);
-        restartButton.setText("RESTART");
-        remapButton = new Button(Assets.button, Assets.button_pressed, width, PussycatMinions.getScreenHeight()/2+100, paint);
-        remapButton.setText("RE-MAP");
-        addButton = new Button(Assets.button, Assets.button_pressed, width, PussycatMinions.getScreenHeight()/2+200, paint);
-        addButton.setText("ADD");
-        exitButton = new Button(Assets.button, Assets.button_pressed, width, PussycatMinions.getScreenHeight()/2+300, paint);
-        exitButton.setText("EXIT");
+       
+        resumeButton.drawButton(g);
+        restartButton.drawButton(g);
+        remapButton.drawButton(g);
+        addButton.drawButton(g);
+        exitButton.drawButton(g);
     }
 
     
