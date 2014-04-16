@@ -16,6 +16,8 @@ public class MainMenuScreen extends Screen {
 	
 	Button playerButton;
 	Button middleButton;
+	Button aboutButton;
+	
 	Paint paint;
 	
     public MainMenuScreen(Game game) {
@@ -29,8 +31,8 @@ public class MainMenuScreen extends Screen {
 		paint.setColor(Color.WHITE);
 		
 		playerButton = new Button(Assets.button_player, Assets.button_player_pressed, PussycatMinions.getScreenWidth()/2 - Assets.button_middle.getWidth()/2, PussycatMinions.getScreenHeight()/2-100);
-		middleButton = new Button(Assets.button_middle, Assets.button_middle_pressed, PussycatMinions.getScreenWidth()/2 - Assets.button_middle.getWidth()/2, PussycatMinions.getScreenHeight()/2+100);
-        
+		middleButton = new Button(Assets.button_middle, Assets.button_middle_pressed, PussycatMinions.getScreenWidth()/2 - Assets.button_middle.getWidth()/2, PussycatMinions.getScreenHeight()/2+50);
+        aboutButton = new Button(Assets.button_middle_pressed, Assets.button_middle, PussycatMinions.getScreenWidth()/2 - Assets.button_middle.getWidth()/2, PussycatMinions.getScreenHeight()/2+200);
     }
     
     @Override
@@ -48,6 +50,9 @@ public class MainMenuScreen extends Screen {
             	if(middleButton.inBounds(event.x, event.y)){
             		middleButton.setPressed(true);
             	}
+            	if(aboutButton.inBounds(event.x, event.y)){
+            		aboutButton.setPressed(true);
+            	}
             }
             
             if(event.type == TouchEvent.TOUCH_DRAGGED){
@@ -57,11 +62,15 @@ public class MainMenuScreen extends Screen {
             	if(!middleButton.inBounds(event.x, event.y)){
             		middleButton.setPressed(false);
             	}
+            	if(!aboutButton.inBounds(event.x, event.y)){
+            		aboutButton.setPressed(false);
+            	}
             }
             
             if (event.type == TouchEvent.TOUCH_UP) {
             	playerButton.setPressed(false);
             	middleButton.setPressed(false);
+            	aboutButton.setPressed(false);
 
             	
             	// TODO: Should go to SetupScreen instead
@@ -71,6 +80,9 @@ public class MainMenuScreen extends Screen {
             	if(middleButton.inBounds(event.x, event.y)){
             		game.setScreen(new GameScreenMiddle(game));
             	}
+            	if(aboutButton.inBounds(event.x, event.y)){
+            		game.setScreen(new GameScreenMiddle(game));
+            	}            	
             }
         }
     }
@@ -88,6 +100,7 @@ public class MainMenuScreen extends Screen {
         
         playerButton.drawButton(g);
         middleButton.drawButton(g);
+        aboutButton.drawButton(g);
     }
 
 

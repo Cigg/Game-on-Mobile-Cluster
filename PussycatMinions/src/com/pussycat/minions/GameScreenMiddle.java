@@ -46,6 +46,13 @@ public class GameScreenMiddle extends Screen {
 	private float downTime;
 	private float timeBegin, timeEnd, timeDelta;
 	
+	Button pauseButton;
+	Button resumeButton;
+	Button restartButton;
+	Button remapButton;
+	Button addButton;
+	Button exitButton;
+	
 	private TCPClient comm;
 
 	// Constructor
@@ -452,12 +459,21 @@ public class GameScreenMiddle extends Screen {
     private void drawRunningUI() {
         game.getGraphics();
         
+        pauseButton = resumeButton = new Button(Assets.button_player, Assets.button_player_pressed, PussycatMinions.getScreenWidth() - 100, PussycatMinions.getScreenHeight()-30);
+        
     }
 
     private void drawPausedUI() {
         Graphics g = game.getGraphics();
         // Darken the entire screen so you can display the Paused screen.
         g.drawARGB(155, 0, 0, 0);
+        int width = PussycatMinions.getScreenWidth()/2 - Assets.button_middle.getWidth()/2;
+        resumeButton = new Button(Assets.button_player, Assets.button_player_pressed, width, PussycatMinions.getScreenHeight()/2-100);
+        restartButton = new Button(Assets.button_player, Assets.button_player_pressed, width, PussycatMinions.getScreenHeight()/2);
+        remapButton = new Button(Assets.button_player, Assets.button_player_pressed, width, PussycatMinions.getScreenHeight()/2+100);
+        addButton = new Button(Assets.button_player, Assets.button_player_pressed, width, PussycatMinions.getScreenHeight()/2+200);
+        exitButton = new Button(Assets.button_player, Assets.button_player_pressed, width, PussycatMinions.getScreenHeight()/2+300);
+        
 
     }
 
