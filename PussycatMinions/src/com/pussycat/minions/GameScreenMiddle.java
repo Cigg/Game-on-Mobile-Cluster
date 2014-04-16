@@ -435,16 +435,6 @@ public class GameScreenMiddle extends Screen {
         g.drawString("Tap to create a ball",
                 640, 300, paint);
         
-        /*
-        // Draw frog image outline
-        g.drawLine(4,0, 2,1, Color.RED);
-        g.drawLine(2,1, 7,0, Color.RED);
-        g.drawLine(6,1, 6,6, Color.RED);
-        g.drawLine(6,7, 7,8, Color.RED);
-        g.drawLine(7,8, 2,1, Color.RED);
-        g.drawLine(2,1, 4,0, Color.RED);
-        */
-        
     }
 
     private void drawRunningUI() {
