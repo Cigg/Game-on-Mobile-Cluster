@@ -91,6 +91,20 @@ public class PhysicsWorld {
 		
 		//loadVertices();
 		//calculateNormals();
+		/*
+		//---------- DEFENITION OF VERTECIES FROM FILE ---------
+		for(int i=0; i < polygons.size(); i++){
+			Polygon polygon = polygons.get(i);
+			polyDef.m_vertexCount = polygon.vertecies.size();
+			for(int j=0; j < polygon.vertecies.size(); j++) {
+				Vertex vertex = polygon.vertecies.get(j);
+				polyDef.m_vertices[j].set(vertex.x,vertex.y);
+				polyDef.m_normals[j].set(vertex.normalX,vertex.normalY);
+			}
+			body.createFixture(polyDef,1.0f);
+		}
+		*/
+		
 		
 		// Define vertices
 		//TODO: read from textfile
