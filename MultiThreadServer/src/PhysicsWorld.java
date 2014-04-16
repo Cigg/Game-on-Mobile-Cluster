@@ -1,21 +1,45 @@
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.IOException;
 import java.util.ArrayList;
-//import java.util.HashMap;
-//import java.util.Hashtable;
-//import java.util.Map;
+import java.util.Iterator;
 
 import org.jbox2d.collision.shapes.CircleShape;
-import org.jbox2d.collision.shapes.Shape;
 import org.jbox2d.collision.shapes.PolygonShape;
+import org.jbox2d.collision.shapes.Shape;
 import org.jbox2d.common.Vec2;
 import org.jbox2d.dynamics.Body;
 import org.jbox2d.dynamics.BodyDef;
 import org.jbox2d.dynamics.BodyType;
 import org.jbox2d.dynamics.FixtureDef;
 import org.jbox2d.dynamics.World;
+import org.json.simple.JSONArray;
+import org.json.simple.JSONObject;
+import org.json.simple.parser.JSONParser;
+import org.json.simple.parser.ParseException;
+//import java.util.HashMap;
+//import java.util.Hashtable;
+//import java.util.Map;
 
 public class PhysicsWorld {
 	//public volatile static Hashtable<Integer, Body> bodies = new Hashtable<Integer, Body>();
-
+	private class Vertex {
+		float x;
+		float y;
+		float normalX;
+		float normalY;
+		
+		Vertex(double x, double y){
+			this.x = (float) x;
+			this.y = (float) y;
+		}
+	}
+	
+	private class Polygon {
+		public ArrayList<Vertex> vertecies = new ArrayList<Vertex>();
+	}
+	private ArrayList<Polygon> polygons = new ArrayList<Polygon>();
+	
 	public volatile static ArrayList<PhysicsBody> bodies = new ArrayList<PhysicsBody>();
 
 	private World world;
@@ -23,7 +47,8 @@ public class PhysicsWorld {
 	public void create(Vec2 gravity) {
 		boolean doSleep = false;
 		world = new World(gravity, doSleep);
-
+		loadVertices();
+		calculateNormals();
 		System.out.println("PhysicsWorld created");
 	}
 
@@ -66,7 +91,10 @@ public class PhysicsWorld {
 		System.out.println("Target pos: " + xPos + " " + yPos);
 
 		PolygonShape polyDef = new PolygonShape();
-
+		
+		//loadVertices();
+		//calculateNormals();
+		
 		// Define vertices
 		//TODO: read from textfile
 		float vert1X = -0.015f;
@@ -197,5 +225,67 @@ public class PhysicsWorld {
 		float dy = y2 - y1;
 		float dx = x2 - x1;
 		return (float) (-dx / (Math.sqrt(dx * dx + dy * dy)));
+	}
+
+	private void loadVertices(){
+		JSONParser parser = new JSONParser();
+		try{
+			Object obj = parser.parse(new FileReader("src\\frog.json"));
+			JSONObject jsonObject = (JSONObject) obj;
+			JSONArray jsonArray = (JSONArray) jsonObject.get("rigidBodies");
+			jsonObject = (JSONObject) jsonArray.get(0);
+			jsonArray = (JSONArray) jsonObject.get("polygons");
+			//jsonObject = (JSONObject) jsonArray.get(0);
+			
+			
+			Iterator i = jsonArray.iterator();
+			while(i.hasNext()) {
+				JSONArray polygonArray = (JSONArray) i.next();
+				Polygon polygon = new Polygon();
+				Iterator j = polygonArray.iterator();
+				while(j.hasNext()) {
+					JSONObject pair = (JSONObject) j.next();
+					double x = (double) pair.get("x");
+					double y = (double) pair.get("y");
+					System.out.println("x = " + x + ", y = " + y);
+					polygon.vertecies.add(new Vertex(x,y));
+				}
+				System.out.println();
+				polygons.add(polygon);
+			}
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		} catch (ParseException e) {
+			e.printStackTrace();
+		}
+	}
+	
+	private void calculateNormals(){
+		System.out.println(polygons.size());
+		if(!polygons.isEmpty()){
+			for(int j=0; j < polygons.size(); j++){
+				Vertex vertex1;
+				Vertex vertex2;
+				for(int i=0; i < polygons.get(j).vertecies.size(); i++){
+					if(i+1 < polygons.get(j).vertecies.size()) {
+						vertex1 = polygons.get(j).vertecies.get(i);
+						vertex2 = polygons.get(j).vertecies.get(i+1);
+					} else {
+						vertex1 = polygons.get(j).vertecies.get(i);
+						vertex2 = polygons.get(j).vertecies.get(0);
+					}
+					
+					polygons.get(j).vertecies.get(i).normalX = calculateNormalX(vertex1.x,vertex1.y,vertex2.x,vertex2.y);
+					polygons.get(j).vertecies.get(i).normalY = calculateNormalY(vertex1.x,vertex1.y,vertex2.x,vertex2.y);
+					//vertecies.get(i).normalX = calculateNormalX(vertex1.x,vertex1.y,vertex2.x,vertex2.y);
+					//vertecies.get(i).normalY = calculateNormalX(vertex1.x,vertex1.y,vertex2.x,vertex2.y);
+					System.out.println("Normalx = " + polygons.get(j).vertecies.get(i).normalX + ", Normaly = " + polygons.get(j).vertecies.get(i).normalY);
+				}
+			}
+		}else{
+			System.out.println("No polygons");
+		}
 	}
 }
