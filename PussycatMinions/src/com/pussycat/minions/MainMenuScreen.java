@@ -69,7 +69,7 @@ public class MainMenuScreen extends Screen {
             		game.setScreen(new GameScreenPlayer(game));
             	}
             	if(middleButton.inBounds(event.x, event.y)){
-            		game.setScreen(new GameScreenMiddle (game));
+            		game.setScreen(new GameScreenMiddle(game));
             	}
             }
         }

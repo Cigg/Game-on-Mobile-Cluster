@@ -30,7 +30,7 @@ public class GameScreenMiddle extends Screen {
         Ready, Running, Paused, GameOver
     }
 
-    private GameState state = GameState.Ready;
+    private GameState state = GameState.Running; //used to be ready, but we want to start immediately
 
     // Variable Setup
     private Paint paint;
@@ -211,8 +211,10 @@ public class GameScreenMiddle extends Screen {
         // state now becomes GameState.Running.
         // Now the updateRunning() method will be called!
         
-        if (touchEvents.size() > 0)
+        //if (touchEvents.size() > 0)
             state = GameState.Running;
+             
+            
     }
 
     private void updateRunning(List<TouchEvent> touchEvents, float deltaTime) {
@@ -283,7 +285,7 @@ public class GameScreenMiddle extends Screen {
 	    				
 	    				internalState = GLOBAL_STATE__.ADD_DEVICE;
 	    			}
-	    			break;
+	    			//break;
     			
     				case ADD_DEVICE:
     				{
@@ -430,11 +432,11 @@ public class GameScreenMiddle extends Screen {
 
     private void drawReadyUI() {
         Graphics g = game.getGraphics();
+       /* state = GameState.Running;
         
         g.drawARGB(155, 0, 0, 0);
         g.drawString("Tap to create a ball",
-                640, 300, paint);
-        
+                640, 300, paint); */
     }
 
     private void drawRunningUI() {
