@@ -32,7 +32,8 @@ public class PhysicsWorld {
 		// Create Shape with Properties
 		CircleShape circleShape = new CircleShape();
 
-		circleShape.m_radius = 0.24f;
+		// Two centimeters
+		circleShape.m_radius = 0.01f*39.37f;
 
 		// MultiThreds.getPhysicsWorld().addBall(xPos, yPos, xVel, yVel, id,
 		// 0.03f, 0.75f, 0.8f, 0.3f);
@@ -45,15 +46,11 @@ public class PhysicsWorld {
 	}
 
 	public void addTarget(float xPos, float yPos, float bounce) {
-		// Create Shape with Properties
-		CircleShape circleShape = new CircleShape();
 
-		circleShape.m_radius = 0.24f;
-
-		// MultiThreds.getPhysicsWorld().addBall(xPos, yPos, xVel, yVel, id,
-		// 0.03f, 0.75f, 0.8f, 0.3f);
 		BodyDef bodyDef = new BodyDef();
 		bodyDef.position.set(xPos, yPos);
+		
+		// TODO: make dynamic bodytype and add pivot
 		bodyDef.type = BodyType.STATIC;
 		Body body = null;
 
