@@ -13,6 +13,8 @@ public class PussycatMinions extends AndroidGame {
 	private static int densityDpi;
 	private static int density;
 	private static int xdpi, ydpi;
+	
+	public static Settings settings;
     
 	@Override
     public Screen getInitScreen() {
@@ -26,7 +28,8 @@ public class PussycatMinions extends AndroidGame {
 		density = (int) metrics.density;
 		xdpi = (int) metrics.xdpi;
 		ydpi = (int) metrics.ydpi;
-        
+		
+		settings = new Settings();
     	
     	//TO-DO: calculate the correct height of display
     	/*

@@ -22,7 +22,7 @@ public class BallHandler {
 		
 		float xdpi = PussycatMinions.getXDPI();
 		ballTypes = new BallType[32];
-		ballTypes[0] = new BallType(Assets.localBall, 50);
+		ballTypes[0] = new BallType(Assets.localBall, Float.parseFloat(PussycatMinions.settings.getSetting("ballRadius")));
 	}
 	
 	
@@ -49,7 +49,7 @@ public class BallHandler {
 		    ball.x += ball.vx * timeStep;
 		    ball.y += ball.vy * timeStep;  
 		    
-		    if( isOutOfBounds( ball.x, ball.y, ballTypes[ball.type].radius )) {
+		    if( isOutOfBounds( ball.x, ball.y, PussycatMinions.meters2Pixels(ballTypes[ball.type].radius ))) {
 		    	balls.remove(ball.id);
 		    }
 		    
@@ -65,10 +65,10 @@ public class BallHandler {
 		    Ball ball = balls.get(key);
 		   
 		    graphics.drawScaledImage(	ballTypes[ball.type].image, 
-				    				 	(int)ball.x - ballTypes[ball.type].radius, 
-				    				 	(int)ball.y - ballTypes[ball.type].radius, 
-				    				 	100, 
-				    				 	100, 
+				    				 	(int)(ball.x - PussycatMinions.meters2Pixels(ballTypes[ball.type].radius)), 
+				    				 	(int)(ball.y - PussycatMinions.meters2Pixels(ballTypes[ball.type].radius)), 
+				    				 	(int)(PussycatMinions.meters2Pixels(ballTypes[ball.type].radius)*2), 
+				    				 	(int)(PussycatMinions.meters2Pixels(ballTypes[ball.type].radius)*2), 
 				    				 	0, 
 				    				 	0, 
 				    				 	128, 
