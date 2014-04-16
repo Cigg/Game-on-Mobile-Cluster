@@ -23,7 +23,7 @@ import com.pussycat.framework.Screen;
 
 public class GameScreenPlayer extends Screen {
     enum GameState {
-        Ready, Running, Paused, GameOver
+        Ready, Running, Paused, GameOver, AddDevice, NotMapped, Wait, MappedWait, Remap, //, Mapped
     }
 
     private GameState state = GameState.Running; //We don't need to start at GameState.Ready now. Changed to Running instead.
@@ -637,10 +637,44 @@ public class GameScreenPlayer extends Screen {
             drawPausedUI();
 		} else if (state == GameState.GameOver) {
 			drawGameOverUI();
+		} else if (state == GameState.NotMapped) {
+			drawSharedUI(state);
 		}
         
     }
-
+    
+ // TODO - Centrera bilden och texten.
+    private void drawSharedUI(GameState state) {
+    	
+    	Graphics g = game.getGraphics();
+    	paint.setTextSize(16);     	    	
+    	
+    	int imageX = PussycatMinions.getScreenWidth()/2;
+    	int imageY = 20;
+    	int textX = PussycatMinions.getScreenWidth()/2;
+    	int textY = PussycatMinions.getScreenHeight()/2;
+    	
+    	//AddDevice, NotMapped, Mapped, Wait, MappedWait, Remap, 
+    	if (state == GameState.AddDevice) {
+    		g.drawImage(Assets.ball, imageX, imageY);
+    		g.drawString("Klicka för att gå med i spelet", textX, textY, paint);
+    	} else if (state == GameState.NotMapped) {
+    		g.drawImage(Assets.ball, imageX, imageY);
+    		g.drawString("Lyckost! Det är din tur att mappa nu.", textX, textY, paint);
+    	} else if (state == GameState.Wait) {
+    		g.drawImage(Assets.ball, imageX, imageY);
+    		g.drawString("Vänta! Någon annan mappar.", textX, textY, paint);
+    	} else if (state == GameState.MappedWait) {
+    		g.drawImage(Assets.ball, imageX, imageY);
+    		g.drawString("Vänta medans de andra mappar sina enheter", textX, textY, paint);
+    	} else if (state == GameState.Remap) {
+    		g.drawImage(Assets.ball, imageX, imageY);
+    		g.drawString("Klicka om du vill mappa om din enhet", textX, textY, paint);
+    	}
+    	
+    	
+    	
+    }
 
     private void drawReadyUI() {
         Graphics g = game.getGraphics();
