@@ -29,7 +29,7 @@ public class PhysicsWorld {
 		float normalX;
 		float normalY;
 		
-		Vertex(double x, double y){
+		Vertex(float x, float y){
 			this.x = (float) x;
 			this.y = (float) y;
 		}
@@ -91,21 +91,21 @@ public class PhysicsWorld {
 		
 		//loadVertices();
 		//calculateNormals();
-		/*
+		
 		//---------- DEFENITION OF VERTECIES FROM FILE ---------
 		for(int i=0; i < polygons.size(); i++){
 			Polygon polygon = polygons.get(i);
 			polyDef.m_vertexCount = polygon.vertecies.size();
 			for(int j=0; j < polygon.vertecies.size(); j++) {
 				Vertex vertex = polygon.vertecies.get(j);
-				polyDef.m_vertices[j].set(vertex.x,vertex.y);
+				polyDef.m_vertices[j].set(1.3f*vertex.x,1.3f*vertex.y);
 				polyDef.m_normals[j].set(vertex.normalX,vertex.normalY);
 			}
 			body.createFixture(polyDef,1.0f);
 		}
-		*/
 		
 		
+		/*
 		// Define vertices
 		//TODO: read from textfile
 		float vert1X = -0.015f;
@@ -152,7 +152,7 @@ public class PhysicsWorld {
 		polyDef.m_normals[1].set(calculateNormalX(vert2X, vert2Y, vert3X, vert3Y), calculateNormalY(vert2X, vert2Y, vert3X, vert3Y));
 		polyDef.m_normals[2].set(calculateNormalX(vert3X, vert3Y, vert1X, vert1Y), calculateNormalY(vert3X, vert3Y, vert1X, vert1Y));
 		body.createFixture(polyDef, 1.0f);
-
+		*/
 		// Fyra centimeter kvadrat
 		// polyDef.setAsBox(0.02f*39.37f,0.02f*39.37f);
 		// FixtureDef fixtureDef = new FixtureDef();
@@ -240,14 +240,19 @@ public class PhysicsWorld {
 
 	private void loadVertices(){
 		JSONParser parser = new JSONParser();
+		float originX;
+		float originY;
 		try{
 			Object obj = parser.parse(new FileReader("src\\frog.json"));
 			JSONObject jsonObject = (JSONObject) obj;
 			JSONArray jsonArray = (JSONArray) jsonObject.get("rigidBodies");
 			jsonObject = (JSONObject) jsonArray.get(0);
-			jsonArray = (JSONArray) jsonObject.get("polygons");
-			//jsonObject = (JSONObject) jsonArray.get(0);
 			
+			JSONObject origin = (JSONObject) jsonObject.get("origin");
+			originX = convertToFloat(origin.get("x"));
+			originY = convertToFloat(origin.get("y"));
+			
+			jsonArray = (JSONArray) jsonObject.get("polygons");
 			
 			Iterator i = jsonArray.iterator();
 			while(i.hasNext()) {
@@ -256,10 +261,11 @@ public class PhysicsWorld {
 				Iterator j = polygonArray.iterator();
 				while(j.hasNext()) {
 					JSONObject pair = (JSONObject) j.next();
-					double x = (double) pair.get("x");
-					double y = (double) pair.get("y");
+					Object x =  pair.get("x");
+					Object y =  pair.get("y");
 					System.out.println("x = " + x + ", y = " + y);
-					polygon.vertecies.add(new Vertex(x,y));
+					
+					polygon.vertecies.add(new Vertex(convertToFloat(x)-originX,convertToFloat(y)-originY));
 				}
 				System.out.println();
 				polygons.add(polygon);
@@ -297,6 +303,16 @@ public class PhysicsWorld {
 			}
 		}else{
 			System.out.println("No polygons");
+		}
+	}
+	
+	private float convertToFloat(Object x){
+		if(x.getClass() == Double.class){
+			return ((Double)x).floatValue();
+		}else if (x.getClass() == Long.class) {
+			return ((Long)x).floatValue();
+		} else {
+			return (float) x;
 		}
 	}
 }

@@ -413,6 +413,7 @@ public class ClientThread extends Thread {
 
 									deviceManager.devicePointMappingStep1(ip,
 											x1, y1, x2, y2, t);
+									
 									System.out.println("MAPPING_STEP1 DONE");
 								}
 							}

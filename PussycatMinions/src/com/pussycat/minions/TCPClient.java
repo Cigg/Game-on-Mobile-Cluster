@@ -14,7 +14,7 @@ import android.util.Log;
 
 public class TCPClient extends Thread {
 	
-	public static String SERVERIP = "172.20.10.2";
+	public static String SERVERIP = "192.168.43.213";
 	public static final int SERVERPORT = 4444;
 	private boolean isRunning = false;
 	
