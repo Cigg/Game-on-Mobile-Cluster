@@ -7,13 +7,9 @@ public class Assets {
 
     public static Image ball;
     public static Image frog;
-    public static Image button_player;
-    public static Image button_player_pressed;
-    public static Image button_middle;
-    public static Image button_middle_pressed;
+    public static Image button;
+    public static Image button_pressed;
     public static Image background;
-    public static Image button_skip;
-    public static Image button_skip_pressed;
     public static Sound click;
 	public static Image localBall;
 	
