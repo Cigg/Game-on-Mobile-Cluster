@@ -256,8 +256,8 @@ public class MultiThreds {
 		if(threads[0] != null){
 			threads[0].clearBalls();
 		}
-		physicsWorld.bodies2.clear();
 		physicsWorld.bodies.clear();
+		//physicsWorld.bodies.clear();
 		
 	}
 	
