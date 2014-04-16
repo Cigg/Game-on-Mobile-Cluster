@@ -10,19 +10,16 @@ public class Target {
 	Image image;
 	private PointF pos;
 	private float scale;
-	
+
+	// Height in meters
 	public Target(float centerX, float centerY, float height){
 		image = Assets.frog;
-		scale = height/image.getHeight();
-		setPos(new PointF(centerX-image.getWidth()/2, centerY-image.getHeight()/2));
+		scale = PussycatMinions.meters2Pixels(height)/image.getHeight();
+		pos = new PointF(centerX-(image.getWidth()/2)*scale, centerY-(image.getHeight()/2)*scale);
 	}
 	
 	public Image getImage(){
 		return image;
-	}
-	
-	public PointF getPoint() {
-		return pos;
 	}
 	
 	public float getX() {
@@ -33,19 +30,19 @@ public class Target {
 		return pos.y;
 	}
 	
-	public float getScale() {
-		return scale;
+	public float getImageWidth() {
+		return image.getWidth();
 	}
 	
-	public void setX(float x) {
-		this.pos.x = x;
+	public float getImageHeight() {
+		return image.getHeight();
 	}
 
-	public void setY(float y) {
-		this.pos.y = y;
+	public float getPixelWidth() {
+		return image.getWidth()*scale;
 	}
-
-	public void setPos(PointF pos) {
-		this.pos = pos;
-	}	
+	
+	public float getPixelHeight() {
+		return image.getHeight()*scale;
+	}
 }

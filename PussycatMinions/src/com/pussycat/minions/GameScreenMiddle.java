@@ -650,7 +650,7 @@ public class GameScreenMiddle extends Screen {
     private void drawTarget() {
         Graphics g = game.getGraphics();
         
-        g.drawImage(middleTarget.getImage(), (int)middleTarget.getX(), (int)middleTarget.getY());
+        g.drawScaledImage(middleTarget.getImage(), (int)middleTarget.getX(), (int)middleTarget.getY(), (int)middleTarget.getPixelWidth(), (int)middleTarget.getPixelHeight(), 0, 0, (int)middleTarget.getImageWidth(), (int)middleTarget.getImageHeight());
     }
 
 
