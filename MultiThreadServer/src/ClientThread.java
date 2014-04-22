@@ -415,6 +415,31 @@ public class ClientThread extends Thread {
 											x1, y1, x2, y2, t);
 									
 									System.out.println("MAPPING_STEP1 DONE");
+									float l_midX = deviceManager.getMidX(ip);
+									float l_midY = deviceManager.getMidY(ip);
+
+									float g_midX = deviceManager
+											.localToGlobalX(ip, l_midX, l_midY);
+									float g_midY = deviceManager
+											.localToGlobalY(ip, l_midX, l_midY);
+
+									String ipOfMiddle = deviceManager
+											.getMiddleIp();
+
+									float l_main_midX = deviceManager
+											.getMidX(ipOfMiddle);
+									float l_main_midY = deviceManager
+											.getMidY(ipOfMiddle);
+
+									float g_main_midX = deviceManager
+											.localToGlobalX(ipOfMiddle,
+													l_main_midX, l_main_midY);
+									float g_main_midY = deviceManager
+											.localToGlobalY(ipOfMiddle,
+													l_main_midX, l_main_midY);
+									
+									
+									MultiThreds.getPhysicsWorld().addTarget(g_main_midX, g_main_midY, 0.8f);
 								}
 							}
 								break;

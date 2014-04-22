@@ -13,10 +13,12 @@ import org.jbox2d.dynamics.BodyDef;
 import org.jbox2d.dynamics.BodyType;
 import org.jbox2d.dynamics.FixtureDef;
 import org.jbox2d.dynamics.World;
+import org.jbox2d.dynamics.joints.RevoluteJointDef;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
+
 //import java.util.HashMap;
 //import java.util.Hashtable;
 //import java.util.Map;
@@ -39,6 +41,8 @@ public class PhysicsWorld {
 		public ArrayList<Vertex> vertecies = new ArrayList<Vertex>();
 	}
 	private ArrayList<Polygon> polygons = new ArrayList<Polygon>();
+	private float originX;
+	private float originY;
 	
 	public volatile static ArrayList<PhysicsBody> bodies = new ArrayList<PhysicsBody>();
 
@@ -76,7 +80,7 @@ public class PhysicsWorld {
 		bodyDef.position.set(xPos, yPos);
 		
 		// TODO: make dynamic bodytype and add pivot
-		bodyDef.type = BodyType.STATIC;
+		bodyDef.type = BodyType.DYNAMIC;
 		Body body = null;
 
 		while (body == null) {
@@ -84,11 +88,15 @@ public class PhysicsWorld {
 			System.out.println("NULLL BODYYY LOOP");
 		}
 
+		FixtureDef fixtureDef = new FixtureDef();
+		fixtureDef.density = 1;
+		
 		System.out.println("ADDING TARGET");
 		System.out.println("Target pos: " + xPos + " " + yPos);
 
 		PolygonShape polyDef = new PolygonShape();
-		
+		CircleShape pivot = new CircleShape();
+		pivot.m_radius = 1.0f;
 		//loadVertices();
 		//calculateNormals();
 		
@@ -104,64 +112,15 @@ public class PhysicsWorld {
 			body.createFixture(polyDef,1.0f);
 		}
 		
-		
-		/*
-		// Define vertices
-		//TODO: read from textfile
-		float vert1X = -0.015f;
-		float vert1Y = 0.0f;
-		float vert2X = 0.01f;
-		float vert2Y = -0.015f;
-		float vert3X = 0.01f;
-		float vert3Y = 0.015f;
-		polyDef.m_vertexCount = 3;
-		polyDef.m_vertices[0].set(vert1X * 39.37f, vert1Y * 39.37f);
-		polyDef.m_vertices[1].set(vert2X * 39.37f, vert2Y * 39.37f);
-		polyDef.m_vertices[2].set(vert3X * 39.37f, vert3Y * 39.37f);
-		polyDef.m_normals[0].set(calculateNormalX(vert1X, vert1Y, vert2X, vert2Y), calculateNormalY(vert1X, vert1Y, vert2X, vert2Y));
-		polyDef.m_normals[1].set(calculateNormalX(vert2X, vert2Y, vert3X, vert3Y), calculateNormalY(vert2X, vert2Y, vert3X, vert3Y));
-		polyDef.m_normals[2].set(calculateNormalX(vert3X, vert3Y, vert1X, vert1Y), calculateNormalY(vert3X, vert3Y, vert1X, vert1Y));
-		body.createFixture(polyDef, 1.0f);
-
-		vert1X = -0.015f;
-		vert1Y = 0.0f;
-		vert2X = 0.02f;
-		vert2Y = 0.02f;
-		vert3X = -0.005f;
-		vert3Y = 0.015f;
-		polyDef.m_vertexCount = 3;
-		polyDef.m_vertices[0].set(vert1X * 39.37f, vert1Y * 39.37f);
-		polyDef.m_vertices[1].set(vert2X * 39.37f, vert2Y * 39.37f);
-		polyDef.m_vertices[2].set(vert3X * 39.37f, vert3Y * 39.37f);
-		polyDef.m_normals[0].set(calculateNormalX(vert1X, vert1Y, vert2X, vert2Y), calculateNormalY(vert1X, vert1Y, vert2X, vert2Y));
-		polyDef.m_normals[1].set(calculateNormalX(vert2X, vert2Y, vert3X, vert3Y), calculateNormalY(vert2X, vert2Y, vert3X, vert3Y));
-		polyDef.m_normals[2].set(calculateNormalX(vert3X, vert3Y, vert1X, vert1Y), calculateNormalY(vert3X, vert3Y, vert1X, vert1Y));
-		body.createFixture(polyDef, 1.0f);
-		
-		vert1X = -0.015f;
-		vert1Y = 0.0f;
-		vert2X = -0.005f;
-		vert2Y = -0.015f;
-		vert3X = 0.02f;
-		vert3Y = -0.02f;
-		polyDef.m_vertexCount = 3;
-		polyDef.m_vertices[0].set(vert1X * 39.37f, vert1Y * 39.37f);
-		polyDef.m_vertices[1].set(vert2X * 39.37f, vert2Y * 39.37f);
-		polyDef.m_vertices[2].set(vert3X * 39.37f, vert3Y * 39.37f);
-		polyDef.m_normals[0].set(calculateNormalX(vert1X, vert1Y, vert2X, vert2Y), calculateNormalY(vert1X, vert1Y, vert2X, vert2Y));
-		polyDef.m_normals[1].set(calculateNormalX(vert2X, vert2Y, vert3X, vert3Y), calculateNormalY(vert2X, vert2Y, vert3X, vert3Y));
-		polyDef.m_normals[2].set(calculateNormalX(vert3X, vert3Y, vert1X, vert1Y), calculateNormalY(vert3X, vert3Y, vert1X, vert1Y));
-		body.createFixture(polyDef, 1.0f);
-		*/
-		// Fyra centimeter kvadrat
-		// polyDef.setAsBox(0.02f*39.37f,0.02f*39.37f);
-		// FixtureDef fixtureDef = new FixtureDef();
-		// fixtureDef.shape = polyDef;
-		// fixtureDef.density = 1.0f;
-		// fixtureDef.friction = 0.1f;
-		// fixtureDef.restitution = 0.9f;
-		// body.createFixture(fixtureDef);
-		// body.resetMassData();
+		bodyDef.type = BodyType.STATIC;
+		bodyDef.position.set(originX,originY);
+		Body body2 = world.createBody(bodyDef);
+		body2.createFixture(pivot,1.0f);
+				
+		RevoluteJointDef joint = new RevoluteJointDef();
+		joint.initialize(body2, body, new Vec2(originX,originY));
+		world.createJoint(joint);
+				
 	}
 
 	private void addItem(float xPos, float yPos, float xVel, float yVel,
@@ -240,8 +199,6 @@ public class PhysicsWorld {
 
 	private void loadVertices(){
 		JSONParser parser = new JSONParser();
-		float originX;
-		float originY;
 		try{
 			Object obj = parser.parse(new FileReader("src\\frog.json"));
 			JSONObject jsonObject = (JSONObject) obj;
