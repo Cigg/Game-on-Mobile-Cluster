@@ -49,6 +49,15 @@ public class DeviceManager {
 				needsMapping = true;
 			}
 		}
+		public float getPosX(){
+			return posX;
+		}
+		public float getPosY(){
+			return posY;
+		}
+		public float getRotZ(){
+			return rotZ;
+		}
 	}
 	
 	
@@ -110,7 +119,7 @@ public class DeviceManager {
 	public float getPosY(String ip) {
 		for (Device device : this.devices) {
 		    if (device.ip.equals(ip)) {
-		    	return device.posX;
+		    	return device.posY;
 		    }
 		}
 		return 0;
@@ -124,6 +133,32 @@ public class DeviceManager {
 		    }
 		}
 		return 0;
+	}
+	
+	public float getWidthInch(String ip) {
+		for (Device device : this.devices) {
+		    if (device.ip.equals(ip)) {
+		    	return (float)device.resX/(float)device.xDPI;
+		    }
+		}
+		return 0;
+	}
+	
+	
+	public float getHeightInch(String ip) {
+		for (Device device : this.devices) {
+		    if (device.ip.equals(ip)) {
+		    	return (float)device.resY/(float)device.yDPI;
+		    }
+		}
+		return 0;
+	}
+	
+	public String getIp(int i) {
+		if(i < devices.size()){
+			return devices.get(i).ip;
+		}
+		return null;
 	}
 	
 	

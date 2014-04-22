@@ -27,6 +27,8 @@ public class MultiThreds {
 	
 	public static volatile SharedVariables sharedVariables;
 	
+	public ServerGraphics serverGraphics;
+	
 	public Thread update;
 	public Thread deviceUpdate;
 	
@@ -41,7 +43,6 @@ public class MultiThreds {
 		// Initiate Physics
 		physicsWorld = new PhysicsWorld();
 		physicsWorld.create(new Vec2(0.0f, 0.0f));
-		 
 		
 		try {
 			serverSocket = new ServerSocket(portNumber);
@@ -50,6 +51,7 @@ public class MultiThreds {
 		}
 		//updateLoop.start();
 		deviceManager = new DeviceManager();
+		serverGraphics = new ServerGraphics(deviceManager);
 		
 	   final float tickRate = 128;
 		
@@ -58,13 +60,15 @@ public class MultiThreds {
 		    	
 		    	float timeBegin, timeEnd = 0, timeDelta = 1 / tickRate, timeDelay;
 		    	while(true) {
+		    		
+		    		physicsWorld.drawDebug();
 		    		//System.out.println("Update-----------------------------------------------");
 		    		//System.out.println("FPS: " + Math.pow(10, 9) / timeDelta);
 		    		timeBegin = System.nanoTime();
 		    		
 		    		// Update physics
 		    		physicsWorld.update(timeDelta);
-		    		
+		    		serverGraphics.update();
 	    			// Update ballz	
 		    		if(threads[0] != null) {
 		    			for(ClientThread.Ballz ball : threads[0].ballz) {
@@ -94,6 +98,12 @@ public class MultiThreds {
 			    		// Send ballz
 			    		for(ClientThread thread : threads) {
 			    			if (thread != null) {
+			    				
+			    				//--- TARGET ANGLE----
+			    				if(thread.targetJoint != null){
+			    					//System.out.println("Target angle is: " + thread.targetJoint.getJointAngle());
+			    				}
+			    				
 			    				
 			    				byte[] arr = new byte[1024];
 			    				ByteBuffer buffer;

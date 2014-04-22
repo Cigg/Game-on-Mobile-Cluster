@@ -4,15 +4,19 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Iterator;
 
+import org.jbox2d.callbacks.DebugDraw;
 import org.jbox2d.collision.shapes.CircleShape;
 import org.jbox2d.collision.shapes.PolygonShape;
 import org.jbox2d.collision.shapes.Shape;
+import org.jbox2d.common.IViewportTransform;
+import org.jbox2d.common.OBBViewportTransform;
 import org.jbox2d.common.Vec2;
 import org.jbox2d.dynamics.Body;
 import org.jbox2d.dynamics.BodyDef;
 import org.jbox2d.dynamics.BodyType;
 import org.jbox2d.dynamics.FixtureDef;
 import org.jbox2d.dynamics.World;
+import org.jbox2d.dynamics.joints.RevoluteJoint;
 import org.jbox2d.dynamics.joints.RevoluteJointDef;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
@@ -40,17 +44,18 @@ public class PhysicsWorld {
 	private class Polygon {
 		public ArrayList<Vertex> vertecies = new ArrayList<Vertex>();
 	}
-	private ArrayList<Polygon> polygons = new ArrayList<Polygon>();
+	public ArrayList<Polygon> polygons = new ArrayList<Polygon>();
 	private float originX;
 	private float originY;
 	
 	public volatile static ArrayList<PhysicsBody> bodies = new ArrayList<PhysicsBody>();
 
 	private World world;
+	
 
 	public void create(Vec2 gravity) {
 		boolean doSleep = false;
-		world = new World(gravity, doSleep);
+		world = new World(gravity, doSleep);		
 		loadVertices();
 		calculateNormals();
 		System.out.println("PhysicsWorld created");
@@ -74,13 +79,13 @@ public class PhysicsWorld {
 				friction);
 	}
 
-	public void addTarget(float xPos, float yPos, float bounce) {
-
+	public RevoluteJoint addTarget(float xPos, float yPos, float bounce) {
+		
 		BodyDef bodyDef = new BodyDef();
 		bodyDef.position.set(xPos, yPos);
 		
 		// TODO: make dynamic bodytype and add pivot
-		bodyDef.type = BodyType.DYNAMIC;
+		bodyDef.type = BodyType.STATIC;
 		Body body = null;
 
 		while (body == null) {
@@ -89,7 +94,8 @@ public class PhysicsWorld {
 		}
 
 		FixtureDef fixtureDef = new FixtureDef();
-		fixtureDef.density = 1;
+		fixtureDef.density = 0;
+		fixtureDef.friction = 1; 
 		
 		System.out.println("ADDING TARGET");
 		System.out.println("Target pos: " + xPos + " " + yPos);
@@ -97,6 +103,8 @@ public class PhysicsWorld {
 		PolygonShape polyDef = new PolygonShape();
 		CircleShape pivot = new CircleShape();
 		pivot.m_radius = 1.0f;
+		
+		fixtureDef.shape = pivot;
 		//loadVertices();
 		//calculateNormals();
 		
@@ -111,15 +119,25 @@ public class PhysicsWorld {
 			}
 			body.createFixture(polyDef,1.0f);
 		}
-		
 		bodyDef.type = BodyType.STATIC;
 		bodyDef.position.set(originX,originY);
-		Body body2 = world.createBody(bodyDef);
-		body2.createFixture(pivot,1.0f);
+		Body body2 = null;
+		while (body2 == null) {
+			body2 = world.createBody(bodyDef);
+			System.out.println("NULLL BODYYY LOOP");
+		}
+		body2.createFixture(fixtureDef);
 				
 		RevoluteJointDef joint = new RevoluteJointDef();
-		joint.initialize(body2, body, new Vec2(originX,originY));
-		world.createJoint(joint);
+		joint.bodyA = body;
+		joint.bodyB = body2;
+		joint.collideConnected = false;
+		joint.localAnchorA.set(0,0);
+		joint.localAnchorB.set(0,0);
+		//joint.initialize(body2, body, new Vec2(originX,originY));
+		RevoluteJoint the_joint = (RevoluteJoint) world.createJoint(joint);
+		return the_joint;
+		//the_joint.getJointAngle();
 				
 	}
 
@@ -158,7 +176,6 @@ public class PhysicsWorld {
 				System.out.println("Erorror fixtureDef");
 			}
 		}
-
 		// body.resetMassData();
 	}
 
@@ -272,4 +289,9 @@ public class PhysicsWorld {
 			return (float) x;
 		}
 	}
+	
+	public void drawDebug(){
+		world.drawDebugData();
+	}
+	
 }

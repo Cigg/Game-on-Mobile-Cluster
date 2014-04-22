@@ -5,10 +5,10 @@ import java.io.PrintWriter;
 import java.net.Socket;
 import java.nio.ByteBuffer;
 import java.util.Hashtable;
-import java.util.Random;
 import java.util.concurrent.LinkedBlockingQueue;
 
 import org.jbox2d.common.Vec2;
+import org.jbox2d.dynamics.joints.RevoluteJoint;
 
 /**
  * One clientThread for one device. Adds and sends balls the balls.
@@ -157,6 +157,7 @@ public class ClientThread extends Thread {
 
 	Hashtable<Integer, Ballz> ownBallz = new Hashtable<Integer, Ballz>();
 
+	public RevoluteJoint targetJoint = null;
 	/**
 	 * Get the ip of the client
 	 * 
@@ -386,7 +387,7 @@ public class ClientThread extends Thread {
 													l_main_midX, l_main_midY);
 									
 									
-									MultiThreds.getPhysicsWorld().addTarget(g_main_midX, g_main_midY, 0.8f);
+									targetJoint = MultiThreds.getPhysicsWorld().addTarget(g_main_midX, g_main_midY, 0.8f);
 
 									sendBuffer.putFloat(rotZ);
 									sendBuffer.putFloat(g_midX);
@@ -438,8 +439,9 @@ public class ClientThread extends Thread {
 											.localToGlobalY(ipOfMiddle,
 													l_main_midX, l_main_midY);
 									
-									
-									MultiThreds.getPhysicsWorld().addTarget(g_main_midX, g_main_midY, 0.8f);
+
+									targetJoint = MultiThreds.getPhysicsWorld().addTarget(g_main_midX, g_main_midY, 0.8f);
+
 								}
 							}
 								break;

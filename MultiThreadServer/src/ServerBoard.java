@@ -78,6 +78,9 @@ public class ServerBoard extends JFrame {
         setSize(400,170);
         setVisible(true);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        
+        
+        
 	}
 	
 	   public static void main(String[] args) {
