@@ -189,7 +189,7 @@ public class ClientThread extends Thread {
 		ballCount = MultiThreds.getPhysicsWorld().bodies.size();
 		this.ip = ip;
 		internalState = LOCAL_STATE__.MAPPING_STEP1;
-		System.out.println("Ballz size is: " + ballz.size());
+		//System.out.println("Ballz size is: " + ballz.size());
 	}
 
 	/**

@@ -94,16 +94,6 @@ public class GameScreenMiddle extends Screen {
 		
 		previousTime = 0;		
 		SharedVariables.getInstance().setInternalState(GLOBAL_STATE__.SYNCHRONIZE_DEVICE);		
-
-		// TODO: Fixa snyggt n�gonstans
-		Thread t = new Thread() {
-			public void run() {
-				comm = new TCPClient();
-				comm.run();
-			}
-		};
-		t.setName("TCPCLIENT");
-		t.start();
 		
 		comm = new TCPClient();
 		comm.start();
