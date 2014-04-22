@@ -179,7 +179,7 @@ public class GameScreenPlayer extends Screen {
     		    		
     		    		buffer.putShort((short) GLOBAL_STATE__.ADD_DEVICE.ordinal());	// State: ADD_DEVICE
 
-    		    		buffer.putShort((short) 1);										// type, 0 är hårdkodat till main-device - sätt 1 för alla andra devices
+    		    		buffer.putShort((short) 0);										// type, 0 är hårdkodat till main-device - sätt 1 för alla andra devices
     		    		buffer.putInt(PussycatMinions.getXDPI());						// XDPI
     		    		buffer.putInt(PussycatMinions.getYDPI());						// YDPI
     		    		buffer.putInt(PussycatMinions.getScreenWidth());				// ResX
