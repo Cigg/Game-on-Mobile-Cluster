@@ -1,5 +1,6 @@
 package com.pussycat.minions;
 
+
 import java.nio.ByteBuffer;
 
 import android.util.Log;
@@ -9,10 +10,12 @@ public class ServerCommunication extends Thread {
 	private volatile boolean communicate;
 	private TCPClient tcp;
 	private BallHandler ballHandler;
+	private BallTypesHandler ballTypesHandler;
 	
 	
 	ServerCommunication(TCPClient stcp, BallHandler ballHandler ) {
 		this.ballHandler = ballHandler;
+		this.ballTypesHandler = new BallTypesHandler();
 		this.tcp = stcp;
 		communicate = true;
 	}
@@ -87,6 +90,7 @@ public class ServerCommunication extends Thread {
 		short state = buffer.getShort();
 		
 		float angle = buffer.getFloat();
+		// TODO: Make function convertFromRadiansToDegrees
 		angle = (float) (angle * 180 / Math.PI);
 		
 		float deviceMiddleX = buffer.getFloat();
@@ -140,7 +144,8 @@ public class ServerCommunication extends Thread {
 			
 			Log.d("BALLINFO", "ADD: " + id + "  " + x + "  " + y + "  " + vx + "  " + vy);
 			
-			ballHandler.addBall(new Ball(id, 0, x, y, vx, vy));
+			// TODO: FIX ALLL BALL TYPES
+			ballHandler.addBall(new BallRegular(id, x, y, vx, vy));
 		}
 	}
 

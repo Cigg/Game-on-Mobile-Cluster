@@ -54,7 +54,7 @@ public class GameScreenPlayer extends Screen {
 
 	
 	private TCPClient comm;
-	private BallHandler ballzHandler;
+	private BallHandler ballHandler;
 
 	// Constructor
     public GameScreenPlayer(Game game) {
@@ -74,8 +74,9 @@ public class GameScreenPlayer extends Screen {
 		comm = new TCPClient();
 		comm.start();
 
-		ballzHandler = new BallHandler();
-		ServerCommunication t4 = new ServerCommunication(comm, ballzHandler);
+		ballHandler = new BallHandler(PussycatMinions.getScreenWidth(), PussycatMinions.getScreenHeight());
+		
+		ServerCommunication t4 = new ServerCommunication(comm, ballHandler);
 		t4.start();
 		
     }
@@ -107,7 +108,9 @@ public class GameScreenPlayer extends Screen {
     	
     	// Thread.currentThread().setPriority(Thread.MAX_PRIORITY);
     	
-    	ballzHandler.updateBalls(deltaTime);
+    	ballHandler.updateBalls(deltaTime);
+    	ballHandler.removeBallsOutOfBounds();
+    	
     	up = false;
     	
         for (int i = 0; i < touchEvents.size(); i++) {
@@ -367,14 +370,14 @@ public class GameScreenPlayer extends Screen {
         	break;
         }
         */
-    	device.drawBackground(graphics);
-       // graphics.drawImage(Assets.background, 0, 0);
-      //  device.drawBackground(graphics);
+    	//.drawBackground(graphics);
+       //graphics.drawImage(Assets.background, 0, 0);
+        device.drawBackground(graphics);
         
         
         
         // TODO: OPTIMERA!!
-        boolean tail = false;
+        boolean tail = true;
         if( dragged && tail) {
 
   			paint.setColor(Color.YELLOW);
@@ -513,7 +516,7 @@ public class GameScreenPlayer extends Screen {
     	float vkb = vk;
     	float vzb = vz;
      	
-     	boolean tail2 = false;
+     	boolean tail2 = true;
         if( (dragged || up ) && tail2 && beginIndex > 7) {
         	
         	beginIndex = beginIndex - 2 ;
@@ -627,7 +630,7 @@ public class GameScreenPlayer extends Screen {
 				 	128		);
         }
         
-        BallHandler.drawBalls(graphics);
+        ballHandler.drawBalls(graphics);
    
         if (state == GameState.Running) {
             drawRunningUI();

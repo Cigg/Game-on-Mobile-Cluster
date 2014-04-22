@@ -1,28 +1,43 @@
 package com.pussycat.minions;
 
-public class Ball {
+import com.pussycat.framework.Graphics;
+import com.pussycat.framework.Image;
 
-	public final int id;
-	public int type;
-	
-	public float x;
-	public float y;
-	
-	public float vx;
-	public float vy;
+public abstract class Ball {
 
+	protected int id;
 	
-	Ball(final int id, final int type, final float x, final float y, final float vx, final float vy) {
-		
-		this.id = id;
-		this.type = type;
-		
-		this.x = x;
-		this.y = y;
-		
-		this.vx = vx;
-		this.vy = vy;
-
+	protected float x;
+	protected float y;
+	
+	protected float vx;
+	protected float vy;
+	
+	protected Image image;
+	protected int radius;
+	
+	
+	public void update(final float timeStep) {
+	    this.x += this.vx * timeStep;
+	    this.y += this.vy * timeStep;  
+	}
+	
+	
+	public int getRadius() {
+		return this.radius;
+	}
+	
+	
+	public void draw(Graphics graphics) {
+	    graphics.drawScaledImage(	this.image, 
+			    				 	(int)this.x - this.radius, 
+			    				 	(int)this.y - this.radius, 
+			    				 	100, 
+			    				 	100, 
+			    				 	0, 
+			    				 	0, 
+			    				 	128, 
+			    				 	128		);				    		
 	}
 	
 }

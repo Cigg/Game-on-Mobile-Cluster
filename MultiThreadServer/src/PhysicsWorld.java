@@ -23,7 +23,7 @@ public class PhysicsWorld {
 		Pair(int id, Body body) {
 			if(body == null) {
 				System.out.println("Added NULL BODYYYY");
-		}
+			}
 			
 			this.body = body;
 			this.id = id;
@@ -94,14 +94,16 @@ public class PhysicsWorld {
 		fixtureDef.density = density;
 		fixtureDef.friction = friction;
 		fixtureDef.restitution = bounce;
+		
 		while(true) {
-		try{
-			body.createFixture(fixtureDef);
-			break;
-		} catch(Exception e) {
-			System.out.println("Erorror fixtureDef");
+			try{
+				body.createFixture(fixtureDef);
+				break;
+			} catch(Exception e) {
+				System.out.println("Erorror fixtureDef");
+			}
 		}
-		}
+		
 	}
 
 	public void update(float deltaTime) {

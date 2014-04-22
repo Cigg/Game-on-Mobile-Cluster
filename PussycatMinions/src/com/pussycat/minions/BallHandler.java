@@ -1,28 +1,21 @@
 package com.pussycat.minions;
 
 import java.util.Enumeration;
-import java.util.Hashtable;
+import java.util.concurrent.ConcurrentHashMap;
 
 import com.pussycat.framework.Graphics;
 
 
 public class BallHandler {
 	
-	private static Hashtable<Integer, Ball> balls = new Hashtable<Integer, Ball>();
-	private static BallType[] ballTypes;
-	
-	private int screenHeight;
-	private int screenWidth;
-	
-	
-	public BallHandler() {
-		this.screenHeight = PussycatMinions.getScreenHeight();
-		this.screenWidth = PussycatMinions.getScreenWidth();
-		
-		
-		float xdpi = PussycatMinions.getXDPI();
-		ballTypes = new BallType[32];
-		ballTypes[0] = new BallType(Assets.localBall, 50);
+	private ConcurrentHashMap<Integer, Ball> balls = new ConcurrentHashMap<Integer, Ball>();
+	private final int screenWidth;
+	private final int screenHeight;
+    
+    
+	public BallHandler(final int screenWidth, final int screenHeight) {
+		this.screenWidth = screenWidth;	
+		this.screenHeight = screenHeight;
 	}
 	
 	
@@ -30,8 +23,35 @@ public class BallHandler {
 		balls.put(ball.id, ball);
 	}
 	
+	 
+	public void updateBalls(final float timeStep) {
+		Enumeration<Integer> enumKey = balls.keys();
+		while( enumKey.hasMoreElements() ) {
+		    int key = enumKey.nextElement();
+		    Ball ball = balls.get(key);		 
+		    ball.update(timeStep);
+		}	
+	}
 	
-	private boolean isOutOfBounds( float x, float y, float radius ) {
+	
+	public void removeBallsOutOfBounds() {
+		Enumeration<Integer> enumKey = balls.keys();
+		while( enumKey.hasMoreElements() ) {
+		    int key = enumKey.nextElement();
+		    Ball ball = balls.get(key);		 
+		    removeIfOutOfBounds(ball);
+		}	
+	}
+	
+	
+	private void removeIfOutOfBounds(Ball ball) {
+		if( isOutOfBounds(ball.x, ball.y, ball.getRadius()) ) {
+	    	balls.remove(ball.id);
+	    }
+	}
+	
+	
+	private boolean isOutOfBounds(final float x, final float y, final float radius) {
 		return ( 	x + radius < 0					||
 					y + radius < 0 					|| 
 					x - radius > this.screenWidth 	|| 
@@ -39,42 +59,13 @@ public class BallHandler {
 	}
 	
 	
-	public void updateBalls( float timeStep ) {
+	public void drawBalls(Graphics graphics) {
 		Enumeration<Integer> enumKey = balls.keys();
-		
 		while( enumKey.hasMoreElements() ) {
 		    int key = enumKey.nextElement();
 		    Ball ball = balls.get(key);
-		    
-		    ball.x += ball.vx * timeStep;
-		    ball.y += ball.vy * timeStep;  
-		    
-		    if( isOutOfBounds( ball.x, ball.y, ballTypes[ball.type].radius )) {
-		    	balls.remove(ball.id);
-		    }
-		    
-		}	
-	}
-	
-	
-	public static void drawBalls( Graphics graphics ) {
-		Enumeration<Integer> enumKey = balls.keys();
-
-		while( enumKey.hasMoreElements() ) {
-		    int key = enumKey.nextElement();
-		    Ball ball = balls.get(key);
-		   
-		    graphics.drawScaledImage(	ballTypes[ball.type].image, 
-				    				 	(int)ball.x - ballTypes[ball.type].radius, 
-				    				 	(int)ball.y - ballTypes[ball.type].radius, 
-				    				 	100, 
-				    				 	100, 
-				    				 	0, 
-				    				 	0, 
-				    				 	128, 
-				    				 	128		);
+		    ball.draw(graphics);
 		}
-
 	}
 	
 	
