@@ -1,8 +1,10 @@
 package com.pussycat.minions;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
@@ -20,6 +22,7 @@ import android.graphics.Paint;
 import android.graphics.Rect;
 import android.net.Uri;
 import android.os.Environment;
+import android.util.Config;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.SurfaceHolder;
@@ -51,9 +54,14 @@ public class Device {
 	
 	private static int l_half;
 	private static int l_side;
-	private static boolean[][] includeTile;
 	
 	private static Background bg;
+	
+	final int nRader = 32;
+	final int nKolumner = 32;
+	Bitmap[][] bitmaps = new Bitmap[nRader][nKolumner];
+	final int numberOfExecutionThreads = 4;
+	
 	
 	public Device() {
 		this.screenHeight = PussycatMinions.getScreenHeight();
@@ -63,202 +71,31 @@ public class Device {
 		this.density = PussycatMinions.getDensity();
 		this.xdpi = PussycatMinions.getXDPI();
 		this.ydpi = PussycatMinions.getYDPI();
-	
+		
 		BackgroundHandler bgh = new BackgroundHandler();
-		this.bg = bgh.backgrounds[BACKGROUNDS.COORDINATES_LOW_RES_3.ordinal()];
+		this.bg = bgh.backgrounds[BACKGROUNDS.COORDINATES.ordinal()];
+		
+		
+		
+		l_half = (int) Math.ceil((Math.sqrt( Math.pow(screenWidth * bg.ppix / xdpi, 2) + Math.pow(screenHeight * bg.ppiy / ydpi, 2)) / 2));
+		l_side = 2 * l_half;
+		backgroundTiled = Bitmap.createBitmap(l_side,  l_side, Bitmap.Config.ARGB_8888);
+		backgroundFinal = Bitmap.createBitmap(screenWidth,  screenHeight, Bitmap.Config.ARGB_8888);
+		backgroundCanvas = new Canvas(backgroundTiled);
 	}
 	
-	public static float rotateX(final float x, final float y, final float theta) {
-		return (float) (x * Math.cos(theta * Math.PI / 180) -  y * Math.sin(theta * Math.PI / 180));
-	}
-	
-	
-	public static float rotateY(final float x, final float y, final float theta) {
-		return (float) (x * Math.sin(theta * Math.PI / 180) + y * Math.cos(theta * Math.PI / 180));
-	}
-	
-	
-	public static void tileBitmap(final int tx, final int ty, final int displayImageCenterX, final int displayImageCenterY, final float theta, final int l_dx, final int l_dy) {
-		
-		// TODO: Create Picture class and PictureHandler 
-		final String file = bg.file; // "coordinates.png";
-		final int width = bg.width; // 16540; // Image width
-		final int height = bg.height; //16540; // Image height
-
-		// TODO: Set number of threads with regards to number available
-		final int k = 60;
-		
-		Thread[] threads = new Thread[k];
-		Bitmap[][] bitmaps = new Bitmap[k][k];
-	
-		final int vk = width/k;
-		final int hk = height/k;
-		
-		
-		// Determines the view, is pixel values of bounding box
-		final int lowerX = displayImageCenterX - l_half;
-		final int lowerY = displayImageCenterY - l_half; 
-		
-		final int higherX = displayImageCenterX + l_half;
-		final int higherY = displayImageCenterY + l_half;
-			
-		// TODO: Optimize number of tiles with regards to the rotation angle
-		// Get lower bounds
-		int a = 0;
-		int b = 0;
-		
-		do {
-			if( (a+1) * vk > lowerX ) {
-				break;
-			}
-			a++;
-		} while(a < k);
-		
-		do {
-			if( (b+1) * hk > lowerY ) {
-				break;
-			}
-			b++;
-		} while(b < k);
-		
-		// Get higher bounds
-		int c = k;
-		int d = k;
-		
-		do {
-			c--;
-			if(c * vk < higherX) {
-				break;
-			}
-		} while(c > 0);
-		
-		do {
-			d--;
-			if(d * hk < higherY) {
-				break;
-			}
-		} while(d > 0);
-		
-		
-		// TODO: Make functions for these
-		final int rb = b;
-		final int eb = d + 1;
-		
-		final int kb = a;
-		final int ke = c + 1;
-		
-		final int counter = (eb - rb) * (ke - kb);
-	
-		
-		Log.d("TILE3", "Regular TILES:");
-		Log.d("TILE3", "--------------------------------");
-		for (int i = 0; i < k; i++) {
-			String line = "";
-			for (int j = 0; j < k; j++) {
-				if(i >= rb && i < eb && j >= kb && j < ke) {
-					line = line + "x";
-				} else {
-					line = line + "-";
-				}
-			}	
-			Log.d("TILE3", line);
-		}
-		Log.d("TILE3", "--------------------------------");
-		Log.d("TILE3", "Number of  tiles: " + counter);
-		
-		
-		// TODO: Split up into threads getting a number of tiles instead of threads getting a whole row
-		for (int i = rb; i < eb; i++) {
-			threads[i] = new Thread(new Row(i, bitmaps[i], vk, hk, file, kb, ke));
-			threads[i].start();
-		}
-		
-		
-		int nw;
-		int nh;
-		
-		for (int i = rb; i < eb; i++) {
-			try {
-				threads[i].join();
-				for (int j = kb; j < ke; j++) {
-					nw = (j*vk);
-				    nh = (i*hk);
-
-				    if(includeTile[i][j]) {
-				    	backgroundCanvas.drawBitmap(bitmaps[i][j], nw + tx, nh + ty, new Paint());
-				    }
-
-				}				
-			} catch (InterruptedException e) {
-				e.printStackTrace();
-			}
-		}
-				
-		
-	}
-	
-
-	public static class Row implements Runnable {
-		
-		final int i;
-		
-		final int kb;
-		final int ke;
-		
-		final int vk;
-		final int hk;
-		
-		final String file;
-		
-		Bitmap[] data;
-		
-		
-		Row(int i, Bitmap[] data, int vk, int hk, String file, int kb, int ke) {
-			this.i = i;
-			this.kb = kb;
-			this.ke = ke;
-			this.data = data;
-			this.vk = vk;
-			this.hk = hk;
-			this.file = file;
-		}
-		
-		
-		public void run() {
-			
-			int nw;
-			int nh;
-			
-			AssetManager assets = AndroidGraphics.getAssets();
-			InputStream istream = null;
-			BitmapRegionDecoder decoder = null;
-			
-			try {
-				istream = assets.open(file);
-	        	decoder = BitmapRegionDecoder.newInstance(istream, false);
-	        } catch (IOException e) {
-	        	Log.d("TILE", "FAIL");
-	        	e.printStackTrace();
-	        }
-			
-		    for (int j = kb; j < ke; j++) {
-			    nw = (j*vk);
-			    nh = (i*hk);
-			    data[j] = decoder.decodeRegion(new Rect(nw,nh, (nw+vk),(nh+hk)), null);
-			    Log.d("TILE", "i, j = " + i + "  ,  " + j);
-		    } 
-		    
-		}
-		
-		
+	public static float rotateX(final float x, final float y, final double theta) {
+		return (float) (x * Math.cos(theta) -  y * Math.sin(theta));
 	}
 	
 	
-	public static Bitmap RotateBitmap(Bitmap source, float angle, float px, float py)
-	{
-	      Matrix matrix = new Matrix();
-	      matrix.postRotate(angle, px, py);
-	      return Bitmap.createBitmap(source, 0, 0, source.getWidth(), source.getHeight(), matrix, true);
+	public static float rotateY(final float x, final float y, final double theta) {
+		return (float) (x * Math.sin(theta) + y * Math.cos(theta));
+	}
+	
+	
+	public static double radiansToDegrees(float radians) {
+		return radians * Math.PI / 180;
 	}
 	
 	
@@ -270,7 +107,7 @@ public class Device {
 	}
 	
 	
-	public boolean isInside(final float x, final float y, final int halfx, final int halfy) {
+	public boolean isPointInsideRectangle(final float x, final float y, final int halfx, final int halfy) {
 		return   -halfx <= x  &&  x <= halfx	 && 
 				 -halfy <= y  &&  y <= halfy	;
 	}
@@ -304,16 +141,14 @@ public class Device {
 			this.hk = hk;
 		}
 		
-		
 		public void run() {
 			
-			int nw;
-			int nh;
-			
+
 			AssetManager assets = AndroidGraphics.getAssets();
 			InputStream istream = null;
-			BitmapRegionDecoder decoder = null;
+			//BitmapRegionDecoder decoder = null;
 			
+			/*
 			try {
 				istream = assets.open(file);
 	        	decoder = BitmapRegionDecoder.newInstance(istream, false);
@@ -321,14 +156,77 @@ public class Device {
 	        	Log.d("TILE", "FAIL");
 	        	e.printStackTrace();
 	        }
+			*/
+			
+			//int nw;
+			//int nh;
 			
 			for(IndexPair indexPair : indexPairs) {
-				nw = (indexPair.kolumn * vk);
-			    nh = (indexPair.rad * hk);
+				//nw = (indexPair.kolumn * vk);
+			    //nh = (indexPair.rad * hk);
+			    //data[indexPair.rad][indexPair.kolumn] = decoder.decodeRegion(new Rect(nw,nh, (nw+vk),(nh+hk)), null);
 			    
-			    data[indexPair.rad][indexPair.kolumn] = decoder.decodeRegion(new Rect(nw,nh, (nw+vk),(nh+hk)), null);
+				
+	
+			    String fileName = "Coordinates_32x32" + File.separator + "Coordinates_" + indexPair.rad + "_" + indexPair.kolumn + ".png";
 			    
+			    try {
+					istream = assets.open(fileName);
+		        
+		        } catch (IOException e) {
+		        	Log.d("TILE", "FAIL");
+		        	e.printStackTrace();
+		        }
+				
+			    data[indexPair.rad][indexPair.kolumn] = BitmapFactory.decodeStream(istream);
 			    Log.d("TILE", "i, j = " + indexPair.rad + "  ,  " + indexPair.kolumn);
+
+			    
+			    /*
+			    
+			    ByteArrayOutputStream bytes = new ByteArrayOutputStream();
+			    data[indexPair.rad][indexPair.kolumn].compress(Bitmap.CompressFormat.PNG, 100, bytes);
+			    
+			   
+			    String dir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES) + File.separator + fileName;
+			    File f = new File(dir);
+			    
+			    Log.d("TILE7", "DIR: " + dir);
+			    
+			    try {
+					f.createNewFile();
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					Log.d("TILE7", "ERROR f.createNewFile()");
+					e.printStackTrace();
+				}
+
+			    FileOutputStream fo = null;
+				try {
+					fo = new FileOutputStream(f);
+				} catch (FileNotFoundException e) {
+					// TODO Auto-generated catch block
+					Log.d("TILE7", "ERROR fo = new FileOutputStream(f);");
+					e.printStackTrace();
+				}
+			    try {
+					fo.write(bytes.toByteArray());
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					Log.d("TILE7", "ERROR fo.write(bytes.toByteArray());");
+					e.printStackTrace();
+				}
+
+			    try {
+					fo.close();
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					Log.d("TILE7", "ERROR 	fo.close();");
+					e.printStackTrace();
+				}	    
+				    
+				*/
+
 			}
 			
 		    
@@ -354,8 +252,7 @@ public class Device {
 			final float g_device_midY = SharedVariables.getInstance().getDeviceMiddleY();
 			
 			final float g_main_midX = SharedVariables.getInstance().getMainMiddleX();
-			final float g_main_midY = SharedVariables.getInstance().getMainMiddleY();
-					 
+			final float g_main_midY = SharedVariables.getInstance().getMainMiddleY();	 
 			
 			final float g_dx = g_device_midX - g_main_midX;
 			final float g_dy = - (g_device_midY - g_main_midY);
@@ -365,18 +262,6 @@ public class Device {
 			
 			final int displayImageCenterX = width/2  + l_dx;  // Pixel coordinates of image
 			final int displayImageCenterY = height/2 + l_dy; // Pixel coordinates of image
-			
-		
-			final int nRader = 60;
-			final int nKolumner = 60;
-			
-			includeTile = new boolean[nRader][nKolumner];
-			
-			for(int rad=0; rad<nRader; rad++) {
-				for(int kolumn=0; kolumn<nKolumner; kolumn++) {
-					includeTile[rad][kolumn] = false;
-				}
-			}
 			
 			final int widthStep = width/nKolumner;
 			final int heightStep = height/nRader;
@@ -415,22 +300,21 @@ public class Device {
 					float lowerLeftCornerYTranslated = lowerLeftCornerY - displayImageCenterY;
 					float lowerRightCornerYTranslated = lowerRightCornerY - displayImageCenterY;
 					
-					float upperLeftCornerXRotated = rotateX(upperLeftCornerXTranslated, upperLeftCornerYTranslated, angle);
-					float upperRightCornerXRotated = rotateX(upperRightCornerXTranslated, upperRightCornerYTranslated, angle);
-					float lowerLeftCornerXRotated = rotateX(lowerLeftCornerXTranslated, lowerLeftCornerYTranslated, angle);
-					float lowerRightCornerXRotated = rotateX(lowerRightCornerXTranslated, lowerRightCornerYTranslated, angle); 
+					float upperLeftCornerXRotated = rotateX(upperLeftCornerXTranslated, upperLeftCornerYTranslated, radiansToDegrees(angle));
+					float upperRightCornerXRotated = rotateX(upperRightCornerXTranslated, upperRightCornerYTranslated, radiansToDegrees(angle));
+					float lowerLeftCornerXRotated = rotateX(lowerLeftCornerXTranslated, lowerLeftCornerYTranslated, radiansToDegrees(angle));
+					float lowerRightCornerXRotated = rotateX(lowerRightCornerXTranslated, lowerRightCornerYTranslated, radiansToDegrees(angle)); 
 					
-					float upperLeftCornerYRotated = rotateY(upperLeftCornerXTranslated, upperLeftCornerYTranslated, angle);
-					float upperRightCornerYRotated = rotateY(upperRightCornerXTranslated, upperRightCornerYTranslated, angle);
-					float lowerLeftCornerYRotated = rotateY(lowerLeftCornerXTranslated, lowerLeftCornerYTranslated, angle); 
-					float lowerRightCornerYRotated = rotateY(lowerRightCornerXTranslated, lowerRightCornerYTranslated, angle);
+					float upperLeftCornerYRotated = rotateY(upperLeftCornerXTranslated, upperLeftCornerYTranslated, radiansToDegrees(angle));
+					float upperRightCornerYRotated = rotateY(upperRightCornerXTranslated, upperRightCornerYTranslated, radiansToDegrees(angle));
+					float lowerLeftCornerYRotated = rotateY(lowerLeftCornerXTranslated, lowerLeftCornerYTranslated, radiansToDegrees(angle)); 
+					float lowerRightCornerYRotated = rotateY(lowerRightCornerXTranslated, lowerRightCornerYTranslated, radiansToDegrees(angle));
 					
-					if( isInside(upperLeftCornerXRotated, upperLeftCornerYRotated, halfx, halfy) 	||
-						isInside(upperRightCornerXRotated, upperRightCornerYRotated, halfx, halfy) 	||
-						isInside(lowerLeftCornerXRotated, lowerLeftCornerYRotated, halfx, halfy) 	||
-						isInside(lowerRightCornerXRotated, lowerRightCornerYRotated, halfx, halfy) 		) {
-						// The tile should be included.
-						includeTile[rad][kolumn] = true;
+					if( isPointInsideRectangle(upperLeftCornerXRotated, upperLeftCornerYRotated, halfx, halfy) 		||
+						isPointInsideRectangle(upperRightCornerXRotated, upperRightCornerYRotated, halfx, halfy) 	||
+						isPointInsideRectangle(lowerLeftCornerXRotated, lowerLeftCornerYRotated, halfx, halfy) 		||
+						isPointInsideRectangle(lowerRightCornerXRotated, lowerRightCornerYRotated, halfx, halfy) 			) {
+						
 						indexes.add(new IndexPair(rad, kolumn));
 						
 						line = line + "x";
@@ -445,15 +329,7 @@ public class Device {
 			
 			Log.d("TILE6", "Counter = " + counter);
 			
-			
-			
-			l_half = (int) Math.ceil((Math.sqrt( Math.pow(screenWidth * ppix / xdpi, 2) + Math.pow(screenHeight * ppiy / ydpi, 2)) / 2));
-			l_side = 2 * l_half;
-			
-			backgroundTiled = Bitmap.createBitmap(l_side,  l_side, Bitmap.Config.ARGB_8888);
-			backgroundFinal = Bitmap.createBitmap(screenWidth,  screenHeight, Bitmap.Config.ARGB_8888);
-			
-			backgroundCanvas = new Canvas(backgroundTiled);
+			backgroundCanvas.drawColor(Color.WHITE);
 			
 			final int tix = - l_half + screenWidth/2;  // Tile image translation in x
 			final int tiy = - l_half + screenHeight/2; // Tile image translation in y
@@ -461,17 +337,12 @@ public class Device {
 			final int tx = - displayImageCenterX  + l_half;  // Tiles translation in x
 			final int ty = - displayImageCenterY  + l_half; // Tiles translation in y
 			
-			//tileBitmap(tx, ty, displayImageCenterX, displayImageCenterY, angle, l_dx, l_dy); // Tile the background image
 			
-			
-			
-			final int numberOfExecutionThreads = 8;
 			Thread[] threads = new Thread[numberOfExecutionThreads];
 			final int numberOfTilesForEachExecutionThread = counter / numberOfExecutionThreads;
 			final int first = numberOfTilesForEachExecutionThread + counter % numberOfExecutionThreads;
 			
-			Bitmap[][] bitmaps = new Bitmap[nRader][nKolumner];
-			
+		
 			ArrayList<IndexPair> temp = new ArrayList<IndexPair>();
 			Log.d("TILE6", "numberOfExecutionThreads: " + numberOfExecutionThreads);
 			Log.d("TILE6", "numberOfTilesForEachExecutionThread: " + numberOfTilesForEachExecutionThread);
@@ -498,15 +369,11 @@ public class Device {
 					temp2.add(indexes.get(j));
 					
 				}
-				
 				indexLast += numberOfTilesForEachExecutionThread;
 				threads[i] = new Thread(new Executor(bitmaps, temp2, bg.file, widthStep, heightStep));
 				threads[i].start();
 			}
-					
 		
-			int nw;
-			int nh;
 		
 			for (int i=0; i<numberOfExecutionThreads; i++) {
 				try {
@@ -516,7 +383,9 @@ public class Device {
 				}
 			}
 			
-			int a =0;
+			int a = 0;
+			int nw;
+			int nh;
 			for(IndexPair indexPair : indexes ) {
 				Log.d("TILE6", "INTE: " + a );
 				a++;
@@ -524,9 +393,9 @@ public class Device {
 			    nh = (indexPair.rad * heightStep);
 			    
 				backgroundCanvas.drawBitmap(bitmaps[indexPair.rad][indexPair.kolumn], nw + tx, nh + ty, new Paint());
+				bitmaps[indexPair.rad][indexPair.kolumn].recycle();
 			}
 				
-			
 			
 			canvas.save();
 			
@@ -547,8 +416,9 @@ public class Device {
 			canvas.drawCircle(screenWidth/2, screenHeight/2, 15, redPaint); // Draw to the current frame buffer
 			
 			// Get and store the rotated background from the current frame buffer
+			backgroundFinal.recycle();
 			backgroundFinal = Bitmap.createBitmap( graphics.getFrameBuffer() );
-
+			
 			once = false;
 		} else {
 			canvas.drawBitmap(backgroundFinal, 0, 0, graphics.getPaint());
