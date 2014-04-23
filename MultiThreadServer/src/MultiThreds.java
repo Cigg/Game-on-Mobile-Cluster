@@ -60,8 +60,6 @@ public class MultiThreds {
 		    	
 		    	float timeBegin, timeEnd = 0, timeDelta = 1 / tickRate, timeDelay;
 		    	while(true) {
-		    		
-		    		physicsWorld.drawDebug();
 		    		//System.out.println("Update-----------------------------------------------");
 		    		//System.out.println("FPS: " + Math.pow(10, 9) / timeDelta);
 		    		timeBegin = System.nanoTime();
@@ -99,11 +97,10 @@ public class MultiThreds {
 			    		for(ClientThread thread : threads) {
 			    			if (thread != null) {
 			    				
-			    				//--- TARGET ANGLE----
+			    				float jointAngle = 0.0f;
 			    				if(thread.targetJoint != null){
-			    					//System.out.println("Target angle is: " + thread.targetJoint.getJointAngle());
+			    					jointAngle =  thread.targetJoint.getJointAngle();
 			    				}
-			    				
 			    				
 			    				byte[] arr = new byte[1024];
 			    				ByteBuffer buffer;
@@ -194,6 +191,9 @@ public class MultiThreds {
 			    				
 			    				buffer.position(2);
 			    				buffer.putShort(nBalls);
+			    				
+			    				System.out.println(jointAngle);
+			    				buffer.putFloat(jointAngle);
 			    				thread.sendData(buffer.array());
 			
 			    			}

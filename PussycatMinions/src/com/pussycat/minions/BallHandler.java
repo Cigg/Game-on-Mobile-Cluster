@@ -72,7 +72,8 @@ public class BallHandler {
 				    				 	0, 
 				    				 	0, 
 				    				 	128, 
-				    				 	128		);
+				    				 	128,
+				    				 	0.0f);
 		}
 
 	}

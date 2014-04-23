@@ -85,7 +85,7 @@ public class PhysicsWorld {
 		bodyDef.position.set(xPos, yPos);
 		
 		// TODO: make dynamic bodytype and add pivot
-		bodyDef.type = BodyType.STATIC;
+		bodyDef.type = BodyType.DYNAMIC;
 		Body body = null;
 
 		while (body == null) {
@@ -102,7 +102,7 @@ public class PhysicsWorld {
 
 		PolygonShape polyDef = new PolygonShape();
 		CircleShape pivot = new CircleShape();
-		pivot.m_radius = 1.0f;
+		pivot.m_radius = 0.1f;
 		
 		fixtureDef.shape = pivot;
 		//loadVertices();
@@ -114,13 +114,13 @@ public class PhysicsWorld {
 			polyDef.m_vertexCount = polygon.vertecies.size();
 			for(int j=0; j < polygon.vertecies.size(); j++) {
 				Vertex vertex = polygon.vertecies.get(j);
-				polyDef.m_vertices[j].set(1.3f*vertex.x,1.3f*vertex.y);
+				polyDef.m_vertices[j].set((originX) + 1.0f*vertex.x, (originY) + 1.0f*vertex.y);
 				polyDef.m_normals[j].set(vertex.normalX,vertex.normalY);
 			}
 			body.createFixture(polyDef,1.0f);
 		}
 		bodyDef.type = BodyType.STATIC;
-		bodyDef.position.set(originX,originY);
+		bodyDef.position.set(xPos,yPos);
 		Body body2 = null;
 		while (body2 == null) {
 			body2 = world.createBody(bodyDef);
@@ -131,9 +131,9 @@ public class PhysicsWorld {
 		RevoluteJointDef joint = new RevoluteJointDef();
 		joint.bodyA = body;
 		joint.bodyB = body2;
-		joint.collideConnected = false;
+		joint.collideConnected = true;
 		joint.localAnchorA.set(0,0);
-		joint.localAnchorB.set(0,0);
+		joint.localAnchorB.set(originX,originY);
 		//joint.initialize(body2, body, new Vec2(originX,originY));
 		RevoluteJoint the_joint = (RevoluteJoint) world.createJoint(joint);
 		return the_joint;

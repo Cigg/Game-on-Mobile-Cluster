@@ -4,6 +4,7 @@ import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Polygon;
 import java.awt.Rectangle;
+import java.awt.geom.AffineTransform;
 
 import javax.swing.JFrame;
 import javax.swing.JPanel;
@@ -64,7 +65,7 @@ public class ServerGraphics {
                     	offsetX = (int) (deviceManager.getWidthInch(deviceManager.getMiddleIp())*converter/2);
                     	offsetY = (int) (deviceManager.getHeightInch(deviceManager.getMiddleIp())*converter/2);
                     	gotOffset = true;
-                    	System.out.println("offsetX: " + offsetX  + ", OffsetY: " + offsetY);
+                    	//System.out.println("offsetX: " + offsetX  + ", OffsetY: " + offsetY);
                     }
                 }
                 
@@ -73,21 +74,37 @@ public class ServerGraphics {
                 	Fixture fixture = body.getFixtureList();
                 	while(fixture != null){
                 		ShapeType type = fixture.getType();
+                		Vec2 pos = body.getPosition();
                 		if(type == ShapeType.POLYGON) {
                 			PolygonShape shape = (PolygonShape)fixture.getShape();
+                			
                 			poly = new Polygon();
-                			Vec2[] vertices = shape.m_vertices;
+                			Vec2[] vertices = shape.getVertices();
+                			float x =0;
+                			float y =0;
                 			for(int i = 0; i < shape.m_vertexCount; i++){
-                				poly.addPoint((int) (vertices[i].x*converter)+600, (600)-(int) (vertices[i].y*converter));
+                				x = pos.x/2; 
+                				y = pos.y/2;
+                				poly.addPoint((int) ((x+vertices[i].x*1.3)*converter)+600 - offsetX, (600+offsetY)-(int) ((y+vertices[i].y*1.3)*converter));
                 			}
-                			g.drawPolygon(poly);
+                			
+                			float centerX = 600 - offsetX;
+                			float centerY = (600+offsetY);
+                			AffineTransform rotateTransform = new AffineTransform();
+                			rotateTransform.rotate(body.getAngle(),centerX,centerY);
+                			
+                			Graphics2D g2d = (Graphics2D) g;
+                			g2d.setTransform(rotateTransform);
+                			g2d.draw(poly);
+                			rotateTransform.rotate(-body.getAngle(),centerX,centerY);
+                			g2d.setTransform(rotateTransform);
+                			//g2d.rotate(-body.getAngle());
                 		} else if (type == ShapeType.CIRCLE){
                 			CircleShape shape = (CircleShape)fixture.getShape();
-                			Vec2 pos = body.getPosition();
-                			System.out.println(pos.x + ", " + pos.y);
+                			//System.out.println(pos.x + ", " + pos.y);
+                			int r = 20;
                 			int x = (int) ((pos.x) * converter) + 600 - offsetX;
                 			int y = (600+offsetY) - ((int) ((pos.y) * converter));
-                			int r = 20;
                 			
                 			x = x - (r/2);
                 			y = y + (r/2);

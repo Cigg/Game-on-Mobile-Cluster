@@ -10,6 +10,7 @@ public class Target {
 	Image image;
 	private PointF pos;
 	private float scale;
+	private float angle;
 
 	// Height in meters
 	public Target(float centerX, float centerY, float height){
@@ -44,5 +45,13 @@ public class Target {
 	
 	public float getPixelHeight() {
 		return image.getHeight()*scale;
+	}
+	
+	public float getAngle(){
+		return angle;
+	}
+	
+	public void setAngle(float angle) {
+		this.angle = angle;
 	}
 }

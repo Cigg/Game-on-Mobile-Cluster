@@ -19,6 +19,7 @@ import android.graphics.Rect;
 import com.pussycat.framework.Graphics;
 import com.pussycat.framework.Image;
 import com.pussycat.minions.PussycatMinions;
+import com.pussycat.minions.SharedVariables;
 
 public class AndroidGraphics implements Graphics {
     static AssetManager assets;
@@ -213,7 +214,7 @@ public class AndroidGraphics implements Graphics {
         canvas.drawBitmap(((AndroidImage)Image).bitmap, x, y, null);
     }
     
-    public void drawScaledImage(Image Image, int x, int y, int width, int height, int srcX, int srcY, int srcWidth, int srcHeight){
+    public void drawScaledImage(Image Image, int x, int y, int width, int height, int srcX, int srcY, int srcWidth, int srcHeight, float angle){
     	
    	 	srcRect.left = srcX;
         srcRect.top = srcY;
@@ -236,8 +237,9 @@ public class AndroidGraphics implements Graphics {
         paint.setAntiAlias(true);
         paint.setFilterBitmap(true);
         paint.setDither(true);
-        
+        //canvas.rotate(angle*(180.0f/3.14f));
         canvas.drawBitmap(bitmap, srcRect, dstRect, paint);
+        //canvas.rotate(-angle);
         
     }
    
