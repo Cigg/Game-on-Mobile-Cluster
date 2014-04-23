@@ -185,7 +185,7 @@ private class Vertex {
 
 	public void update(float deltaTime) {
 		// Update Physics World
-		world.step(deltaTime, 128, 128); // vilka värden bör de 2 sista
+		world.step(deltaTime, 128, 128); // vilka vï¿½rden bï¿½r de 2 sista
 											// parametrarna ha?
 	}
 
@@ -221,7 +221,7 @@ private class Vertex {
 	private void loadVertices(){
 		JSONParser parser = new JSONParser();
 		try{
-			Object obj = parser.parse(new FileReader("src\\frog.json"));
+			Object obj = parser.parse(new FileReader("src/frog.json"));
 			JSONObject jsonObject = (JSONObject) obj;
 			JSONArray jsonArray = (JSONArray) jsonObject.get("rigidBodies");
 			jsonObject = (JSONObject) jsonArray.get(0);

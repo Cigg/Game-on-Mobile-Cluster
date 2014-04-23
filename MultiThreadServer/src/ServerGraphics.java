@@ -55,10 +55,6 @@ public class ServerGraphics {
             protected void paintComponent(Graphics g) {
                 super.paintComponent(g);
                 g.setColor(Color.RED);
-                
-                g.fillOval(600, 600, 10, 10);
-                
-                g.setColor(Color.BLUE);
                 if(!gotOffset) {
                     if(deviceManager.getMiddleIp() != null ){
                     	deviceManager.getDeviceThread(deviceManager.getMiddleIp());
@@ -69,6 +65,9 @@ public class ServerGraphics {
                     }
                 }
                 
+                g.fillOval(595, 595, 10, 10);
+                g.setColor(Color.BLUE);
+                
                 Body body = world.getBodyList();
                 while(body != null){
                 	Fixture fixture = body.getFixtureList();
@@ -76,6 +75,7 @@ public class ServerGraphics {
                 		ShapeType type = fixture.getType();
                 		Vec2 pos = body.getPosition();
                 		if(type == ShapeType.POLYGON) {
+                			System.out.println(pos.x +", " + pos.y);
                 			PolygonShape shape = (PolygonShape)fixture.getShape();
                 			
                 			poly = new Polygon();
@@ -83,31 +83,31 @@ public class ServerGraphics {
                 			float x =0;
                 			float y =0;
                 			for(int i = 0; i < shape.m_vertexCount; i++){
-                				x = pos.x/2; 
-                				y = pos.y/2;
-                				poly.addPoint((int) ((x+vertices[i].x*1.3)*converter)+600 - offsetX, (600+offsetY)-(int) ((y+vertices[i].y*1.3)*converter));
+                				//x = pos.x/2; 
+                				//y = pos.y/2;
+                				poly.addPoint((int) ((vertices[i].x*1.3)*converter),(int) ((vertices[i].y*1.3)*converter));
                 			}
                 			
-                			float centerX = 600 - offsetX;
-                			float centerY = (600+offsetY);
-                			AffineTransform rotateTransform = new AffineTransform();
-                			rotateTransform.rotate(body.getAngle(),centerX,centerY);
+                			x = (float) (pos.x*converter + 600 - offsetX - 11.5f);
+                			y = (float) (-pos.y*converter + 600 +offsetY - 11.5f);
                 			
+                			AffineTransform rotateTransform = new AffineTransform();
+                			rotateTransform.rotate(-body.getAngle(),600,600);
                 			Graphics2D g2d = (Graphics2D) g;
                 			g2d.setTransform(rotateTransform);
+                			poly.translate((int)x, (int)y);
                 			g2d.draw(poly);
-                			rotateTransform.rotate(-body.getAngle(),centerX,centerY);
+                			rotateTransform.rotate(body.getAngle(),600,600);
                 			g2d.setTransform(rotateTransform);
                 			//g2d.rotate(-body.getAngle());
                 		} else if (type == ShapeType.CIRCLE){
                 			CircleShape shape = (CircleShape)fixture.getShape();
                 			//System.out.println(pos.x + ", " + pos.y);
-                			int r = 20;
+                			int r = 10;
                 			int x = (int) ((pos.x) * converter) + 600 - offsetX;
                 			int y = (600+offsetY) - ((int) ((pos.y) * converter));
-                			
-                			x = x - (r/2);
-                			y = y + (r/2);
+                			x = x - r/2;
+                			y = y - r/2;
                 			g.fillOval(x, y, r, r);
                 		}
                 		fixture = fixture.getNext();

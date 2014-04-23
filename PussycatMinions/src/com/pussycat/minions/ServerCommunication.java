@@ -142,19 +142,21 @@ public class ServerCommunication extends Thread {
         	float y = buffer.getFloat();	
 			float vx = buffer.getFloat();	
 			float vy = buffer.getFloat();					        			
-			float middleAngle = buffer.getFloat();
 			Log.d("BALLINFO", "ADD: " + id + "  " + x + "  " + y + "  " + vx + "  " + vy);
 			
-
 			// TODO: FIX ALLL BALL TYPES
 			ballHandler.addBall(new BallRegular(id, x, y, vx, vy));
 			
+			/*
 			if(target != null) {
 				target.setAngle(middleAngle);
 			}
+			*/
 			//SharedVariables.getInstance().setMiddleAngle(middleAngle);
 
 		}
+		float targetAngle = buffer.getFloat();
+		target.setRadAngle(targetAngle);
 	}
 
 

@@ -76,7 +76,6 @@ public class GameScreenPlayer extends Screen {
 
 		ballHandler = new BallHandler(PussycatMinions.getScreenWidth(), PussycatMinions.getScreenHeight());
 		ServerCommunication t4 = new ServerCommunication(comm, ballHandler, null);
-
 		t4.start();
 		
     }
@@ -178,6 +177,7 @@ public class GameScreenPlayer extends Screen {
     		    		buffer.clear();
     		    		
     		    		buffer.putShort((short) GLOBAL_STATE__.ADD_DEVICE.ordinal());	// State: ADD_DEVICE
+
 
     		    		buffer.putShort((short) 0);										// type, 0 är hårdkodat till main-device - sätt 1 för alla andra devices
     		    		buffer.putInt(PussycatMinions.getXDPI());						// XDPI
@@ -327,8 +327,8 @@ public class GameScreenPlayer extends Screen {
 
 	
 	
-	// För trace/trigger - ska fixa fint
-	// TODO: ska fixa fint och städa
+	// Fï¿½r trace/trigger - ska fixa fint
+	// TODO: ska fixa fint och stï¿½da
 	public float x1 = ptx[0];
 	public float y1 = pty[0];
 	public float t1 = tms[0];
@@ -408,7 +408,7 @@ public class GameScreenPlayer extends Screen {
 	        	
 	        		for(int j=0 ; j<steps; j++) {
 	        			
-	        			scale = j / (float) steps;  // Kan räknas ut i förväg
+	        			scale = j / (float) steps;  // Kan rï¿½knas ut i fï¿½rvï¿½g
 	            	    ix = cubicInterpolation(xk, xz, x1, x2, scale);
 	            	    iy = cubicInterpolation(yk, yz, y1, y2, scale);
 	            	    
@@ -420,7 +420,7 @@ public class GameScreenPlayer extends Screen {
 	        			
 	        			//float iv = cosineInterpolation(v1, v2, scale);
 	            	    
-	            	    // Går att förenkla
+	            	    // Gï¿½r att fï¿½renkla
 	            	    iv = (float) (iv * Math.pow(10, 6));
 	            	    iv = Math.max(iv, 1);
 	            	    iv = Math.max(1, 6 / iv);
@@ -548,7 +548,7 @@ public class GameScreenPlayer extends Screen {
 	        		
 	        		for(int j=0 ; j<steps; j++) {
 	        			
-	        			scale = j / (float) steps;  // Kan räknas ut i förväg
+	        			scale = j / (float) steps;  // Kan rï¿½knas ut i fï¿½rvï¿½g
 	            	    ix = cubicInterpolation(xk, xz, x1, x2, scale);
 	            	    iy = cubicInterpolation(yk, yz, y1, y2, scale);
 	            	    
@@ -560,7 +560,7 @@ public class GameScreenPlayer extends Screen {
 	        			
 	        			//float iv = cosineInterpolation(v1, v2, scale);
 	            	    
-	            	    // Går att förenkla
+	            	    // Gï¿½r att fï¿½renkla
 	            	    iv = (float) (iv * Math.pow(10, 6));
 	            	    iv = Math.max(iv, 1);
 	            	    iv = Math.max(1, 6 / iv);
@@ -628,7 +628,7 @@ public class GameScreenPlayer extends Screen {
 				 	0, 
 				 	128, 
 				 	128,
-				 	0.0f);
+				 	0.0f	);
         }
         
         ballHandler.drawBalls(graphics);
@@ -661,16 +661,16 @@ public class GameScreenPlayer extends Screen {
     	//AddDevice, NotMapped, Mapped, Wait, MappedWait, Remap, 
     	if (state == GameState.AddDevice) {
     		g.drawImage(Assets.ball, imageX, imageY);
-    		g.drawString("Klicka för att gå med i spelet", textX, textY, paint);
+    		g.drawString("Klicka fï¿½r att gï¿½ med i spelet", textX, textY, paint);
     	} else if (state == GameState.NotMapped) {
     		g.drawImage(Assets.ball, imageX, imageY);
-    		g.drawString("Lyckost! Det är din tur att mappa nu.", textX, textY, paint);
+    		g.drawString("Lyckost! Det ï¿½r din tur att mappa nu.", textX, textY, paint);
     	} else if (state == GameState.Wait) {
     		g.drawImage(Assets.ball, imageX, imageY);
-    		g.drawString("Vänta! Någon annan mappar.", textX, textY, paint);
+    		g.drawString("Vï¿½nta! Nï¿½gon annan mappar.", textX, textY, paint);
     	} else if (state == GameState.MappedWait) {
     		g.drawImage(Assets.ball, imageX, imageY);
-    		g.drawString("Vänta medans de andra mappar sina enheter", textX, textY, paint);
+    		g.drawString("Vï¿½nta medans de andra mappar sina enheter", textX, textY, paint);
     	} else if (state == GameState.Remap) {
     		g.drawImage(Assets.ball, imageX, imageY);
     		g.drawString("Klicka om du vill mappa om din enhet", textX, textY, paint);

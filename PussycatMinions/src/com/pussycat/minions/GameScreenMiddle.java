@@ -13,6 +13,8 @@ import android.util.Log;
 
 import com.pussycat.framework.Game;
 import com.pussycat.framework.Graphics;
+
+
 import com.pussycat.framework.Input.TouchEvent;
 import com.pussycat.framework.Screen;
 
@@ -63,6 +65,7 @@ public class GameScreenMiddle extends Screen {
 	// Game objects
 	private Target middleTarget;
 
+	// Constructor
     public GameScreenMiddle(Game game) {
         super(game);
 
@@ -96,7 +99,9 @@ public class GameScreenMiddle extends Screen {
 		comm.start();
 
 		//ballzHandler = new BallHandler();
-		ServerCommunication t4 = new ServerCommunication(comm, ballzHandler,middleTarget);
+		
+		ballzHandler = new BallHandler(PussycatMinions.getScreenWidth(), PussycatMinions.getScreenHeight());
+		ServerCommunication t4 = new ServerCommunication(comm, ballzHandler, middleTarget);
 		t4.start();
 		
     }
@@ -348,8 +353,8 @@ public class GameScreenMiddle extends Screen {
 
 	
 	
-	// För trace/trigger - ska fixa fint
-	// TODO: ska fixa fint och städa
+	// Fï¿½r trace/trigger - ska fixa fint
+	// TODO: ska fixa fint och stï¿½da
 	public float x1 = ptx[0];
 	public float y1 = pty[0];
 	public float t1 = tms[0];
@@ -429,7 +434,7 @@ public class GameScreenMiddle extends Screen {
 	        	
 	        		for(int j=0 ; j<steps; j++) {
 	        			
-	        			scale = j / (float) steps;  // Kan räknas ut i förväg
+	        			scale = j / (float) steps;  // Kan rï¿½knas ut i fï¿½rvï¿½g
 	            	    ix = cubicInterpolation(xk, xz, x1, x2, scale);
 	            	    iy = cubicInterpolation(yk, yz, y1, y2, scale);
 	            	    
@@ -441,7 +446,7 @@ public class GameScreenMiddle extends Screen {
 	        			
 	        			//float iv = cosineInterpolation(v1, v2, scale);
 	            	    
-	            	    // Går att förenkla
+	            	    // Gï¿½r att fï¿½renkla
 	            	    iv = (float) (iv * Math.pow(10, 6));
 	            	    iv = Math.max(iv, 1);
 	            	    iv = Math.max(1, 6 / iv);
@@ -569,7 +574,7 @@ public class GameScreenMiddle extends Screen {
 	        		
 	        		for(int j=0 ; j<steps; j++) {
 	        			
-	        			scale = j / (float) steps;  // Kan räknas ut i förväg
+	        			scale = j / (float) steps;  // Kan rï¿½knas ut i fï¿½rvï¿½g
 	            	    ix = cubicInterpolation(xk, xz, x1, x2, scale);
 	            	    iy = cubicInterpolation(yk, yz, y1, y2, scale);
 	            	    
@@ -581,7 +586,7 @@ public class GameScreenMiddle extends Screen {
 	        			
 	        			//float iv = cosineInterpolation(v1, v2, scale);
 	            	    
-	            	    // Går att förenkla
+	            	    // Gï¿½r att fï¿½renkla
 	            	    iv = (float) (iv * Math.pow(10, 6));
 	            	    iv = Math.max(iv, 1);
 	            	    iv = Math.max(1, 6 / iv);
@@ -650,7 +655,8 @@ public class GameScreenMiddle extends Screen {
 				 	0, 
 				 	128, 
 				 	128,
-				 	0.0f);
+				 	0.0f
+				 	);
         }
         
         drawTarget();
@@ -670,8 +676,9 @@ public class GameScreenMiddle extends Screen {
     }
     
     private void drawTarget() {
-        Graphics g = game.getGraphics(); 
-        g.drawScaledImage(middleTarget.getImage(), (int)middleTarget.getX(), (int)middleTarget.getY(), (int)middleTarget.getPixelWidth(), (int)middleTarget.getPixelHeight(), 0, 0, (int)middleTarget.getImageWidth(), (int)middleTarget.getImageHeight(),middleTarget.getAngle());
+        Graphics g = game.getGraphics();
+        
+        g.drawScaledImage(middleTarget.getImage(), (int)middleTarget.getX(), (int)middleTarget.getY(), (int)middleTarget.getPixelWidth(), (int)middleTarget.getPixelHeight(), 0, 0, (int)middleTarget.getImageWidth(), (int)middleTarget.getImageHeight(), middleTarget.getRadAngle());
     }
 
 

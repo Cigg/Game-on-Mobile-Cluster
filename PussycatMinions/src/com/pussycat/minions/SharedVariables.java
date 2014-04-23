@@ -34,8 +34,6 @@ public class SharedVariables {
 	private float mainMiddleY;
 	private Object mainMiddleYMutex = new Object();
 	
-	private float middleAngle;
-	private Object middleAngleMutex = new Object();
 	
 	
 	// Singleton design pattern
@@ -125,11 +123,6 @@ public class SharedVariables {
 		}
 	}
 	
-	public float getMiddleAngle(){
-		synchronized(this.middleAngleMutex) {
-			return this.middleAngle;
-		}
-	}
 	
 	// =========================================
 	// Set methods
@@ -201,10 +194,6 @@ public class SharedVariables {
 		this.nClocks.incrementAndGet();
 	}
 
-	public void setMiddleAngle(float newMiddleAngle) {
-		synchronized( this.middleAngleMutex ){
-			this.middleAngle = newMiddleAngle;
-		}
-	}
+
 
 }
