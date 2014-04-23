@@ -229,6 +229,8 @@ public class AndroidGraphics implements Graphics {
         
         bitmap = ((AndroidImage) Image).bitmap;
         
+        float angleInDegrees = angle*(180.0f/3.14f); 
+        
         /**
          * Improves resizing quality of bitmaps a lot, but possibly much heavier to calculate
          */
@@ -237,9 +239,18 @@ public class AndroidGraphics implements Graphics {
         paint.setAntiAlias(true);
         paint.setFilterBitmap(true);
         paint.setDither(true);
-        //canvas.rotate(angle*(180.0f/3.14f));
-        canvas.drawBitmap(bitmap, srcRect, dstRect, paint);
-        //canvas.rotate(-angle);
+        
+        /*
+         * Code from Arvis at http://stackoverflow.com/questions/4166917/android-how-to-rotate-a-bitmap-on-a-center-point #2
+         */
+        
+        Matrix matrix = new Matrix();
+        matrix.postRotate(angleInDegrees);
+        Bitmap rotatedBitmap = Bitmap.createBitmap(bitmap, 0, 0, bitmap.getWidth(), bitmap.getHeight(), matrix, true);
+        
+        //canvas.rotate(angleInDegrees);
+        canvas.drawBitmap(rotatedBitmap, srcRect, dstRect, paint);
+        //canvas.rotate(-angleInDegrees);
         
     }
    
