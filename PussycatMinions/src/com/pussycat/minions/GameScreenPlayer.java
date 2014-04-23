@@ -75,7 +75,7 @@ public class GameScreenPlayer extends Screen {
 		comm.start();
 
 		ballzHandler = new BallHandler();
-		ServerCommunication t4 = new ServerCommunication(comm, ballzHandler,null);
+		ServerCommunication t4 = new ServerCommunication(comm, ballzHandler, null);
 		t4.start();
 		
     }
@@ -624,8 +624,7 @@ public class GameScreenPlayer extends Screen {
 				 	0, 
 				 	0, 
 				 	128, 
-				 	128,
-				 	0.0f);
+				 	128		);
         }
         
         BallHandler.drawBalls(graphics);

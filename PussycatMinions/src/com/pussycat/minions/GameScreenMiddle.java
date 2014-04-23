@@ -13,6 +13,8 @@ import android.util.Log;
 
 import com.pussycat.framework.Game;
 import com.pussycat.framework.Graphics;
+
+
 import com.pussycat.framework.Input.TouchEvent;
 import com.pussycat.framework.Screen;
 
@@ -63,6 +65,7 @@ public class GameScreenMiddle extends Screen {
 	// Game objects
 	private Target middleTarget;
 
+	// Constructor
     public GameScreenMiddle(Game game) {
         super(game);
 
@@ -96,7 +99,7 @@ public class GameScreenMiddle extends Screen {
 		comm.start();
 
 		ballzHandler = new BallHandler();
-		ServerCommunication t4 = new ServerCommunication(comm, ballzHandler,middleTarget);
+		ServerCommunication t4 = new ServerCommunication(comm, ballzHandler, middleTarget);
 		t4.start();
 		
     }
@@ -649,8 +652,7 @@ public class GameScreenMiddle extends Screen {
 				 	0, 
 				 	0, 
 				 	128, 
-				 	128,
-				 	0.0f);
+				 	128		);
         }
         
         drawTarget();
@@ -670,8 +672,9 @@ public class GameScreenMiddle extends Screen {
     }
     
     private void drawTarget() {
-        Graphics g = game.getGraphics(); 
-        g.drawScaledImage(middleTarget.getImage(), (int)middleTarget.getX(), (int)middleTarget.getY(), (int)middleTarget.getPixelWidth(), (int)middleTarget.getPixelHeight(), 0, 0, (int)middleTarget.getImageWidth(), (int)middleTarget.getImageHeight(),middleTarget.getAngle());
+        Graphics g = game.getGraphics();
+        
+        g.drawScaledImage(middleTarget.getImage(), (int)middleTarget.getX(), (int)middleTarget.getY(), (int)middleTarget.getPixelWidth(), (int)middleTarget.getPixelHeight(), 0, 0, (int)middleTarget.getImageWidth(), (int)middleTarget.getImageHeight());
     }
 
 
