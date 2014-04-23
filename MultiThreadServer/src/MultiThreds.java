@@ -192,8 +192,8 @@ public class MultiThreds {
 			    				buffer.position(2);
 			    				buffer.putShort(nBalls);
 			    				
-			    				System.out.println(jointAngle);
-			    				buffer.putFloat(jointAngle);
+			    				//System.out.println(jointAngle);
+			    				//buffer.putFloat(jointAngle);
 			    				thread.sendData(buffer.array());
 			
 			    			}

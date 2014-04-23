@@ -10,7 +10,7 @@ public class Target {
 	Image image;
 	private PointF pos;
 	private float scale;
-	private float angle;
+	private float radAngle;
 
 	// Height in meters
 	public Target(float centerX, float centerY, float height){
@@ -47,11 +47,11 @@ public class Target {
 		return image.getHeight()*scale;
 	}
 	
-	public float getAngle(){
-		return angle;
+	public float getRadAngle(){
+		return radAngle;
 	}
 	
-	public void setAngle(float angle) {
-		this.angle = angle;
+	public void setRadAngle(float radAngle){
+		this.radAngle = radAngle;
 	}
 }

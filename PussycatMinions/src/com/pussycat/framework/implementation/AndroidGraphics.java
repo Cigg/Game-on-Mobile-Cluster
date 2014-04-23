@@ -19,7 +19,6 @@ import android.graphics.Rect;
 import com.pussycat.framework.Graphics;
 import com.pussycat.framework.Image;
 import com.pussycat.minions.PussycatMinions;
-import com.pussycat.minions.SharedVariables;
 
 public class AndroidGraphics implements Graphics {
     static AssetManager assets;
