@@ -16,11 +16,6 @@ import org.jbox2d.common.Vec2;
 
 public class MultiThreds {
 	
-	
-	public static void main(String[] args) {
-		MultiThreds mt = new MultiThreds();
-	}
-	
 	private static ServerSocket serverSocket = null;
 	private static Socket clientSocket = null;
 	

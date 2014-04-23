@@ -145,18 +145,19 @@ public class ServerCommunication extends Thread {
 			Log.d("BALLINFO", "ADD: " + id + "  " + x + "  " + y + "  " + vx + "  " + vy);
 			
 			// TODO: FIX ALLL BALL TYPES
-			ballHandler.addBall(new BallRegular(id, x, y, vx, vy));
-			
-			/*
-			if(target != null) {
-				target.setAngle(middleAngle);
-			}
-			*/
+			ballHandler.addBall(new BallRegular(id, x, y, vx, vy));			
 			//SharedVariables.getInstance().setMiddleAngle(middleAngle);
 
 		}
+		
+		/*
+		if(target != null) {
+			target.setAngle(middleAngle);
+		}
+		
 		float targetAngle = buffer.getFloat();
 		target.setRadAngle(targetAngle);
+		*/
 	}
 
 
