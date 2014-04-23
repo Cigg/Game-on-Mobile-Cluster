@@ -37,7 +37,19 @@ public abstract class Ball {
 			    				 	0, 
 			    				 	0, 
 			    				 	128, 
-			    				 	128		);				    		
+			    				 	128, 0.0f	);		
+	    /*
+	    graphics.drawScaledImage(	ballTypes[ball.type].image, 
+			 	(int)(ball.x - PussycatMinions.meters2Pixels(ballTypes[ball.type].radius)), 
+			 	(int)(ball.y - PussycatMinions.meters2Pixels(ballTypes[ball.type].radius)), 
+			 	(int)(PussycatMinions.meters2Pixels(ballTypes[ball.type].radius)*2), 
+			 	(int)(PussycatMinions.meters2Pixels(ballTypes[ball.type].radius)*2), 
+			 	0, 
+			 	0, 
+			 	128, 
+			 	128,
+			 	0.0f);
+	    */
 	}
 	
 }

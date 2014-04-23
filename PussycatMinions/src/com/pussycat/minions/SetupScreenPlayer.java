@@ -31,8 +31,8 @@ public class SetupScreenPlayer extends Screen {
 		paint.setTextAlign(Paint.Align.CENTER);
 		paint.setAntiAlias(true);
 		paint.setColor(Color.WHITE);
-		skipButton = new Button(Assets.button_skip, Assets.button_skip_pressed, PussycatMinions.getScreenWidth()/2 - Assets.button_skip.getWidth()/2, PussycatMinions.getScreenHeight() - 4*Assets.button_skip.getHeight());
-
+		skipButton = new Button(Assets.button, Assets.button_pressed, PussycatMinions.getScreenWidth()/2 - Assets.button.getWidth()/2, PussycatMinions.getScreenHeight() - 4*Assets.button.getHeight(), paint);
+		skipButton.setText("SKIP");
 		//skipButton = new Button(Assets.button_skip, Assets.button_skip_pressed, PussycatMinions.getScreenWidth()/2 - Assets.button_skip.getWidth()/2, PussycatMinions.getScreenHeight() - 2*Assets.button_skip.getHeight());
     }
     

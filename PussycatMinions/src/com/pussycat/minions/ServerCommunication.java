@@ -11,12 +11,13 @@ public class ServerCommunication extends Thread {
 	private TCPClient tcp;
 	private BallHandler ballHandler;
 	private BallTypesHandler ballTypesHandler;
-	
-	
-	ServerCommunication(TCPClient stcp, BallHandler ballHandler ) {
+	private Target target;
+
+	ServerCommunication(TCPClient stcp, BallHandler ballHandler, Target target ) {
 		this.ballHandler = ballHandler;
 		this.ballTypesHandler = new BallTypesHandler();
 		this.tcp = stcp;
+		this.target = target;
 		communicate = true;
 	}
 	
@@ -141,11 +142,18 @@ public class ServerCommunication extends Thread {
         	float y = buffer.getFloat();	
 			float vx = buffer.getFloat();	
 			float vy = buffer.getFloat();					        			
-			
+			float middleAngle = buffer.getFloat();
 			Log.d("BALLINFO", "ADD: " + id + "  " + x + "  " + y + "  " + vx + "  " + vy);
 			
+
 			// TODO: FIX ALLL BALL TYPES
 			ballHandler.addBall(new BallRegular(id, x, y, vx, vy));
+			
+			if(target != null) {
+				target.setAngle(middleAngle);
+			}
+			//SharedVariables.getInstance().setMiddleAngle(middleAngle);
+
 		}
 	}
 

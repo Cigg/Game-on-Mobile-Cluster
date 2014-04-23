@@ -1,5 +1,8 @@
 package com.pussycat.minions;
 
+import android.graphics.Paint;
+import android.util.Log;
+
 import com.pussycat.framework.Graphics;
 import com.pussycat.framework.Image;
 
@@ -12,10 +15,16 @@ public class Button {
 	private boolean visible;
 	private boolean enabled;
 	private boolean pressed;
+	private String string;
 	
-	public Button(Image imageNormal, Image imagePressed,int posX, int posY){
+	private Paint paint;
+	private float textHeight;
+	
+	public Button(Image imageNormal, Image imagePressed,int posX, int posY, Paint paint){
 		this.imageNormal = imageNormal;
 		this.imagePressed = imagePressed;
+		
+		this.paint = paint;
 		
 		this.posX = posX;
 		this.posY = posY;
@@ -24,10 +33,14 @@ public class Button {
 		this.visible = true;
 		this.enabled = true;
 		this.pressed = false;
+		this.string = "";
+		this.textHeight = paint.getTextSize()/2;
 	}
 	
 	public void drawButton(Graphics g){
+		//Log.d("Debug Pussycat", "paint: " + paint.getTextSize());
 		g.drawImage(getButtonImage(), posX, posY);
+		g.drawString(string, posX + width/2, (int)(posY + height/2 + textHeight/2), paint);
 	}
 
 	private Image getButtonImage(){
@@ -83,5 +96,9 @@ public class Button {
 
 	public void setEnabled(boolean enabled) {
 		this.enabled = enabled;
+	}
+	
+	public void setText(String string) {
+		this.string = string;
 	}
 }
