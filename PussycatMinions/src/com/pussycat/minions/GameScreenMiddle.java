@@ -643,20 +643,18 @@ public class GameScreenMiddle extends Screen {
     	
         vk = vkb;
         vz = vzb;
-    	
+        
         if( dragged ) {
-        	//Log.d("Debug Pussycat", "Ballradius: " + Float.parseFloat(PussycatMinions.settings.getSetting("ballRadius")));
         	graphics.drawScaledImage(	Assets.ball, 
-				 	(int)(draggedX - PussycatMinions.meters2Pixels(Float.parseFloat(PussycatMinions.settings.getSetting("ballRadius")))), 
-				 	(int)(draggedY - PussycatMinions.meters2Pixels(Float.parseFloat(PussycatMinions.settings.getSetting("ballRadius")))), 
-				 	(int)(PussycatMinions.meters2Pixels(Float.parseFloat(PussycatMinions.settings.getSetting("ballRadius"))*2)), 
-				 	(int)(PussycatMinions.meters2Pixels(Float.parseFloat(PussycatMinions.settings.getSetting("ballRadius"))*2)), 
+				 	(int)(draggedX - PussycatMinions.meters2Pixels(0.0075f)), 
+				 	(int)(draggedY - PussycatMinions.meters2Pixels(0.0075f)), 
+				 	(int)(PussycatMinions.meters2Pixels(0.0075f*2)), 
+				 	(int)(PussycatMinions.meters2Pixels(0.0075f*2)), 
 				 	0, 
 				 	0, 
 				 	128, 
 				 	128,
-				 	0.0f
-				 	);
+				 	0.0f	);
         }
         
         drawTarget();
