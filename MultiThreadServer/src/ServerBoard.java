@@ -21,6 +21,8 @@ public class ServerBoard extends JFrame {
 		panel.setLayout(new BoxLayout(panel,BoxLayout.X_AXIS));
 		panel2.setLayout(new BoxLayout(panel2,BoxLayout.X_AXIS));
 		
+		this.setTitle("SERVER");
+		
 		btnStart = new JButton("Start");
         btnStart.addActionListener(new ActionListener() {
             @Override

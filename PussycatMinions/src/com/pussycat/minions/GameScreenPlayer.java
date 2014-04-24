@@ -167,7 +167,7 @@ public class GameScreenPlayer extends Screen {
 	    				comm.sendData(buffer.array());
 	    				SharedVariables.getInstance().setInternalState(GLOBAL_STATE__.ADD_DEVICE);
 	    			}
-	    			//break;
+	    			break;
     			
     				case ADD_DEVICE:
     				{
@@ -620,10 +620,10 @@ public class GameScreenPlayer extends Screen {
     	
         if( dragged ) {
         	graphics.drawScaledImage(	Assets.ball, 
-				 	(int)(draggedX - PussycatMinions.meters2Pixels(Float.parseFloat(PussycatMinions.settings.getSetting("ballRadius")))), 
-				 	(int)(draggedY - PussycatMinions.meters2Pixels(Float.parseFloat(PussycatMinions.settings.getSetting("ballRadius")))), 
-				 	(int)(PussycatMinions.meters2Pixels(Float.parseFloat(PussycatMinions.settings.getSetting("ballRadius"))*2)), 
-				 	(int)(PussycatMinions.meters2Pixels(Float.parseFloat(PussycatMinions.settings.getSetting("ballRadius"))*2)), 
+				 	(int)(draggedX - PussycatMinions.meters2Pixels(0.0075f)), 
+				 	(int)(draggedY - PussycatMinions.meters2Pixels(0.0075f)), 
+				 	(int)(PussycatMinions.meters2Pixels(0.0075f*2)), 
+				 	(int)(PussycatMinions.meters2Pixels(0.0075f*2)), 
 				 	0, 
 				 	0, 
 				 	128, 
@@ -689,9 +689,7 @@ public class GameScreenPlayer extends Screen {
 
     
     private void drawRunningUI() {
-
         Graphics g = game.getGraphics();
-
     }
 
     

@@ -1,11 +1,9 @@
 package com.pussycat.minions;
 
-import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.io.PrintWriter;
 import java.net.InetAddress;
 import java.net.Socket;
 import java.nio.ByteBuffer;
@@ -14,21 +12,16 @@ import android.util.Log;
 
 public class TCPClient extends Thread {
 	
-
-	public static String SERVERIP = "192.168.43.122";
-
-
+	public static final String SERVERIP = "192.168.43.122";
 	public static final int SERVERPORT = 4444;
-	private boolean isRunning = false;
+	private volatile boolean isRunning = false;
 	
-	PrintWriter out;
-	BufferedReader in;
-	OutputStream dout;
-	InputStream din;
+	OutputStream outputStream;
+	InputStream inputStream;
 	BufferedWriter buffw;
 	
-	public EndlessQueue<DataPackage> messages;
 	private final int numberOfMessages = 64; 
+	public EndlessQueue<DataPackage> messages;
 
 	
 	public TCPClient() {
@@ -43,10 +36,10 @@ public class TCPClient extends Thread {
 				header.putInt(buffer.length);
 				header.putFloat(System.nanoTime());
 				
-				if( dout != null ) {
-					dout.write(header.array());
-					dout.write(buffer);
-					dout.flush();
+				if( outputStream != null ) {
+					outputStream.write(header.array());
+					outputStream.write(buffer);
+					outputStream.flush();
 				}
 			} catch (IOException e) {
 				e.printStackTrace();
@@ -55,8 +48,8 @@ public class TCPClient extends Thread {
 	}
 
 	
-	public void stopCommuinication() {
-		isRunning = false;
+	public void setIsRunning(final boolean isRunning) {
+		this.isRunning = isRunning;
 	}
 	
 	
@@ -66,35 +59,35 @@ public class TCPClient extends Thread {
 		Thread.currentThread().setName("TCPClient");
 		
 		try {
-			InetAddress serverAddr = InetAddress.getByName(SERVERIP);
-			Socket socket = new Socket(serverAddr, SERVERPORT);
+			InetAddress serverAddress = InetAddress.getByName(SERVERIP);
+			Socket socket = new Socket(serverAddress, SERVERPORT);
 			
 			socket.setTcpNoDelay(true);
 
 			try {
 				
-				dout = socket.getOutputStream();
-				din = socket.getInputStream();
+				outputStream = socket.getOutputStream();
+				inputStream = socket.getInputStream();
 				byte[] headerBuffer = new byte[8];
 				
 				while( isRunning ) {
 				
-					din.read(headerBuffer);	
-					float reciveTime = System.nanoTime();
+					inputStream.read(headerBuffer);	
+					final float dataPackageReciveTime = System.nanoTime();
 					
 					ByteBuffer header = ByteBuffer.wrap(headerBuffer);
 					
-					int length = header.getInt();
-				    length = Math.max(0, length);
+					int dataPackageLength = header.getInt();
+				    dataPackageLength = Math.max(0, dataPackageLength);
 				    
-				    float sendTime = header.getFloat();
+				    final float dataPackageSendTime = header.getFloat();
 
-					if( length > 0 ) {
+					if( dataPackageLength > 0 ) {
 						
-						byte[] bytes = new byte[length];
+						byte[] dataPackageBytes = new byte[dataPackageLength];
 					
-						din.read(bytes);
-						DataPackage dataPackageToAdd = new DataPackage(bytes, socket.getInetAddress().toString(), socket.getPort(), sendTime, reciveTime);
+						inputStream.read(dataPackageBytes);
+						DataPackage dataPackageToAdd = new DataPackage(dataPackageBytes, socket.getInetAddress().toString(), socket.getPort(), dataPackageSendTime, dataPackageReciveTime);
 						
 						messages.add(dataPackageToAdd);
 						

@@ -4,6 +4,10 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 public class SharedVariables {
 	
+	private static SharedVariables theOnlyInstance = null;
+	private static Object theOnlyInstanceMutex = new Object();
+	
+	
 	private GLOBAL_STATE__ internalState;
 	private Object internalStateMutex = new Object();
 	
@@ -13,11 +17,7 @@ public class SharedVariables {
 	private float sendDelay;
 	private Object sendDelayMutex = new Object();
 	
-	private AtomicInteger nClocks;
-	
-	private static SharedVariables theOnlyInstance = null;
-	private static Object theOnlyInstanceMutex = new Object();
-	
+	private AtomicInteger nClocks;	
 	
 	private float deviceAngle;
 	private Object deviceAngleMutex = new Object();
@@ -33,7 +33,6 @@ public class SharedVariables {
 	
 	private float mainMiddleY;
 	private Object mainMiddleYMutex = new Object();
-	
 	
 	
 	// Singleton design pattern

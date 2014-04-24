@@ -8,15 +8,22 @@ public class EndlessQueue<T> {
 	private int begin;
 	private int next;
 
+	final int MINIMUM_QUEUE_LENGTH = 4;
 	
 	public EndlessQueue(T[] queue) {	
-		if(queue.length < 3) {
+		
+		if( !isValidQueueLength(queue.length) ) {
 			Log.e("Android", "FATAL ERROR: Size of EndlessQueue is too small.");
-		}
+		} 
 		
 		this.queue = queue;
 		begin = 0;
 		next = begin;
+	}
+	
+	
+	public boolean isValidQueueLength(final int length) {
+		return length >= MINIMUM_QUEUE_LENGTH;
 	}
 	
 	

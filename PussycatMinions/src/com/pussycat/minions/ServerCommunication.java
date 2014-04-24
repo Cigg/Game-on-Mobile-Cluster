@@ -7,7 +7,7 @@ import android.util.Log;
 
 public class ServerCommunication extends Thread {
 
-	private volatile boolean communicate;
+	private volatile boolean isCommunicating;
 	private TCPClient tcp;
 	private BallHandler ballHandler;
 	private BallTypesHandler ballTypesHandler;
@@ -18,12 +18,12 @@ public class ServerCommunication extends Thread {
 		this.ballTypesHandler = new BallTypesHandler();
 		this.tcp = stcp;
 		this.target = target;
-		communicate = true;
+		isCommunicating = true;
 	}
 	
 
-	public void stopCommunication() {
-		communicate = false;
+	public void setIsCommunicating(final boolean isCommunicating) {
+		this.isCommunicating = isCommunicating;
 	}
 	
 	
@@ -32,10 +32,10 @@ public class ServerCommunication extends Thread {
 		
 		Thread.currentThread().setName("ServerCommunication");
 		
-		while( communicate ) {
+		while( isCommunicating ) {
 
 			if( tcp != null ) {
-				DataPackage incomingData = (DataPackage)tcp.messages.popFront();
+				DataPackage incomingData = tcp.messages.popFront();
 				
 				if( incomingData != null ) {
 					ByteBuffer buffer = ByteBuffer.wrap(incomingData.getData());

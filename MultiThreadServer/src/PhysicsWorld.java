@@ -69,7 +69,7 @@ private class Vertex {
 		CircleShape circleShape = new CircleShape();
 
 		// Two centimeters
-		circleShape.m_radius = 0.01f*39.37f;
+		circleShape.m_radius = 0.0075f*39.37f;
 
 		// MultiThreds.getPhysicsWorld().addBall(xPos, yPos, xVel, yVel, id,
 		// 0.03f, 0.75f, 0.8f, 0.3f);

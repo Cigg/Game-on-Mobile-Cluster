@@ -77,7 +77,7 @@ public class Device {
 		
 		
 		
-		l_half = (int) Math.ceil((Math.sqrt( Math.pow(screenWidth * bg.ppix / xdpi, 2) + Math.pow(screenHeight * bg.ppiy / ydpi, 2)) / 2));
+		l_half = (int) Math.ceil( (Math.sqrt( Math.pow(screenWidth * bg.ppix / xdpi, 2) + Math.pow(screenHeight * bg.ppiy / ydpi, 2)) / 2) );
 		l_side = 2 * l_half;
 		backgroundTiled = Bitmap.createBitmap(l_side,  l_side, Bitmap.Config.ARGB_8888);
 		backgroundFinal = Bitmap.createBitmap(screenWidth,  screenHeight, Bitmap.Config.ARGB_8888);
@@ -94,12 +94,12 @@ public class Device {
 	}
 	
 	
-	public static double radiansToDegrees(float radians) {
+	public static double radiansToDegrees(final double radians) {
 		return radians * Math.PI / 180;
 	}
 	
 	
-	// TODO: Fix in a better way, this is temporary :)
+	// TODO: Fix in a better way, this is temporary :) - everything is temporary
 	static boolean once = true;
 	
 	public static void setOnce() {
@@ -107,7 +107,7 @@ public class Device {
 	}
 	
 	
-	public boolean isPointInsideRectangle(final float x, final float y, final int halfx, final int halfy) {
+	public boolean pointIsInsideRectangle(final float x, final float y, final int halfx, final int halfy) {
 		return   -halfx <= x  &&  x <= halfx	 && 
 				 -halfy <= y  &&  y <= halfy	;
 	}
@@ -273,6 +273,7 @@ public class Device {
 			
 			ArrayList<IndexPair> indexes = new ArrayList<IndexPair>();
 			
+			// TODO: FIX BUG WHEN no corner of an actual tile is inside the rectangle
 			int counter = 0;
 			for(int rad=0; rad<nRader; rad++) {
 				String line = "";
@@ -310,10 +311,10 @@ public class Device {
 					float lowerLeftCornerYRotated = rotateY(lowerLeftCornerXTranslated, lowerLeftCornerYTranslated, radiansToDegrees(angle)); 
 					float lowerRightCornerYRotated = rotateY(lowerRightCornerXTranslated, lowerRightCornerYTranslated, radiansToDegrees(angle));
 					
-					if( isPointInsideRectangle(upperLeftCornerXRotated, upperLeftCornerYRotated, halfx, halfy) 		||
-						isPointInsideRectangle(upperRightCornerXRotated, upperRightCornerYRotated, halfx, halfy) 	||
-						isPointInsideRectangle(lowerLeftCornerXRotated, lowerLeftCornerYRotated, halfx, halfy) 		||
-						isPointInsideRectangle(lowerRightCornerXRotated, lowerRightCornerYRotated, halfx, halfy) 			) {
+					if( pointIsInsideRectangle(upperLeftCornerXRotated, upperLeftCornerYRotated, halfx, halfy) 		||
+						pointIsInsideRectangle(upperRightCornerXRotated, upperRightCornerYRotated, halfx, halfy) 	||
+						pointIsInsideRectangle(lowerLeftCornerXRotated, lowerLeftCornerYRotated, halfx, halfy) 		||
+						pointIsInsideRectangle(lowerRightCornerXRotated, lowerRightCornerYRotated, halfx, halfy) 			) {
 						
 						indexes.add(new IndexPair(rad, kolumn));
 						
@@ -331,8 +332,8 @@ public class Device {
 			
 			backgroundCanvas.drawColor(Color.WHITE);
 			
-			final int tix = - l_half + screenWidth/2;  // Tile image translation in x
-			final int tiy = - l_half + screenHeight/2; // Tile image translation in y
+			final int tix = screenWidth/2 - l_half;  // Tile image translation in x
+			final int tiy = screenHeight/2 - l_half; // Tile image translation in y
 			
 			final int tx = - displayImageCenterX  + l_half;  // Tiles translation in x
 			final int ty = - displayImageCenterY  + l_half; // Tiles translation in y
@@ -359,7 +360,7 @@ public class Device {
 			}
 			
 			indexLast = first;
-			threads[0] = new Thread(new Executor(bitmaps, temp, bg.file, widthStep, heightStep));
+			threads[0] = new Thread(new Executor(bitmaps, temp, bg.fileName, widthStep, heightStep));
 			threads[0].start();
 			
 			for(int i=1; i<numberOfExecutionThreads; i++) {
@@ -370,7 +371,7 @@ public class Device {
 					
 				}
 				indexLast += numberOfTilesForEachExecutionThread;
-				threads[i] = new Thread(new Executor(bitmaps, temp2, bg.file, widthStep, heightStep));
+				threads[i] = new Thread(new Executor(bitmaps, temp2, bg.fileName, widthStep, heightStep));
 				threads[i].start();
 			}
 		
@@ -383,12 +384,9 @@ public class Device {
 				}
 			}
 			
-			int a = 0;
 			int nw;
 			int nh;
 			for(IndexPair indexPair : indexes ) {
-				Log.d("TILE6", "INTE: " + a );
-				a++;
 				nw = (indexPair.kolumn * widthStep);
 			    nh = (indexPair.rad * heightStep);
 			    

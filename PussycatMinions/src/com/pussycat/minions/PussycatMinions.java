@@ -70,8 +70,8 @@ public class PussycatMinions extends AndroidGame {
     	return xdpi;
     }
     
-    public static float meters2Pixels(float meters) {
-		return meters*39.37f*ppi;
+    public static int meters2Pixels(float meters) {
+		return (int) (meters * xdpi * 100 / 2.54);
     }
     
 }

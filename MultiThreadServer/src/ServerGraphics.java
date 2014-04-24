@@ -41,6 +41,7 @@ public class ServerGraphics {
     private void initComponents() {
 
         mainMap = new JFrame();
+        mainMap.setTitle("GAME BOARD");
         mainMap.setResizable(false);
         mainMap.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         

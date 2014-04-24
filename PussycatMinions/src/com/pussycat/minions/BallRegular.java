@@ -11,7 +11,7 @@ public class BallRegular extends Ball {
 		this.vx = vx;
 		this.vy = vy;
 		
-		this.radius = 50;
+		this.radius = PussycatMinions.meters2Pixels(0.0075f);
 		this.image = Assets.localBall;
 	}
 

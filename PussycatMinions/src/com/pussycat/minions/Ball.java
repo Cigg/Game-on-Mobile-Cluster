@@ -29,11 +29,12 @@ public abstract class Ball {
 	
 	
 	public void draw(Graphics graphics) {
+		
 	    graphics.drawScaledImage(	this.image, 
 			    				 	(int)this.x - this.radius, 
 			    				 	(int)this.y - this.radius, 
-			    				 	100, 
-			    				 	100, 
+			    				 	this.radius * 2, 
+			    				 	this.radius * 2, 
 			    				 	0, 
 			    				 	0, 
 			    				 	128, 

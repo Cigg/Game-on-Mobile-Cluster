@@ -97,8 +97,6 @@ public class GameScreenMiddle extends Screen {
 		
 		comm = new TCPClient();
 		comm.start();
-
-		//ballzHandler = new BallHandler();
 		
 		ballzHandler = new BallHandler(PussycatMinions.getScreenWidth(), PussycatMinions.getScreenHeight());
 		ServerCommunication t4 = new ServerCommunication(comm, ballzHandler, middleTarget);
@@ -139,6 +137,8 @@ public class GameScreenMiddle extends Screen {
     	// Thread.currentThread().setPriority(Thread.MAX_PRIORITY);
     	
     	ballzHandler.updateBalls(deltaTime);
+    	ballzHandler.removeBallsOutOfBounds();
+    	
     	up = false;
     	
         for (int i = 0; i < touchEvents.size(); i++) {
@@ -194,7 +194,7 @@ public class GameScreenMiddle extends Screen {
 	    				comm.sendData(buffer.array());
 	    				SharedVariables.getInstance().setInternalState(GLOBAL_STATE__.ADD_DEVICE);
 	    			}
-	    			//break;
+	    			break;
     			
     				case ADD_DEVICE:
     				{
@@ -661,7 +661,7 @@ public class GameScreenMiddle extends Screen {
         
         drawTarget();
         
-        //BallHandler.drawBalls(graphics);
+        ballzHandler.drawBalls(graphics);
    
         if (state == GameState.Running) {
             drawRunningUI();

@@ -2,14 +2,14 @@ package com.pussycat.minions;
 
 public class DataPackage {
 	
-	private byte[] data;
-	private String ip;
-	private int port;
-	private float sendTime;
-	private float reciveTime;
+	private final byte[] data;
+	private final String ip;
+	private final int port;
+	private final float sendTime;
+	private final float reciveTime;
 	
 	
-	public DataPackage(byte[] data, String ip, int port, float sendTime, float reciveTime) {
+	public DataPackage(final byte[] data, final String ip, final int port, final float sendTime, final float reciveTime) {
 		this.data = data;
 		this.ip = ip;
 		this.port = port; 
