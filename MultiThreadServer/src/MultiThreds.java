@@ -91,6 +91,7 @@ public class MultiThreds {
 			    						System.out.println("SEND to " + thread.getIp() + ": " + test.getShort() + "  " + test.getShort());
 			    						
 			    						thread.sendData(data);
+			    						thread.clientInfo.addSentPackageItem("SENDATA   TODO: FIX");
 			    					}
 			    				}
 		    				}
@@ -110,7 +111,8 @@ public class MultiThreds {
 			    				buffer = ByteBuffer.wrap(arr);
 			    				buffer.clear();
 			    				
-			    				buffer.putShort((short) GLOBAL_STATE__.ADD_BALLS.ordinal());	// State: Add balls
+			    				short sendState = (short) GLOBAL_STATE__.ADD_BALLS.ordinal();
+			    				buffer.putShort(sendState);	// State: Add balls
 			    				buffer.putShort((short) 0);										// nBalls, byte 2 och 3
 			    				
 			    				short nBalls = 0;
@@ -181,8 +183,10 @@ public class MultiThreds {
 			    					} else {
 			    						buffer.position(2);
 					    				buffer.putShort(nBalls);
-					    				thread.sendData(buffer.array());
-					    				
+					    				if(nBalls != 0) {
+						    				thread.sendData(buffer.array());
+						    				thread.clientInfo.addSentPackageItem(GLOBAL_STATE__.values()[sendState] + "   " + nBalls);
+					    				}
 					    				nBalls = 0;
 					    				buffer.clear();
 					    				
@@ -197,7 +201,10 @@ public class MultiThreds {
 			    				
 			    				//System.out.println(jointAngle);
 			    				//buffer.putFloat(jointAngle);
-			    				thread.sendData(buffer.array());
+			    				if(nBalls != 0) {
+				    				thread.sendData(buffer.array());
+				    				thread.clientInfo.addSentPackageItem(GLOBAL_STATE__.values()[sendState] + "   " + nBalls);
+			    				}
 			
 			    			}
 			    		}
@@ -255,6 +262,7 @@ public class MultiThreds {
 	public void stopClientThreads(){
 		for(int i = 0; i < maxClientCount; i++) {
 			if(threads[i] != null){
+				threads[i].clientInfo.closeWindow();
 				threads[i].closeClientSocket();
 				threads[i].stop();
 				threads[i] = null;

@@ -52,7 +52,6 @@ public class BallHandler {
 	}
 
 	
-	
 	public void removeBallsOutOfBounds() {
 		Enumeration<Integer> enumKey = balls.keys();
 		while( enumKey.hasMoreElements() ) {
