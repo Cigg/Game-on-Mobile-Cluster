@@ -13,6 +13,7 @@ public class ServerCommunication extends Thread {
 	private BallTypesHandler ballTypesHandler;
 	private Target target;
 
+	
 	ServerCommunication(TCPClient stcp, BallHandler ballHandler, Target target ) {
 		this.ballHandler = ballHandler;
 		this.ballTypesHandler = new BallTypesHandler();
@@ -20,33 +21,26 @@ public class ServerCommunication extends Thread {
 		this.target = target;
 		isCommunicating = true;
 	}
-	
 
-	public void setIsCommunicating(final boolean isCommunicating) {
-		this.isCommunicating = isCommunicating;
-	}
-	
 	
 	public void run() {
-		Log.d("ADDBALLS", "RUN");
-		
 		Thread.currentThread().setName("ServerCommunication");
 		
 		while( isCommunicating ) {
 
 			if( tcp != null ) {
-				DataPackage incomingData = tcp.messages.popFront();
+				DataPackage incomingData = tcp.incomingMessages.popFront();
 				
 				if( incomingData != null ) {
 					ByteBuffer buffer = ByteBuffer.wrap(incomingData.getData());
-					short state = buffer.getShort();
+					final short state = buffer.getShort();
 					
 					GLOBAL_STATE__ actualState;
 					
 					try {
 						actualState = GLOBAL_STATE__.values()[state];
 					} catch(Exception e) {
-						actualState = GLOBAL_STATE__.REG; // Do nothing
+						actualState = GLOBAL_STATE__.REG;
 					}
 					
 					switch( actualState ) {
@@ -73,9 +67,9 @@ public class ServerCommunication extends Thread {
 					}
 					
 				} else {
-	    			synchronized( tcp.messages ) {
+	    			synchronized( tcp.incomingMessages ) {
 						try {
-							tcp.messages.wait();
+							tcp.incomingMessages.wait();
 						} catch (InterruptedException e) {
 							e.printStackTrace();
 						}
@@ -85,6 +79,13 @@ public class ServerCommunication extends Thread {
 			
 		}
 	}
+	
+	
+	public void setIsCommunicating(final boolean isCommunicating) {
+		this.isCommunicating = isCommunicating;
+	}
+	
+	
 	
 	private void addMap(DataPackage incomingData) {
 		ByteBuffer buffer = ByteBuffer.wrap(incomingData.getData());

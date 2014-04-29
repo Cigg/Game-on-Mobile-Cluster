@@ -1,110 +1,129 @@
 package com.pussycat.minions;
 
-import java.io.BufferedWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.InetAddress;
 import java.net.Socket;
-import java.nio.ByteBuffer;
 
 import android.util.Log;
 
 public class TCPClient extends Thread {
 	
-	public static final String SERVERIP = "192.168.43.122";
-	public static final int SERVERPORT = 4444;
+	private final String SERVER_IP = "192.168.43.122";
+	private final int SERVER_PORT = 4444;
+	private final int NUMBER_OF_INCOMING_MESSAGES = 64; 
+	
 	private volatile boolean isRunning = false;
+	private OutputStream outputStream;
+	private InputStream inputStream;
+	private Socket socket;
 	
-	OutputStream outputStream;
-	InputStream inputStream;
-	BufferedWriter buffw;
+	public EndlessQueue<DataPackage> incomingMessages = new EndlessQueue<DataPackage>(new DataPackage[NUMBER_OF_INCOMING_MESSAGES]);
 	
-	private final int numberOfMessages = 64; 
-	public EndlessQueue<DataPackage> messages;
-
 	
 	public TCPClient() {
-		messages = new EndlessQueue<DataPackage>(new DataPackage[numberOfMessages]);
-	}
 
+	}
 	
-	public synchronized void sendData(byte[] buffer) {
-		if( buffer.length > 0 ) {	
+	
+	public synchronized void sendData(final byte[] buffer) {
+		if( isValid(buffer) ) {	
 			try {
-				ByteBuffer header = ByteBuffer.allocate(8);
-				header.putInt(buffer.length);
-				header.putFloat(System.nanoTime());
-				
-				if( outputStream != null ) {
-					outputStream.write(header.array());
-					outputStream.write(buffer);
-					outputStream.flush();
-				}
+				Header header = new Header(buffer.length, System.nanoTime());
+				tcpWrite(header.getBuffer(), buffer);	
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
 		}
 	}
+	
+	
+	public static boolean isValid(final byte[] buffer) {
+		return buffer.length > 0;
+	}
+	
+	
+	public void tcpWrite(final byte[] header, final byte[] buffer) throws IOException {
+		if( outputStream != null ) {
+			outputStream.write(header);
+			outputStream.write(buffer);
+			outputStream.flush();
+		}	
+	}
+	
+	
+	public void run() {
+		try {
+			setUpRunningThread();
+			socket = setUpAndGetSocket();
+			setUpStreams(socket);
+				
+			while( isRunning ) {
+				Header header = new Header(inputStream);
+				final float dataPackageReciveTime = System.nanoTime();
 
+				if( header.isValid() ) {
+					DataPackage dataPackageToAdd = getDataPackageToAdd(header, dataPackageReciveTime);
+					addDataPackageToIncomingMessages(dataPackageToAdd);
+		        }
+			}
+		} catch ( Exception e ) {
+			Log.e("Android", "ERROR", e);
+		} finally {
+			cleanUpRunningThread();
+		}
+	}
+			
+	
+	private void setUpRunningThread() {
+		setIsRunning(true);
+		Thread.currentThread().setName("TCPClient");
+	}
+	
 	
 	public void setIsRunning(final boolean isRunning) {
 		this.isRunning = isRunning;
 	}
 	
 	
-	public void run() {
-		isRunning = true;
-		
-		Thread.currentThread().setName("TCPClient");
-		
-		try {
-			InetAddress serverAddress = InetAddress.getByName(SERVERIP);
-			Socket socket = new Socket(serverAddress, SERVERPORT);
-			
-			socket.setTcpNoDelay(true);
-
+	private Socket setUpAndGetSocket() throws IOException {
+		InetAddress serverAddress = InetAddress.getByName(SERVER_IP);
+		Socket socket = new Socket(serverAddress, SERVER_PORT);
+		socket.setTcpNoDelay(true);
+		return socket;
+	}
+	
+	
+	private void setUpStreams(final Socket socket) throws IOException {
+		outputStream = socket.getOutputStream();
+		inputStream = socket.getInputStream();
+	}
+	
+	
+	private DataPackage getDataPackageToAdd(final Header header, final float dataPackageReciveTime) throws IOException {
+		byte[] dataPackageBytes = new byte[header.getDataPackageLength()];
+		inputStream.read(dataPackageBytes);
+		return new DataPackage(dataPackageBytes, socket.getInetAddress().toString(), socket.getPort(), header.getDataPackageSendTime(), dataPackageReciveTime);
+	}
+	
+	
+	private void addDataPackageToIncomingMessages(final DataPackage dataPackageToAdd) {
+		incomingMessages.add(dataPackageToAdd);
+		synchronized( incomingMessages ) {
+			incomingMessages.notify();
+		};
+	}
+	
+	
+	private void cleanUpRunningThread() {
+		setIsRunning(false);
+		if( socket != null ) {
 			try {
-				
-				outputStream = socket.getOutputStream();
-				inputStream = socket.getInputStream();
-				byte[] headerBuffer = new byte[8];
-				
-				while( isRunning ) {
-				
-					inputStream.read(headerBuffer);	
-					final float dataPackageReciveTime = System.nanoTime();
-					
-					ByteBuffer header = ByteBuffer.wrap(headerBuffer);
-					
-					int dataPackageLength = header.getInt();
-				    dataPackageLength = Math.max(0, dataPackageLength);
-				    
-				    final float dataPackageSendTime = header.getFloat();
-
-					if( dataPackageLength > 0 ) {
-						
-						byte[] dataPackageBytes = new byte[dataPackageLength];
-					
-						inputStream.read(dataPackageBytes);
-						DataPackage dataPackageToAdd = new DataPackage(dataPackageBytes, socket.getInetAddress().toString(), socket.getPort(), dataPackageSendTime, dataPackageReciveTime);
-						
-						messages.add(dataPackageToAdd);
-						
-						synchronized( messages ) {
-							messages.notify();
-						};
-			        }
-				}
-				
-			} catch (Exception e) {
-				Log.e("Android", "ERROR", e);
-			} finally {
 				socket.close();
+			} catch (IOException e) {
+				e.printStackTrace();
 			}
-			
-		} catch (Exception e) {
-			Log.e("Android", "ERROR", e);
 		}
 	}
 	

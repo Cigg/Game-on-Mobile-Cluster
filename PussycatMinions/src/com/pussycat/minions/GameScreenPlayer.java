@@ -56,7 +56,7 @@ public class GameScreenPlayer extends Screen {
 	private TCPClient comm;
 	private BallHandler ballHandler;
 
-	// Constructor
+	
     public GameScreenPlayer(Game game) {
         super(game);
 

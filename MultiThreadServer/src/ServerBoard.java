@@ -90,7 +90,7 @@ public class ServerBoard extends JFrame {
 	        //creating and showing this application's GUI.
 	        javax.swing.SwingUtilities.invokeLater(new Runnable() {
 	            public void run() {
-	                ServerBoard serverBoard = new ServerBoard();
+	                new ServerBoard();
 	            }
 	        });
 	    }

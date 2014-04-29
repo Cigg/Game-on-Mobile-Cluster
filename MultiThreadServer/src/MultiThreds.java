@@ -113,9 +113,10 @@ public class MultiThreds {
 			    				
 			    				short sendState = (short) GLOBAL_STATE__.ADD_BALLS.ordinal();
 			    				buffer.putShort(sendState);	// State: Add balls
-			    				buffer.putShort((short) 0);										// nBalls, byte 2 och 3
-			    				
 			    				short nBalls = 0;
+			    				buffer.putShort(nBalls);										// nBalls, byte 2 och 3
+			    				
+			    				
 			    				
 			    				for(ClientThread.Ballz ball : thread.ballz) {
 			    			

@@ -12,12 +12,10 @@ import javax.swing.ScrollPaneConstants;
 
 public class ClientInfo {
 
-	JFrame clientInfo;
+	JFrame winClientInfo;
 	JPanel pnlIncomingPackages;
 	JPanel pnlSentPackages;
-	JScrollPane scrollPaneIncomingPackages;
-	JScrollPane scrollPaneSentPackages;
-	
+
 	final String ip;
 	
 	
@@ -26,12 +24,12 @@ public class ClientInfo {
 	}
 
 	public void createWindow() {
-		clientInfo = new JFrame();
-		clientInfo.setTitle("Device: " + ip);
-		clientInfo.setVisible(true);
-		clientInfo.setSize(800,400);
-		clientInfo.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		clientInfo.getContentPane().setLayout(new BoxLayout(clientInfo.getContentPane(), BoxLayout.Y_AXIS));
+		winClientInfo = new JFrame();
+		winClientInfo.setTitle("Device: " + ip);
+		winClientInfo.setVisible(true);
+		winClientInfo.setSize(800,400);
+		winClientInfo.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		winClientInfo.getContentPane().setLayout(new BoxLayout(winClientInfo.getContentPane(), BoxLayout.Y_AXIS));
 		
 		JPanel panel = new JPanel();
 		panel.setLayout(new BorderLayout(0, 0));
@@ -45,7 +43,7 @@ public class ClientInfo {
 		
 		JLabel lblState = new JLabel("State:");
 		pnlInfo.add(lblState);
-		clientInfo.getContentPane().add(panel);
+		winClientInfo.getContentPane().add(panel);
 		
 		JPanel pnlPackagesWrapper = new JPanel();
 		panel.add(pnlPackagesWrapper, BorderLayout.CENTER);
@@ -53,7 +51,7 @@ public class ClientInfo {
 		
 		pnlIncomingPackages = new JPanel();
 		
-		scrollPaneIncomingPackages = new JScrollPane(pnlIncomingPackages);
+		JScrollPane scrollPaneIncomingPackages = new JScrollPane(pnlIncomingPackages);
 		scrollPaneIncomingPackages.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
 		
 		
@@ -66,7 +64,7 @@ public class ClientInfo {
 		
 		pnlSentPackages = new JPanel();
 		
-		scrollPaneSentPackages = new JScrollPane(pnlSentPackages);
+		JScrollPane scrollPaneSentPackages = new JScrollPane(pnlSentPackages);
 		scrollPaneSentPackages.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
 		
 		
@@ -80,16 +78,16 @@ public class ClientInfo {
 	
 	public void addIncomingPackageItem(final String item) {
 		pnlIncomingPackages.add(new JLabel(item), 1);
-		clientInfo.revalidate();
+		winClientInfo.revalidate();
 	}
 	
 	public void addSentPackageItem(final String item) {
 		pnlSentPackages.add(new JLabel(item), 1);
-		clientInfo.revalidate();
+		winClientInfo.revalidate();
 	}
 	
 	public void closeWindow() {
-		clientInfo.setVisible(false);
-		clientInfo.dispose();
+		winClientInfo.setVisible(false);
+		winClientInfo.dispose();
 	}
 }

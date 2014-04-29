@@ -7,28 +7,10 @@ import java.nio.ByteBuffer;
 import java.util.Hashtable;
 import java.util.concurrent.LinkedBlockingQueue;
 
-import javax.swing.BoxLayout;
-import javax.swing.JFrame;
-import javax.swing.JPanel;
-import javax.swing.JTextField;
 
 import org.jbox2d.common.Vec2;
 import org.jbox2d.dynamics.joints.RevoluteJoint;
-import javax.swing.JScrollPane;
-import javax.swing.JSplitPane;
-import javax.swing.JTextPane;
-import javax.swing.JLabel;
 
-import java.awt.Dimension;
-import java.awt.GridLayout;
-import java.awt.Component;
-import java.awt.BorderLayout;
-import java.awt.FlowLayout;
-import java.awt.GridBagLayout;
-import java.awt.GridBagConstraints;
-import java.awt.Insets;
-import javax.swing.ScrollPaneConstants;
-import java.awt.Color;
 
 /**
  * One clientThread for one device. Adds and sends balls the balls.
@@ -41,7 +23,7 @@ public class ClientThread extends Thread {
 	private Socket clientSocket = null;
 	private final ClientThread[] threads;
 	private int maxClientCount;
-	private boolean running = false;
+	private boolean isRunning = false;
 
 	private float posX = 0;
 	private float posY = 0;
@@ -269,7 +251,7 @@ public class ClientThread extends Thread {
 	 * Starts the thread and reads new data from device
 	 */
 	public void run() {
-		running = true;
+		isRunning = true;
 		int maxClientsCount = this.maxClientCount;
 		thread = this.threads;
 
@@ -277,11 +259,9 @@ public class ClientThread extends Thread {
 			dout = clientSocket.getOutputStream();
 			clientSocket.setTcpNoDelay(true);
 
-			while (running) {
+			while( isRunning ) {
 
-				// Onödig loop?
-				for (int i = 0; i < maxClientsCount; i++) {
-					if (thread[i] != null && thread[i] == this && !clientSocket.isClosed()) {
+					if (!clientSocket.isClosed()) {
 
 						byte[] headerBuffer = new byte[8];
 						
@@ -301,7 +281,6 @@ public class ClientThread extends Thread {
 							clientSocket.getInputStream().read(bytes);
 							ByteBuffer buffer = ByteBuffer.wrap(bytes);
 
-							System.out.println("In thread: " + i);
 							short state = buffer.getShort();
 							GLOBAL_STATE__ actualState;
 
@@ -313,22 +292,18 @@ public class ClientThread extends Thread {
 
 							String ip = clientSocket.getInetAddress()
 									.toString();
-							
-				
-							
+
 							
 							switch (actualState) {
 
 							case SYNCHRONIZE_DEVICE: {
 								clientInfo.addIncomingPackageItem(actualState.name() + "   " + reciveTime + "   " + sendTime);
 								
-								ByteBuffer sendBuffer = ByteBuffer
-										.allocate(1 * 2 + 2 * 4);
+								ByteBuffer sendBuffer = ByteBuffer.allocate(1 * 2 + 2 * 4);
 								sendBuffer.clear();
 
 								final short sendState = (short) GLOBAL_STATE__.SYNCHRONIZE_DEVICE.ordinal();
-								sendBuffer.putShort(sendState); // State:
-																// SYNCHRONZE_DEVICE
+								sendBuffer.putShort(sendState); // State: SYNCHRONZE_DEVICE
 
 								float delta1 = reciveTime - sendTime;
 								System.out.println("delta1 = " + delta1);
@@ -339,11 +314,7 @@ public class ClientThread extends Thread {
 								
 								clientInfo.addSentPackageItem(GLOBAL_STATE__.values()[sendState] + "   " + sendTime + "   " + reciveTime);
 								
-								System.out.println("CLOCK === "
-										+ System.nanoTime() * Math.pow(10, -9));
-								
-								
-								
+								System.out.println("CLOCK === " + System.nanoTime() * Math.pow(10, -9));
 							}
 								break;
 
@@ -355,8 +326,7 @@ public class ClientThread extends Thread {
 								int deviceResY = buffer.getInt();
 
 								// TODO: Add type of device.
-								deviceManager.addDevice(ip, type, xDPI, yDPI,
-										deviceResX, deviceResY);
+								deviceManager.addDevice(ip, type, xDPI, yDPI, deviceResX, deviceResY);
 								
 								clientInfo.addIncomingPackageItem(actualState.name() + "   " + type + "   " + xDPI + "   " + yDPI + "   " + deviceResX + "   " + deviceResY);
 							}
@@ -376,14 +346,9 @@ public class ClientThread extends Thread {
 									float t1 = buffer.getFloat();
 									
 									clientInfo.addIncomingPackageItem(actualState.name() + "   STEP2   " + x11 + "   " + y11 + "   " + x22 + "   " + y22 + "   " + t1);
-									
-									System.out.println("STEP2: " + ip + ", "
-											+ x11 + ", " + y11 + ", " + x22
-											+ ", " + y22 + ", " + t1 + ", "
-											+ deltaTime);
+									System.out.println("STEP2: " + ip + ", " + x11 + ", " + y11 + ", " + x22 + ", " + y22 + ", " + t1 + ", " + deltaTime);
 
-									deviceManager.devicePointMappingStep2(ip,
-											x11, y11, x22, y22, t1, deltaTime);
+									deviceManager.devicePointMappingStep2(ip, x11, y11, x22, y22, t1, deltaTime);
 
 									time1 = time2; // För multirow
 									System.out.println("MAPPING_STEP2 DONE");
@@ -395,8 +360,7 @@ public class ClientThread extends Thread {
 									float posX = deviceManager.getPosX(ip);
 									float posY = deviceManager.getPosY(ip);
 
-									ByteBuffer sendBuffer = ByteBuffer
-											.allocate(1 * 2 + 5 * 4);
+									ByteBuffer sendBuffer = ByteBuffer.allocate(1 * 2 + 5 * 4);
 									sendBuffer.clear();
 
 									// Send response - for drawing background
@@ -406,25 +370,16 @@ public class ClientThread extends Thread {
 									float l_midX = deviceManager.getMidX(ip);
 									float l_midY = deviceManager.getMidY(ip);
 
-									float g_midX = deviceManager
-											.localToGlobalX(ip, l_midX, l_midY);
-									float g_midY = deviceManager
-											.localToGlobalY(ip, l_midX, l_midY);
+									float g_midX = deviceManager.localToGlobalX(ip, l_midX, l_midY);
+									float g_midY = deviceManager.localToGlobalY(ip, l_midX, l_midY);
 
-									String ipOfMiddle = deviceManager
-											.getMiddleIp();
+									String ipOfMiddle = deviceManager.getMiddleIp();
 
-									float l_main_midX = deviceManager
-											.getMidX(ipOfMiddle);
-									float l_main_midY = deviceManager
-											.getMidY(ipOfMiddle);
+									float l_main_midX = deviceManager.getMidX(ipOfMiddle);
+									float l_main_midY = deviceManager.getMidY(ipOfMiddle);
 
-									float g_main_midX = deviceManager
-											.localToGlobalX(ipOfMiddle,
-													l_main_midX, l_main_midY);
-									float g_main_midY = deviceManager
-											.localToGlobalY(ipOfMiddle,
-													l_main_midX, l_main_midY);
+									float g_main_midX = deviceManager.localToGlobalX(ipOfMiddle, l_main_midX, l_main_midY);
+									float g_main_midY = deviceManager.localToGlobalY(ipOfMiddle, l_main_midX, l_main_midY);
 									
 									
 									targetJoint = MultiThreds.getPhysicsWorld().addTarget(g_main_midX, g_main_midY, 0.8f);
@@ -450,38 +405,24 @@ public class ClientThread extends Thread {
 									float t = buffer.getFloat();
 
 									clientInfo.addIncomingPackageItem(actualState.name() + "   STEP1   " + x1 + "   " + y1 + "   " + x2 + "   " + y2 + "   " + t);
-									
-									System.out.println("STEP1: " + ip + ", "
-											+ x1 + ", " + y1 + ", " + x2 + ", "
-											+ y2 + ", " + t);
+									System.out.println("STEP1: " + ip + ", " + x1 + ", " + y1 + ", " + x2 + ", " + y2 + ", " + t);
 
-									deviceManager.devicePointMappingStep1(ip,
-											x1, y1, x2, y2, t);
+									deviceManager.devicePointMappingStep1(ip, x1, y1, x2, y2, t);
 									
 									System.out.println("MAPPING_STEP1 DONE");
 									float l_midX = deviceManager.getMidX(ip);
 									float l_midY = deviceManager.getMidY(ip);
 
-									float g_midX = deviceManager
-											.localToGlobalX(ip, l_midX, l_midY);
-									float g_midY = deviceManager
-											.localToGlobalY(ip, l_midX, l_midY);
+									float g_midX = deviceManager.localToGlobalX(ip, l_midX, l_midY);
+									float g_midY = deviceManager.localToGlobalY(ip, l_midX, l_midY);
 
-									String ipOfMiddle = deviceManager
-											.getMiddleIp();
+									String ipOfMiddle = deviceManager.getMiddleIp();
 
-									float l_main_midX = deviceManager
-											.getMidX(ipOfMiddle);
-									float l_main_midY = deviceManager
-											.getMidY(ipOfMiddle);
+									float l_main_midX = deviceManager.getMidX(ipOfMiddle);
+									float l_main_midY = deviceManager.getMidY(ipOfMiddle);
 
-									float g_main_midX = deviceManager
-											.localToGlobalX(ipOfMiddle,
-													l_main_midX, l_main_midY);
-									float g_main_midY = deviceManager
-											.localToGlobalY(ipOfMiddle,
-													l_main_midX, l_main_midY);
-									
+									float g_main_midX = deviceManager.localToGlobalX(ipOfMiddle, l_main_midX, l_main_midY);
+									float g_main_midY = deviceManager.localToGlobalY(ipOfMiddle, l_main_midX, l_main_midY);
 
 									targetJoint = MultiThreds.getPhysicsWorld().addTarget(g_main_midX, g_main_midY, 0.8f);
 
@@ -490,8 +431,7 @@ public class ClientThread extends Thread {
 								break;
 
 							case RUN_DEVICE: {
-								System.out.println("RUN DEVICE: "
-										+ System.nanoTime() * Math.pow(10, -9));
+								System.out.println("RUN DEVICE: " + System.nanoTime() * Math.pow(10, -9));
 								float x1 = buffer.getFloat();
 								float y1 = buffer.getFloat();
 								float x2 = buffer.getFloat();
@@ -500,23 +440,16 @@ public class ClientThread extends Thread {
 
 								clientInfo.addIncomingPackageItem(actualState.name() + "   " + x1 + "   " + y1 + "   " + x2 + "   " + y2 + "   " + t);
 								
-								
-								float xVel = deviceManager.computeVelocityX(ip,
-										x1, y1, x2, y2, t);
-								float yVel = deviceManager.computeVelocityY(ip,
-										x1, y1, x2, y2, t);
+								float xVel = deviceManager.computeVelocityX(ip, x1, y1, x2, y2, t);
+								float yVel = deviceManager.computeVelocityY(ip, x1, y1, x2, y2, t);
 
-								float xG = deviceManager.localToGlobalX(ip, x2,
-										y2);
-								float yG = deviceManager.localToGlobalY(ip, x2,
-										y2);
+								float xG = deviceManager.localToGlobalX(ip, x2, y2);
+								float yG = deviceManager.localToGlobalY(ip, x2, y2);
 
 								float timeStep = System.nanoTime() - sendTime;
 
-								xG = (float) (xG + xVel * timeStep
-										* Math.pow(10, -9));
-								yG = (float) (yG + yVel * timeStep
-										* Math.pow(10, -9));
+								xG = (float) (xG + xVel * timeStep * Math.pow(10, -9));
+								yG = (float) (yG + yVel * timeStep * Math.pow(10, -9));
 
 								ballCount++;
 								// MultiThreds.sharedVariables.getInstance().incrementBallCounter();
@@ -544,12 +477,10 @@ public class ClientThread extends Thread {
 								
 								clientInfo.addIncomingPackageItem(actualState.name() + "   " + newState);
 								
-								System.out.println("@ SERVER: SET STATE: "
-										+ newState);
+								System.out.println("@ SERVER: SET STATE: " + newState);
 
 								try {
-									GLOBAL_STATE__ toState = GLOBAL_STATE__
-											.values()[newState];
+									GLOBAL_STATE__ toState = GLOBAL_STATE__.values()[newState];
 
 									switch (toState) {
 									case MAP_MAIN: {
@@ -561,8 +492,7 @@ public class ClientThread extends Thread {
 									}
 								} catch (Exception e) {
 									// Do nothing
-									System.out.println("ERROR: Invalid state: "
-											+ newState);
+									System.out.println("ERROR: Invalid state: " + newState);
 								}
 							}
 								break;
@@ -576,7 +506,6 @@ public class ClientThread extends Thread {
 						}
 
 					}
-				}
 			}
 			clientSocket.close();
 		} catch (Exception e) {
