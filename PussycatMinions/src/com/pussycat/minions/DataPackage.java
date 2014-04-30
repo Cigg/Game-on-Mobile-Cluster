@@ -1,5 +1,6 @@
 package com.pussycat.minions;
 
+
 public class DataPackage {
 	
 	private final byte[] data;
