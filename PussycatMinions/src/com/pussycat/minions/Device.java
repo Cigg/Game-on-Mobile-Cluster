@@ -280,9 +280,9 @@ public class Device {
 			
 			Log.d("TILE6", "oooooooo NEW MAP ooooooooo");
 			
-			ArrayList<IndexPair> indexes = new ArrayList<IndexPair>();
+			ArrayList<IndexPair> indexes = new ArrayList<IndexPair>();	
 			
-			// TODO: FIX BUG WHEN no corner of an actual tile is inside the rectangle
+			
 			int counter = 0;
 			for(int rad=0; rad<nRader; rad++) {
 				String line = "";
