@@ -79,6 +79,7 @@ public class Device {
 		
 		l_half = (int) Math.ceil( (Math.sqrt( Math.pow(screenWidth * bg.ppix / xdpi, 2) + Math.pow(screenHeight * bg.ppiy / ydpi, 2)) / 2) );
 		l_side = 2 * l_half;
+		
 		backgroundTiled = Bitmap.createBitmap(l_side,  l_side, Bitmap.Config.ARGB_8888);
 		backgroundFinal = Bitmap.createBitmap(screenWidth,  screenHeight, Bitmap.Config.ARGB_8888);
 		backgroundCanvas = new Canvas(backgroundTiled);
@@ -107,9 +108,16 @@ public class Device {
 	}
 	
 	
+	static int insider = 0;
 	public boolean pointIsInsideRectangle(final float x, final float y, final int halfx, final int halfy) {
-		return   -halfx <= x  &&  x <= halfx	 && 
-				 -halfy <= y  &&  y <= halfy	;
+		boolean inside = -halfx <= x  &&  x <= halfx	 && 
+						 -halfy <= y  &&  y <= halfy	;
+		
+		if(inside) {
+			insider++;
+			Log.d("LINE", "INSIDE: " + insider);
+		}
+		return inside;
 	}
 	
 	public class IndexPair {
@@ -268,6 +276,7 @@ public class Device {
 			
 			final int halfx = (int) ((screenWidth / 2) * (bg.ppix / xdpi));
 			final int halfy = (int) ((screenHeight / 2) * (bg.ppiy / ydpi));
+			final Rectangle rect = new Rectangle(halfx, halfy);
 			
 			Log.d("TILE6", "oooooooo NEW MAP ooooooooo");
 			
@@ -311,10 +320,15 @@ public class Device {
 					float lowerLeftCornerYRotated = rotateY(lowerLeftCornerXTranslated, lowerLeftCornerYTranslated, radiansToDegrees(angle)); 
 					float lowerRightCornerYRotated = rotateY(lowerRightCornerXTranslated, lowerRightCornerYTranslated, radiansToDegrees(angle));
 					
-					if( pointIsInsideRectangle(upperLeftCornerXRotated, upperLeftCornerYRotated, halfx, halfy) 		||
+					
+					if(	pointIsInsideRectangle(upperLeftCornerXRotated, upperLeftCornerYRotated, halfx, halfy) 		||
 						pointIsInsideRectangle(upperRightCornerXRotated, upperRightCornerYRotated, halfx, halfy) 	||
 						pointIsInsideRectangle(lowerLeftCornerXRotated, lowerLeftCornerYRotated, halfx, halfy) 		||
-						pointIsInsideRectangle(lowerRightCornerXRotated, lowerRightCornerYRotated, halfx, halfy) 			) {
+						pointIsInsideRectangle(lowerRightCornerXRotated, lowerRightCornerYRotated, halfx, halfy) 	||
+						LineIntersectsRect(new Point(upperLeftCornerXRotated, upperLeftCornerYRotated), new Point(upperRightCornerXRotated, upperRightCornerYRotated), rect) ||
+						LineIntersectsRect(new Point(upperRightCornerXRotated, upperRightCornerYRotated), new Point(lowerRightCornerXRotated, lowerRightCornerYRotated), rect) ||
+						LineIntersectsRect(new Point(lowerRightCornerXRotated, lowerRightCornerYRotated), new Point(lowerLeftCornerXRotated, lowerLeftCornerYRotated), rect) ||
+						LineIntersectsRect(new Point(lowerLeftCornerXRotated, lowerLeftCornerYRotated), new Point(upperLeftCornerXRotated, upperLeftCornerYRotated), rect)) {
 						
 						indexes.add(new IndexPair(rad, kolumn));
 						
@@ -323,11 +337,12 @@ public class Device {
 					} else {
 						line = line + "-";
 					}
+					
+					
 	
 				}
 				Log.d("TILE6", line);
 			}
-			
 			Log.d("TILE6", "Counter = " + counter);
 			
 			backgroundCanvas.drawColor(Color.WHITE);
@@ -423,6 +438,75 @@ public class Device {
 		}
 		
 	}
+
+	
+	private class Rectangle {
+		
+		private final Point upperLeft;
+		private final Point upperRight;
+		private final Point lowerRight;
+		private final Point lowerLeft;
+		
+		private Rectangle(final float halfx, final float halfy) {
+			upperRight = new Point(halfx, -halfy);
+			lowerRight =  new Point(halfx, halfy);
+			
+			upperLeft = new Point(-halfx, -halfy);
+			lowerLeft =  new Point(-halfx, halfy);
+		}
+	}
+	
+	
+	private class Point {
+		
+		final float x;
+		final float y;
+		
+		private Point(final float x, final float y) {
+			this.x = x;
+			this.y = y;
+		}
+	}
+	
+	private static int intersections = 0;
+	private boolean LineIntersectsRect(Point p1, Point p2, final Rectangle rect)
+    {
+        boolean intersect =
+               LineIntersectsLine(p1, p2, rect.upperRight, rect.lowerRight) ||
+               LineIntersectsLine(p1, p2, rect.lowerRight, rect.lowerLeft) ||
+               LineIntersectsLine(p1, p2, rect.lowerLeft, rect.upperLeft) ||
+               LineIntersectsLine(p1, p2, rect.upperLeft, rect.upperRight);
+        
+        if(intersect) {
+        	intersections++;
+        	 Log.d("LINE", "LineIntersectsLine: " + intersections);
+        }
+       
+        return intersect;
+    }
+	  
+	private boolean LineIntersectsLine(Point l1p1, Point l1p2, Point l2p1, Point l2p2)
+    {
+        float q = (l1p1.y - l2p1.y) * (l2p2.x - l2p1.x) - (l1p1.x - l2p1.x) * (l2p2.y - l2p1.y);
+        float d = (l1p2.x - l1p1.x) * (l2p2.y - l2p1.y) - (l1p2.y - l1p1.y) * (l2p2.x - l2p1.x);
+
+        if( d == 0 )
+        {
+            return false;
+        }
+
+        float r = q / d;
+
+        q = (l1p1.y - l2p1.y) * (l1p2.x - l1p1.x) - (l1p1.x - l2p1.x) * (l1p2.y - l1p1.y);
+        float s = q / d;
+
+        if( r < 0 || r > 1 || s < 0 || s > 1 )
+        {
+            return false;
+        }
+
+        return true;
+    }
 	
 	
 
