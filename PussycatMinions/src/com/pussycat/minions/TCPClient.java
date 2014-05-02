@@ -58,14 +58,12 @@ public class TCPClient extends Thread {
 			setUpRunningThread();
 			socket = setUpAndGetSocket();
 			setUpStreams(socket);
-				
+			
 			while( isRunning ) {
 				Header header = new Header(inputStream);
-				final float dataPackageReciveTime = System.nanoTime();
-
 				if( header.isValid() ) {
-					DataPackage dataPackageToAdd = getDataPackageToAdd(header, dataPackageReciveTime);
-					addDataPackageToIncomingMessages(dataPackageToAdd);
+					DataPackage dataPackageToAdd = readDataPackage(header);
+					addIncomingMessage(dataPackageToAdd);
 		        }
 			}
 		} catch ( Exception e ) {
@@ -101,14 +99,14 @@ public class TCPClient extends Thread {
 	}
 	
 	
-	private DataPackage getDataPackageToAdd(final Header header, final float dataPackageReciveTime) throws IOException {
+	private DataPackage readDataPackage(final Header header) throws IOException {
 		byte[] dataPackageBytes = new byte[header.getDataPackageLength()];
 		inputStream.read(dataPackageBytes);
-		return new DataPackage(dataPackageBytes, socket.getInetAddress().toString(), socket.getPort(), header.getDataPackageSendTime(), dataPackageReciveTime);
+		return new DataPackage(dataPackageBytes, socket.getInetAddress().toString(), socket.getPort(), header.getDataPackageSendTime(), header.getDataPackageReciveTime());
 	}
 	
 	
-	private void addDataPackageToIncomingMessages(final DataPackage dataPackageToAdd) {
+	private void addIncomingMessage(final DataPackage dataPackageToAdd) {
 		incomingMessages.add(dataPackageToAdd);
 		synchronized( incomingMessages ) {
 			incomingMessages.notify();
