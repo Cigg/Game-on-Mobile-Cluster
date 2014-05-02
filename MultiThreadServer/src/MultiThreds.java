@@ -97,7 +97,7 @@ public class MultiThreds {
 		    				}
 		    			}
 		    			
-			    		// Send ballz
+			    		// Send info to device
 			    		for(ClientThread thread : threads) {
 			    			if (thread != null) {
 			    				
@@ -115,9 +115,13 @@ public class MultiThreds {
 			    				buffer.putShort(sendState);	// State: Add balls
 			    				short nBalls = 0;
 			    				buffer.putShort(nBalls);										// nBalls, byte 2 och 3
+
+			    				// Send angle of middle target
+			    				//System.out.println("angle: " + jointAngle);
+			    				buffer.putFloat(jointAngle);
 			    				
 			    				
-			    				
+			    				// Send balls pos and vel
 			    				for(Ball ball : thread.balls) {
 			    			
 			    					if(buffer.limit() - buffer.position() >= 5*4) {
@@ -200,8 +204,6 @@ public class MultiThreds {
 			    				buffer.position(2);
 			    				buffer.putShort(nBalls);
 			    				
-			    				//System.out.println(jointAngle);
-			    				//buffer.putFloat(jointAngle);
 			    				if(nBalls != 0) {
 				    				thread.sendData(buffer.array());
 				    				thread.clientInfo.addSentPackageItem(GLOBAL_STATE__.values()[sendState] + "   " + nBalls);

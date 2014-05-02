@@ -10,13 +10,11 @@ public class ServerCommunication extends Thread {
 	private volatile boolean isCommunicating;
 	private TCPClient tcp;
 	private BallHandler ballHandler;
-	private BallTypesHandler ballTypesHandler;
 	private Target target;
 
 	
 	ServerCommunication(TCPClient stcp, BallHandler ballHandler, Target target ) {
 		this.ballHandler = ballHandler;
-		this.ballTypesHandler = new BallTypesHandler();
 		this.tcp = stcp;
 		this.target = target;
 		isCommunicating = true;
@@ -137,6 +135,11 @@ public class ServerCommunication extends Thread {
 		
 		final short nBalls = buffer.getShort();
 		
+		if(target != null) {
+			float targetAngle = buffer.getFloat();
+			target.setRadAngle(targetAngle);
+		}
+		
 		for(int i=0; i<nBalls; i++) {
 			int id = buffer.getInt();
 			float x = buffer.getFloat();
@@ -150,12 +153,6 @@ public class ServerCommunication extends Thread {
 			//SharedVariables.getInstance().setMiddleAngle(middleAngle);
 
 		}
-		
-		
-//		if(target != null) {
-//			float targetAngle = buffer.getFloat();
-//			target.setRadAngle(targetAngle);
-//		}
 	}
 
 

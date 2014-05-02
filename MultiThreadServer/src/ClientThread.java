@@ -42,7 +42,7 @@ public class ClientThread extends Thread {
 	private DeviceManager deviceManager;
 	private OutputStream dout;
 
-	public volatile static LinkedBlockingQueue<Ball> balls = new LinkedBlockingQueue<Ball>();
+	public volatile LinkedBlockingQueue<Ball> balls = new LinkedBlockingQueue<Ball>();
 
 	Hashtable<Integer, Ball> ownBallz = new Hashtable<Integer, Ball>();
 

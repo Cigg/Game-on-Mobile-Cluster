@@ -50,7 +50,7 @@ private class Vertex {
 	private float originX;
 	private float originY;
 	
-	public volatile static ArrayList<PhysicsBody> bodies = new ArrayList<PhysicsBody>();
+	public volatile ArrayList<PhysicsBody> bodies = new ArrayList<PhysicsBody>();
 
 	private World world;
 	
@@ -68,7 +68,7 @@ private class Vertex {
 		// Create Shape with Properties
 		CircleShape circleShape = new CircleShape();
 
-		// Two centimeters
+		// 1.5 centimeters
 		circleShape.m_radius = 0.0075f*39.37f;
 
 		// MultiThreds.getPhysicsWorld().addBall(xPos, yPos, xVel, yVel, id,
@@ -110,7 +110,7 @@ private class Vertex {
 		//loadVertices();
 		//calculateNormals();
 		
-		//---------- DEFENITION OF VERTECIES FROM FILE ---------
+		//---------- DEFINITION OF VERTICES FROM FILE ---------
 		for(int i=0; i < polygons.size(); i++){
 			Polygon polygon = polygons.get(i);
 			polyDef.m_vertexCount = polygon.vertices.size();
@@ -185,7 +185,7 @@ private class Vertex {
 
 	public void update(float deltaTime) {
 		// Update Physics World
-		world.step(deltaTime, 128, 128); // vilka v�rden b�r de 2 sista
+		world.step(deltaTime, 8, 3); // vilka v�rden b�r de 2 sista
 											// parametrarna ha?
 	}
 

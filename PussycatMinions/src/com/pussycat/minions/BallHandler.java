@@ -63,7 +63,7 @@ public class BallHandler {
 
 	
 	private void removeIfOutOfBounds(Ball ball) {
-		if( isOutOfBounds(ball.x, ball.y, ball.getRadius()) ) {
+		if( isOutOfBounds(ball.posX, ball.posX, ball.getRadius()) ) {
 	    	balls.remove(ball.id);
 	    }
 	}

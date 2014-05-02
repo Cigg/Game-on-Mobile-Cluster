@@ -29,11 +29,12 @@ public class Target {
 	}
 	
 	public float getX() {
-		return (float) (centerX - scale*(image.getWidth()*Math.cos(radAngle) + image.getHeight()*Math.sin(radAngle))/2);
+		//Log.d("Debug Pussycat", "target Pos: " + (float) (centerX - scale*(image.getWidth()*Math.cos(radAngle) + image.getHeight()*Math.sin(radAngle))/2) + ", " + (float) (centerY - scale*(image.getHeight()*Math.cos(radAngle) + image.getWidth()*Math.sin(radAngle))/2));
+		return (float) (centerX - scale*(image.getWidth()*Math.abs(Math.cos(radAngle)) + image.getHeight()*Math.abs(Math.sin(radAngle)))/2);
 	}
 
 	public float getY() {
-		return (float) (centerY - scale*(image.getHeight()*Math.cos(radAngle) + image.getWidth()*Math.sin(radAngle))/2);
+		return (float) (centerY - scale*(image.getHeight()*Math.abs(Math.cos(radAngle)) + image.getWidth()*Math.abs(Math.sin(radAngle)))/2);
 	}
 	
 	public float getImageWidth() {
@@ -57,6 +58,7 @@ public class Target {
 	}
 	
 	public void setRadAngle(float radAngle){
+		Log.d("Debug Pussycat", "targetAngle: " + radAngle);
 		this.radAngle = radAngle;
 	}
 }
