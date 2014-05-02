@@ -757,6 +757,9 @@ public class GameScreenMiddle extends Screen {
     
     private void drawTarget() {
         Graphics g = game.getGraphics();
+        //Log.d("Debug Pussycat", "drawTarget");
+        //Log.d("Debug Pussycat", "targetWidth: " + (int)middleTarget.getPixelWidth());
+        //Log.d("Debug Pussycat", "srcWidth: " + (int)middleTarget.getImageWidth());
         
         g.drawScaledImage(middleTarget.getImage(), (int)middleTarget.getX(), (int)middleTarget.getY(), (int)middleTarget.getPixelWidth(), (int)middleTarget.getPixelHeight(), 0, 0, (int)middleTarget.getImageWidth(), (int)middleTarget.getImageHeight(), middleTarget.getRadAngle());
     }
