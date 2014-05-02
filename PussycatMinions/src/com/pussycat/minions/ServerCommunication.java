@@ -151,14 +151,11 @@ public class ServerCommunication extends Thread {
 
 		}
 		
-		/*
-		if(target != null) {
-			target.setAngle(middleAngle);
-		}
 		
-		float targetAngle = buffer.getFloat();
-		target.setRadAngle(targetAngle);
-		*/
+//		if(target != null) {
+//			float targetAngle = buffer.getFloat();
+//			target.setRadAngle(targetAngle);
+//		}
 	}
 
 

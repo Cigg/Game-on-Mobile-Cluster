@@ -72,10 +72,10 @@ public class MultiThreds {
 		    		serverGraphics.update();
 	    			// Update ballz	
 		    		if(threads[0] != null) {
-		    			for(ClientThread.Ballz ball : threads[0].ballz) {
+		    			for(Ball ball : threads[0].balls) {
 		    				ball.update(timeDelta);
 		    				if(ball.isDead()) {
-		    					threads[0].ballz.remove(ball);
+		    					threads[0].balls.remove(ball);
 		    				}
 		    			}		
 
@@ -118,7 +118,7 @@ public class MultiThreds {
 			    				
 			    				
 			    				
-			    				for(ClientThread.Ballz ball : thread.ballz) {
+			    				for(Ball ball : thread.balls) {
 			    			
 			    					if(buffer.limit() - buffer.position() >= 5*4) {
 			    						
@@ -139,7 +139,7 @@ public class MultiThreds {
 						    				
 					    					if( thread.ownBallz.containsKey(ball.id) ) {
 					    						
-					    						ClientThread.Ballz ball2 = thread.ownBallz.get(ball.id);
+					    						Ball ball2 = thread.ownBallz.get(ball.id);
 					    					
 					    						//System.out.println("OOOOOOOOOOOOOOOOOOO___SAMMMME___OOOOOOOOOOOOOOOOOOO");
 					    						
