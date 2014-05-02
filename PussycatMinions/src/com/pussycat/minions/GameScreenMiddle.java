@@ -377,10 +377,14 @@ public class GameScreenMiddle extends Screen {
             		state = GameState.Running;
             		
             	} else if (restartButton.inBounds(event.x, event.y)){
+            		// TODO: Send message to clear the server. Reset scores not devices.
             		
             	} else if (remapButton.inBounds(event.x, event.y)){
+            		// TODO: Send message to the server that it should be
+            		// prepared to remap a device.
             		
             	} else if (addButton.inBounds(event.x, event.y)){
+            		// TODO: Add a device. The server should be prepared to recieve info and map the device.
             		
             	} else if (exitButton.inBounds(event.x, event.y)){
             		//finish();
