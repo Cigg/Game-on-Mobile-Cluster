@@ -4,6 +4,7 @@ package com.pussycat.minions;
 import java.nio.ByteBuffer;
 import java.util.List;
 
+import android.app.Activity;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
@@ -77,8 +78,8 @@ public class GameScreenMiddle extends Screen {
 		
 		int width = PussycatMinions.getScreenWidth()/2 - Assets.button.getWidth()/2;
 		
-		menuButton = new Button(Assets.button, Assets.button_pressed, PussycatMinions.getScreenWidth() - 200, PussycatMinions.getScreenHeight()-70, paint);
-        menuButton.setText("MENU");
+		menuButton = new Button(Assets.settings, Assets.settings_pressed, PussycatMinions.getScreenWidth() - Assets.settings.getWidth() - 30, PussycatMinions.getScreenHeight()-Assets.settings.getHeight() - 30, paint);
+        //menuButton.setText("MENU");
         resumeButton = new Button(Assets.button, Assets.button_pressed, width, PussycatMinions.getScreenHeight()/2-100, paint);
         resumeButton.setText("RESUME");
         restartButton = new Button(Assets.button, Assets.button_pressed, width, PussycatMinions.getScreenHeight()/2, paint);
@@ -103,17 +104,22 @@ public class GameScreenMiddle extends Screen {
 		t4.start();
 		
     }
-
+    
+    public void eventTouched(GameState state, TouchEvent event) {
+    	
+    }
+    
     @Override
     public void update(float deltaTime) {
         List<TouchEvent> touchEvents = game.getInput().getTouchEvents();
-        
+        int len = touchEvents.size();
+		
         if (state == GameState.Running) {
             updateRunning(touchEvents, deltaTime);
         } else if (state == GameState.Ready) {
             updateReady(touchEvents);
     	} else if (state == GameState.Paused) {
-            updatePaused(touchEvents);
+    		updatePaused(touchEvents);
 		} else if (state == GameState.GameOver) {
             updateGameOver(touchEvents);
 		}
@@ -147,9 +153,8 @@ public class GameScreenMiddle extends Screen {
         	currentX = event.x;
     		currentY = event.y;
     		final float currentTime = event.time;
-    		
     	
-    		  if(event.pointer >= 2) {
+    		if(event.pointer >= 2) {
      			Log.d("AppStates", "SEND SET_STATE");
      			
      			ByteBuffer buffer = ByteBuffer.allocate(2*2);
@@ -161,8 +166,16 @@ public class GameScreenMiddle extends Screen {
      			
      			SharedVariables.getInstance().setInternalState(GLOBAL_STATE__.MAP_DEVICE);
      			
-     		} 
-    		  else if(event.type == TouchEvent.TOUCH_DRAGGED) {
+     		} else if(event.type == TouchEvent.TOUCH_DOWN) {
+     			
+     			/* 
+    			 * Försök till implementation av menyknappen i hörnet av skärmen
+    			 */
+     			if(menuButton.inBounds(event.x, event.y)) {
+            		menuButton.setPressed(true);
+            	}
+     			
+            } else if(event.type == TouchEvent.TOUCH_DRAGGED) {
     			draggedX = currentX;
     			draggedY = currentY;  	
     		
@@ -175,7 +188,23 @@ public class GameScreenMiddle extends Screen {
     				index++;
     			}
     			
+    			/* 
+    			 * Försök till implementation av menyknappen i hörnet av skärmen
+    			 */
+    			if(!menuButton.inBounds(event.x, event.y)){
+            		menuButton.setPressed(false);
+            	}
+    			
     		} else if(event.type == TouchEvent.TOUCH_UP) {
+    			
+    			/* 
+    			 * Försök till implementation av menyknappen i hörnet av skärmen
+    			 */
+    			menuButton.setPressed(false);
+    			if(menuButton.inBounds(event.x, event.y)){
+            		//game.setScreen(new GameScreenPlayer(game));
+    				state = GameState.Paused;
+            	}
     			
     			final float deltaTimeDragged = currentTime - downTime;
 
@@ -306,9 +335,62 @@ public class GameScreenMiddle extends Screen {
         int len = touchEvents.size();
         for (int i = 0; i < len; i++) {
             TouchEvent event = touchEvents.get(i);
-            if (event.type == TouchEvent.TOUCH_UP) {
-
+            
+            if(event.type == TouchEvent.TOUCH_DOWN){
+            	if(resumeButton.inBounds(event.x, event.y)){
+            		resumeButton.setPressed(true);
+            	} else if (restartButton.inBounds(event.x, event.y)){
+            		restartButton.setPressed(true);
+            	} else if (remapButton.inBounds(event.x, event.y)){
+            		remapButton.setPressed(true);
+            	} else if (addButton.inBounds(event.x, event.y)){
+            		addButton.setPressed(true);
+            	} else if (exitButton.inBounds(event.x, event.y)){
+            		exitButton.setPressed(true);
+            	}
             }
+            
+            if(event.type == TouchEvent.TOUCH_DRAGGED){
+            	if(!resumeButton.inBounds(event.x, event.y)){
+            		resumeButton.setPressed(false);
+            	} else if (restartButton.inBounds(event.x, event.y)){
+            		restartButton.setPressed(false);
+            	} else if (remapButton.inBounds(event.x, event.y)){
+            		remapButton.setPressed(false);
+            	} else if (addButton.inBounds(event.x, event.y)){
+            		addButton.setPressed(false);
+            	} else if (exitButton.inBounds(event.x, event.y)){
+            		exitButton.setPressed(false);
+            	}
+            }
+            
+            if (event.type == TouchEvent.TOUCH_UP) {
+            	resumeButton.setPressed(false);
+            	restartButton.setPressed(false);
+            	remapButton.setPressed(false);
+            	addButton.setPressed(false);
+            	exitButton.setPressed(false);
+            	
+            	// TODO: Should go to SetupScreen instead
+            	if(resumeButton.inBounds(event.x, event.y)){
+            		//game.setScreen(new GameScreenPlayer(game));
+            		state = GameState.Running;
+            		
+            	} else if (restartButton.inBounds(event.x, event.y)){
+            		// TODO: Send message to clear the server. Reset scores not devices.
+            		
+            	} else if (remapButton.inBounds(event.x, event.y)){
+            		// TODO: Send message to the server that it should be
+            		// prepared to remap a device.
+            		
+            	} else if (addButton.inBounds(event.x, event.y)){
+            		// TODO: Add a device. The server should be prepared to recieve info and map the device.
+            		
+            	} else if (exitButton.inBounds(event.x, event.y)){
+            		//finish();
+                    System.exit(0);
+            	}
+            }        
         }
     }
 
