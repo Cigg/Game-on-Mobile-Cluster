@@ -20,7 +20,6 @@ import com.pussycat.framework.Input.TouchEvent;
 import com.pussycat.framework.Screen;
 
 
-
 public class GameScreenPlayer extends Screen {
     enum GameState {
         Ready, Running, Paused, GameOver, AddDevice, NotMapped, Wait, MappedWait, Remap, //, Mapped
@@ -52,6 +51,11 @@ public class GameScreenPlayer extends Screen {
 
 	public boolean drawTraceAfter = false;
 
+	
+	private AnimationHandler animationHandler = AnimationHandler.getInstance();
+	private TestObject testObj = new TestObject(0, 0);
+	private LoadingBar loadingBar = new LoadingBar();
+	
 	
 	private TCPClient comm;
 	private BallHandler ballHandler;
@@ -109,6 +113,11 @@ public class GameScreenPlayer extends Screen {
     	
     	ballHandler.updateBalls(deltaTime);
     	ballHandler.removeBallsOutOfBounds();
+    	
+    	if(animationHandler != null) {
+    		animationHandler.updateAnimations(System.nanoTime());
+    		loadingBar.update(System.nanoTime());
+    	}
     	
     	up = false;
     	
@@ -250,6 +259,10 @@ public class GameScreenPlayer extends Screen {
     			dragged = false;
     			up = true;
     			drawTraceAfter = true;
+    			
+    			animationHandler.addAnimation(new Animation(testObj.getXX(), 0, 100, System.nanoTime(), 1, Animation.INTERPOLATION.FLIP, Animation.TYPE.PING_PONG));
+    			animationHandler.addAnimation(new Animation(testObj.getYY(), 0, 400, System.nanoTime(), 2, Animation.INTERPOLATION.COSINE, Animation.TYPE.ENDLESS));
+    			
     			    			
     		} else if(event.type == TouchEvent.TOUCH_DOWN) {
     			downTime = currentTime;
@@ -375,6 +388,25 @@ public class GameScreenPlayer extends Screen {
         device.drawBackground(graphics);
         
         
+    	if(animationHandler != null) {
+
+            graphics.drawScaledImage(	Assets.ball, 
+    			 	100 + (int)testObj.getXX().getValue(), 
+    			 	100 + (int)testObj.getYY().getValue(), 
+    			 	(int)(PussycatMinions.meters2Pixels(0.0075f*2)), 
+    			 	(int)(PussycatMinions.meters2Pixels(0.0075f*2)), 
+    			 	0, 
+    			 	0, 
+    			 	128, 
+    			 	128,
+    			 	0.0f	);
+                        
+            loadingBar.draw(graphics);
+
+    	}
+
+        
+        
         
         // TODO: OPTIMERA!!
         boolean tail = true;
@@ -423,7 +455,7 @@ public class GameScreenPlayer extends Screen {
 	            	    // G�r att f�renkla
 	            	    iv = (float) (iv * Math.pow(10, 6));
 	            	    iv = Math.max(iv, 1);
-	            	    iv = Math.max(1, 6 / iv);
+	            	    iv = Math.max(3, 25 / iv);
 	            	    
 	            	    paint.setStrokeWidth( iv ) ;
 	      
@@ -563,7 +595,7 @@ public class GameScreenPlayer extends Screen {
 	            	    // G�r att f�renkla
 	            	    iv = (float) (iv * Math.pow(10, 6));
 	            	    iv = Math.max(iv, 1);
-	            	    iv = Math.max(1, 6 / iv);
+	            	    iv = Math.max(3, 25 / iv);
 	            	    
 	            	    paint.setStrokeWidth( iv ) ;
 	      
@@ -631,6 +663,8 @@ public class GameScreenPlayer extends Screen {
 				 	0.0f	);
         }
         
+        
+       
         ballHandler.drawBalls(graphics);
    
         if (state == GameState.Running) {

@@ -125,7 +125,7 @@ public class MultiThreds {
 				    					float xG = ball.getXPos();
 					    				float yG = ball.getYPos();
 					    				
-					    				if(deviceManager.isOnDevice(thread.getIp(), xG, yG, ball.radious)) {
+					    				if(deviceManager.isOnDevice(thread.getIp(), xG, yG, ball.radius)) {
 					    					
 					    					float xVelG = ball.getXVel();
 						    				float yVelG = ball.getYVel();

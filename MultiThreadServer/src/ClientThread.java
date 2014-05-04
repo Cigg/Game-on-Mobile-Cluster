@@ -50,7 +50,7 @@ public class ClientThread extends Thread {
 
 		float xPos, yPos;
 		float xVel, yVel;
-		float mass, radious, lifeTime;
+		float mass, radius, lifeTime;
 		int id;
 		boolean isMoved;
 
@@ -64,7 +64,7 @@ public class ClientThread extends Thread {
 			this.xVel = xVel;
 			this.yVel = yVel;
 			this.lifeTime = 0;
-			this.radious = 1;
+			this.radius = 0.75f;
 			this.isMoved = false;
 
 			lx = xPos;
@@ -75,7 +75,7 @@ public class ClientThread extends Thread {
 					+ xVel + ", " + yVel); // * Math.pow(10, 9) * 2.5
 
 			MultiThreds.getPhysicsWorld().addBall(xPos, yPos, xVel, yVel, id,
-					0.03f, 0.75f, 0.8f, 0.3f);
+					0.03f, radius, 0.8f, 0.3f);
 
 		}
 
@@ -313,6 +313,7 @@ public class ClientThread extends Thread {
 								sendData(sendBuffer.array());
 								
 								clientInfo.addSentPackageItem(GLOBAL_STATE__.values()[sendState] + "   " + sendTime + "   " + reciveTime);
+								clientInfo.setClock(delta1);
 								
 								System.out.println("CLOCK === " + System.nanoTime() * Math.pow(10, -9));
 							}
@@ -329,6 +330,20 @@ public class ClientThread extends Thread {
 								deviceManager.addDevice(ip, type, xDPI, yDPI, deviceResX, deviceResY);
 								
 								clientInfo.addIncomingPackageItem(actualState.name() + "   " + type + "   " + xDPI + "   " + yDPI + "   " + deviceResX + "   " + deviceResY);
+								clientInfo.setType(type);
+								clientInfo.setXDPI(xDPI);
+								clientInfo.setYDPI(yDPI);
+								clientInfo.setResX(deviceResX);
+								clientInfo.setResY(deviceResY);
+								
+								// Dupliciation for main device
+								float l_midX = deviceManager.getMidX(ip);
+								float l_midY = deviceManager.getMidY(ip);
+
+								float g_midX = deviceManager.localToGlobalX(ip, l_midX, l_midY);
+								float g_midY = deviceManager.localToGlobalY(ip, l_midX, l_midY);
+								clientInfo.setMidX(g_midX * 2.5f);
+								clientInfo.setMidY(g_midY * 2.5f);
 							}
 								break;
 
@@ -392,6 +407,11 @@ public class ClientThread extends Thread {
 
 									sendData(sendBuffer.array());
 									clientInfo.addSentPackageItem(GLOBAL_STATE__.values()[sendState] + "   " + rotZ + "   " + g_midX + "   " + g_midY + "   " + g_main_midX + "   " + g_main_midY);
+									clientInfo.setAngle((float) (rotZ * 180 / Math.PI));
+									clientInfo.setPosX(posX * 2.5f);
+									clientInfo.setPosY(posY * 2.5f);
+									clientInfo.setMidX(g_midX * 2.5f);
+									clientInfo.setMidY(g_midY * 2.5f);
 
 								} else {
 									System.out.println("MAPPING_STEP1");
@@ -425,7 +445,6 @@ public class ClientThread extends Thread {
 									float g_main_midY = deviceManager.localToGlobalY(ipOfMiddle, l_main_midX, l_main_midY);
 
 									targetJoint = MultiThreds.getPhysicsWorld().addTarget(g_main_midX, g_main_midY, 0.8f);
-
 								}
 							}
 								break;

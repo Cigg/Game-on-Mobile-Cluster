@@ -282,11 +282,61 @@ public class Device {
 			
 			ArrayList<IndexPair> indexes = new ArrayList<IndexPair>();	
 			
+			final int lowerX = displayImageCenterX - l_half;
+			final int lowerY = displayImageCenterY - l_half; 
 			
+			final int higherX = displayImageCenterX + l_half;
+			final int higherY = displayImageCenterY + l_half;
+			
+			
+			int a = 0;
+			int b = 0;
+			
+			do {
+				if( (a+1) * widthStep > lowerX ) {
+					break;
+				}
+				a++;
+			} while(a < nKolumner);
+			
+			do {
+				if( (b+1) * heightStep > lowerY ) {
+					break;
+				}
+				b++;
+			} while(b < nRader);
+			
+
+			int c = nKolumner;
+			int d = nRader;
+			
+			do {
+				c--;
+				if(c * widthStep < higherX) {
+					break;
+				}
+			} while(c > 0);
+			
+			do {
+				d--;
+				if(d * heightStep < higherY) {
+					break;
+				}
+			} while(d > 0);
+			
+			
+			// TODO: Make functions for these
+			final int rb = b;
+			final int eb = d + 1;
+			
+			final int kb = a;
+			final int ke = c + 1;
+			
+	
 			int counter = 0;
-			for(int rad=0; rad<nRader; rad++) {
+			for(int rad=rb; rad<eb; rad++) {
 				String line = "";
-				for(int kolumn=0; kolumn<nKolumner; kolumn++) {
+				for(int kolumn=kb; kolumn<ke; kolumn++) {
 					
 					float upperLeftCornerX = kolumn * widthStep;
 					float upperLeftCornerY = rad * heightStep;
