@@ -675,7 +675,8 @@ public class GameScreenPlayer extends Screen {
             drawPausedUI();
 		} else if (state == GameState.GameOver) {
 			drawGameOverUI();
-		} else if (state == GameState.NotMapped) {
+		} else if (state == GameState.NotMapped || state == GameState.AddDevice || state == GameState.Wait ||
+				   state == GameState.MappedWait || state == GameState.Remap) {
 			drawSharedUI(state);
 		}
         
@@ -708,10 +709,7 @@ public class GameScreenPlayer extends Screen {
     	} else if (state == GameState.Remap) {
     		g.drawImage(Assets.ball, imageX, imageY);
     		g.drawString("Klicka om du vill mappa om din enhet", textX, textY, paint);
-    	}
-    	
-    	
-    	
+    	}    	
     }
 
     private void drawReadyUI() {
@@ -724,6 +722,33 @@ public class GameScreenPlayer extends Screen {
     
     private void drawRunningUI() {
         Graphics g = game.getGraphics();
+        // TODO: Score! The server should send info about everyones score when it changes.
+        // Draw rectangles based on percentage of everyones score.
+        
+        int screenHeight = PussycatMinions.getScreenHeight();
+        int screenWidth = PussycatMinions.getScreenWidth();
+        
+        int scoreHeight = screenHeight - 200;
+        
+        // TODO: getNumberOfPlayers(), getTotalScore(), getThisPlayersScore()
+        int getNumberOfPlayers = 3;
+        int getTotalScore = 14;
+        int getThisPlayersScore[] = {4,3,7};
+        
+        int start = 0;
+        
+        for(int i = 0; i < getNumberOfPlayers; i++) {
+        	int percentage = (getThisPlayersScore[i] + start)/getTotalScore;
+        	int end = percentage*screenWidth;
+        	
+        	if(i%2 != 0) {
+        		g.drawRect(start, scoreHeight, end, screenHeight, Color.BLACK);
+        	} else {
+        		g.drawRect(start, scoreHeight, end, screenHeight, Color.GREEN);
+        	}
+        	
+        	start = end;
+        }
     }
 
     

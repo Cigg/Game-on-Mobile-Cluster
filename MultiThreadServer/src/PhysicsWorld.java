@@ -4,12 +4,9 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Iterator;
 
-import org.jbox2d.callbacks.DebugDraw;
 import org.jbox2d.collision.shapes.CircleShape;
 import org.jbox2d.collision.shapes.PolygonShape;
 import org.jbox2d.collision.shapes.Shape;
-import org.jbox2d.common.IViewportTransform;
-import org.jbox2d.common.OBBViewportTransform;
 import org.jbox2d.common.Vec2;
 import org.jbox2d.dynamics.Body;
 import org.jbox2d.dynamics.BodyDef;
@@ -22,6 +19,9 @@ import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
+
+
+
 
 //import java.util.HashMap;
 //import java.util.Hashtable;
@@ -44,13 +44,13 @@ private class Vertex {
 
 	
 	private class Polygon {
-		public ArrayList<Vertex> vertecies = new ArrayList<Vertex>();
+		public ArrayList<Vertex> vertices = new ArrayList<Vertex>();
 	}
 	public ArrayList<Polygon> polygons = new ArrayList<Polygon>();
 	private float originX;
 	private float originY;
 	
-	public volatile static ArrayList<PhysicsBody> bodies = new ArrayList<PhysicsBody>();
+	public volatile ArrayList<PhysicsBody> bodies = new ArrayList<PhysicsBody>();
 
 	private World world;
 	
@@ -68,7 +68,7 @@ private class Vertex {
 		// Create Shape with Properties
 		CircleShape circleShape = new CircleShape();
 
-		// Two centimeters
+		// 1.5 centimeters
 		circleShape.m_radius = 0.0075f*39.37f;
 
 		// MultiThreds.getPhysicsWorld().addBall(xPos, yPos, xVel, yVel, id,
@@ -110,12 +110,12 @@ private class Vertex {
 		//loadVertices();
 		//calculateNormals();
 		
-		//---------- DEFENITION OF VERTECIES FROM FILE ---------
+		//---------- DEFINITION OF VERTICES FROM FILE ---------
 		for(int i=0; i < polygons.size(); i++){
 			Polygon polygon = polygons.get(i);
-			polyDef.m_vertexCount = polygon.vertecies.size();
-			for(int j=0; j < polygon.vertecies.size(); j++) {
-				Vertex vertex = polygon.vertecies.get(j);
+			polyDef.m_vertexCount = polygon.vertices.size();
+			for(int j=0; j < polygon.vertices.size(); j++) {
+				Vertex vertex = polygon.vertices.get(j);
 				polyDef.m_vertices[j].set((originX) + 1.0f*vertex.x, (originY) + 1.0f*vertex.y);
 				polyDef.m_normals[j].set(vertex.normalX,vertex.normalY);
 			}
@@ -185,7 +185,7 @@ private class Vertex {
 
 	public void update(float deltaTime) {
 		// Update Physics World
-		world.step(deltaTime, 128, 128); // vilka v�rden b�r de 2 sista
+		world.step(deltaTime, 8, 3); // vilka v�rden b�r de 2 sista
 											// parametrarna ha?
 	}
 
@@ -243,7 +243,7 @@ private class Vertex {
 					Object y =  pair.get("y");
 					System.out.println("x = " + x + ", y = " + y);
 					
-					polygon.vertecies.add(new Vertex(convertToFloat(x)-originX,convertToFloat(y)-originY));
+					polygon.vertices.add(new Vertex(convertToFloat(x)-originX,convertToFloat(y)-originY));
 				}
 				System.out.println();
 				polygons.add(polygon);
@@ -263,20 +263,20 @@ private class Vertex {
 			for(int j=0; j < polygons.size(); j++){
 				Vertex vertex1;
 				Vertex vertex2;
-				for(int i=0; i < polygons.get(j).vertecies.size(); i++){
-					if(i+1 < polygons.get(j).vertecies.size()) {
-						vertex1 = polygons.get(j).vertecies.get(i);
-						vertex2 = polygons.get(j).vertecies.get(i+1);
+				for(int i=0; i < polygons.get(j).vertices.size(); i++){
+					if(i+1 < polygons.get(j).vertices.size()) {
+						vertex1 = polygons.get(j).vertices.get(i);
+						vertex2 = polygons.get(j).vertices.get(i+1);
 					} else {
-						vertex1 = polygons.get(j).vertecies.get(i);
-						vertex2 = polygons.get(j).vertecies.get(0);
+						vertex1 = polygons.get(j).vertices.get(i);
+						vertex2 = polygons.get(j).vertices.get(0);
 					}
 					
-					polygons.get(j).vertecies.get(i).normalX = calculateNormalX(vertex1.x,vertex1.y,vertex2.x,vertex2.y);
-					polygons.get(j).vertecies.get(i).normalY = calculateNormalY(vertex1.x,vertex1.y,vertex2.x,vertex2.y);
+					polygons.get(j).vertices.get(i).normalX = calculateNormalX(vertex1.x,vertex1.y,vertex2.x,vertex2.y);
+					polygons.get(j).vertices.get(i).normalY = calculateNormalY(vertex1.x,vertex1.y,vertex2.x,vertex2.y);
 					//vertecies.get(i).normalX = calculateNormalX(vertex1.x,vertex1.y,vertex2.x,vertex2.y);
 					//vertecies.get(i).normalY = calculateNormalX(vertex1.x,vertex1.y,vertex2.x,vertex2.y);
-					System.out.println("Normalx = " + polygons.get(j).vertecies.get(i).normalX + ", Normaly = " + polygons.get(j).vertecies.get(i).normalY);
+					System.out.println("Normalx = " + polygons.get(j).vertices.get(i).normalX + ", Normaly = " + polygons.get(j).vertices.get(i).normalY);
 				}
 			}
 		}else{

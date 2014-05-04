@@ -42,12 +42,13 @@ public class ClientThread extends Thread {
 	private DeviceManager deviceManager;
 	private OutputStream dout;
 
-	static final int MAX_LIFETIME = 15;
-	static final float MAX_POSITION_X = (float) (100 / 2.5);
-	static final float MAX_POSITION_Y = MAX_POSITION_X;
+	public volatile LinkedBlockingQueue<Ballz> balls = new LinkedBlockingQueue<Ballz>();
 
 	public class Ballz {
-
+		static final int MAX_LIFETIME = 15;
+		static final float MAX_POSITION_X = (float) (100 / 2.5);
+		static final float MAX_POSITION_Y = MAX_POSITION_X;
+		
 		float xPos, yPos;
 		float xVel, yVel;
 		float mass, radius, lifeTime;
@@ -476,7 +477,7 @@ public class ClientThread extends Thread {
 									// ballz.add(new
 									// Ballz(MultiThreds.sharedVariables.getInstance().getBallCounter(),xG,
 									// yG, xVel, yVel));
-									ballz.add(new Ballz(ballCount, xG, yG,
+									balls.add(new Ballz(ballCount, xG, yG,
 											xVel, yVel));
 									for (int j = 0; j < maxClientsCount; j++) {
 										if (threads[j] != null) {
@@ -485,7 +486,7 @@ public class ClientThread extends Thread {
 									}
 								}
 								System.out.println("Ball count: " + ballCount);
-								System.out.println("Ballz size: " + ballz.size());
+								System.out.println("Ballz size: " + balls.size());
 							}
 								break;
 
@@ -545,7 +546,7 @@ public class ClientThread extends Thread {
 		
 			for(int i = 0; i < 100; i++) {
 				ballCount++;
-				ballz.add(new Ballz(ballCount, 0, 0,0, 0));
+				balls.add(new Ballz(ballCount, 0, 0,0, 0));
 			}
 			synchronized (this) {
 			for (int j = 0; j < 10; j++) {
@@ -558,7 +559,7 @@ public class ClientThread extends Thread {
 	}
 	
 	public void clearBalls() {
-		ballz.clear();
+		balls.clear();
 		synchronized (this) {
 			ballCount = 0;
 			for (int j = 0; j < 10; j++) {
