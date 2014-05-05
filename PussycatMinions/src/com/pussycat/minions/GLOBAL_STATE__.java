@@ -12,7 +12,8 @@ public enum GLOBAL_STATE__ {
 	RESTART_SERVER,
 	REG,
 	START,
-	ADD_MAP
+	ADD_MAP, 
+	SET_MIDDLE_ANGLE
 }
 
 

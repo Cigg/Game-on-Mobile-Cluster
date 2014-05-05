@@ -7,20 +7,19 @@ public abstract class Ball {
 
 	protected int id;
 	
-	protected float posX;
-	protected float posY;
+	protected float x;
+	protected float y;
 	
-	protected float velX;
-	protected float velY;
+	protected float vx;
+	protected float vy;
 	
 	protected Image image;
-	protected int imageWidth, imageHeight;
 	protected int radius;
 	
 	
 	public void update(final float timeStep) {
-	    this.posX += this.velX * timeStep;
-	    this.posY += this.velY * timeStep;  
+	    this.x += this.vx * timeStep;
+	    this.y += this.vy * timeStep;  
 	}
 	
 	
@@ -32,15 +31,26 @@ public abstract class Ball {
 	public void draw(Graphics graphics) {
 		
 	    graphics.drawScaledImage(	this.image, 
-			    				 	(int)this.posX - this.radius, 
-			    				 	(int)this.posY - this.radius, 
+			    				 	(int)this.x - this.radius, 
+			    				 	(int)this.y - this.radius, 
 			    				 	this.radius * 2, 
 			    				 	this.radius * 2, 
 			    				 	0, 
 			    				 	0, 
-			    				 	this.imageWidth, 
-			    				 	this.imageHeight,
-			    				 	0.0f	);		
+			    				 	128, 
+			    				 	128, 0.0f	);		
+	    /*
+	    graphics.drawScaledImage(	ballTypes[ball.type].image, 
+			 	(int)(ball.x - PussycatMinions.meters2Pixels(ballTypes[ball.type].radius)), 
+			 	(int)(ball.y - PussycatMinions.meters2Pixels(ballTypes[ball.type].radius)), 
+			 	(int)(PussycatMinions.meters2Pixels(ballTypes[ball.type].radius)*2), 
+			 	(int)(PussycatMinions.meters2Pixels(ballTypes[ball.type].radius)*2), 
+			 	0, 
+			 	0, 
+			 	128, 
+			 	128,
+			 	0.0f);
+	    */
 	}
 	
 }

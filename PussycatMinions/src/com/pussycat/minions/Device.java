@@ -57,9 +57,9 @@ public class Device {
 	
 	private static Background bg;
 	
-	final int nRader = 32;
-	final int nKolumner = 32;
-	Bitmap[][] bitmaps = new Bitmap[nRader][nKolumner];
+	final int nRader;
+	final int nKolumner;
+	Bitmap[][] bitmaps;
 	final int numberOfExecutionThreads = 4;
 	
 	
@@ -74,6 +74,11 @@ public class Device {
 		
 		BackgroundHandler bgh = new BackgroundHandler();
 		this.bg = bgh.backgrounds[BACKGROUNDS.COORDINATES.ordinal()];
+		
+		nRader = bg.nRows;
+		nKolumner = bg.nCols;
+		bitmaps = new Bitmap[nRader][nKolumner];
+
 		
 		
 		

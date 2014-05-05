@@ -10,11 +10,13 @@ public class ServerCommunication extends Thread {
 	private volatile boolean isCommunicating;
 	private TCPClient tcp;
 	private BallHandler ballHandler;
+	private BallTypesHandler ballTypesHandler;
 	private Target target;
 
 	
 	ServerCommunication(TCPClient stcp, BallHandler ballHandler, Target target ) {
 		this.ballHandler = ballHandler;
+		this.ballTypesHandler = new BallTypesHandler();
 		this.tcp = stcp;
 		this.target = target;
 		isCommunicating = true;
@@ -58,7 +60,11 @@ public class ServerCommunication extends Thread {
 						case ADD_MAP: {
 							addMap( incomingData );
 						} break;
-
+						
+						case SET_MIDDLE_ANGLE: {
+							setMiddleAngle( incomingData );
+						} break;
+						
 		    			default:
 		    			break;
 		    			
@@ -81,6 +87,27 @@ public class ServerCommunication extends Thread {
 	
 	public void setIsCommunicating(final boolean isCommunicating) {
 		this.isCommunicating = isCommunicating;
+	}
+	
+	
+	private void setMiddleAngle(DataPackage incomingData) {
+		ByteBuffer buffer = ByteBuffer.wrap(incomingData.getData());
+		final short state = buffer.getShort();
+		
+		final float angle = buffer.getFloat();
+		
+		Log.d("GOTANGLE", "GOTANGLE: " + angle);
+		SharedVariables.getInstance().setMiddleAngle(angle);
+		
+		/*
+		if(target != null) {
+			target.setAngle(middleAngle);
+		}
+		
+		float targetAngle = buffer.getFloat();
+		target.setRadAngle(targetAngle);
+		*/
+		
 	}
 	
 	
@@ -134,11 +161,6 @@ public class ServerCommunication extends Thread {
 		short state = buffer.getShort();
 		
 		final short nBalls = buffer.getShort();
-		
-		if(target != null) {
-			float targetAngle = buffer.getFloat();
-			target.setRadAngle(targetAngle);
-		}
 		
 		for(int i=0; i<nBalls; i++) {
 			int id = buffer.getInt();
