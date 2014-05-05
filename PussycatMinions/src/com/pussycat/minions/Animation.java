@@ -17,7 +17,7 @@ public class Animation {
 		PING_PONG
 	}
 	
-	private final float EPSILON = 0.1f;
+	private static final float EPSILON = 0.1f;
 	private boolean isAnimating;
     private boolean isFinished;
 	private AnimatedValue animatedValue;
@@ -44,6 +44,15 @@ public class Animation {
 	
 	public void setIsAnimating(final boolean isAnimating) {
 		this.isAnimating = isAnimating;
+	}
+	
+	
+	public void start() {
+		if( startTime + durationTime - System.nanoTime() <= EPSILON ) {
+			animatedValue.setValue(from);
+			startTime = System.nanoTime();
+			isAnimating = true;
+		}
 	}
 	
 	
@@ -88,6 +97,12 @@ public class Animation {
 			case COSINE:
 			{
 				animatedValue.setValue(cosineInterpolation(from, to, scale));
+				if( startTime + durationTime - time <= EPSILON ) {
+					if( type == TYPE.POINT_TO_POINT ) {
+						animatedValue.setValue(to);
+				    	isAnimating = false;
+				    }	
+				}
 			} break;
 			
 			case FLIP:
@@ -95,6 +110,8 @@ public class Animation {
 				if( startTime + durationTime - time <= EPSILON ) {
 					if( type == TYPE.ENDLESS ) {
 						animatedValue.setValue(to);
+						isAnimating = false;
+						//Log.d("WID", "TYPE_ENDLESS - set value to: " + to);
 					} else if( type == TYPE.POINT_TO_POINT ) {
 						animatedValue.setValue(to);
 						isFinished = true;

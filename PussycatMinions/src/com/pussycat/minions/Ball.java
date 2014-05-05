@@ -29,7 +29,6 @@ public abstract class Ball {
 	
 	
 	public void draw(Graphics graphics) {
-		
 	    graphics.drawScaledImage(	this.image, 
 			    				 	(int)this.x - this.radius, 
 			    				 	(int)this.y - this.radius, 
@@ -39,18 +38,25 @@ public abstract class Ball {
 			    				 	0, 
 			    				 	128, 
 			    				 	128, 0.0f	);		
-	    /*
-	    graphics.drawScaledImage(	ballTypes[ball.type].image, 
-			 	(int)(ball.x - PussycatMinions.meters2Pixels(ballTypes[ball.type].radius)), 
-			 	(int)(ball.y - PussycatMinions.meters2Pixels(ballTypes[ball.type].radius)), 
-			 	(int)(PussycatMinions.meters2Pixels(ballTypes[ball.type].radius)*2), 
-			 	(int)(PussycatMinions.meters2Pixels(ballTypes[ball.type].radius)*2), 
-			 	0, 
-			 	0, 
-			 	128, 
-			 	128,
-			 	0.0f);
-	    */
 	}
 	
+	
+	public float getX() {
+		return x;
+	}
+	
+	
+	public float getY() {
+		return y;
+	}
+	
+	
+	public void setX(final float x) {
+		this.x = x;
+	}
+	
+	
+	public void setY(final float y) {
+		this.y = y;
+	}
 }

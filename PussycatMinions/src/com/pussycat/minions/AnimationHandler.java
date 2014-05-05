@@ -3,7 +3,6 @@ package com.pussycat.minions;
 import java.util.Enumeration;
 import java.util.concurrent.ConcurrentHashMap;
 
-import android.util.Log;
 
 public class AnimationHandler {
 

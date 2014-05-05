@@ -53,12 +53,12 @@ public class GameScreenPlayer extends Screen {
 
 	
 	private AnimationHandler animationHandler = AnimationHandler.getInstance();
-	private TestObject testObj = new TestObject(0, 0);
 	private LoadingBar loadingBar = new LoadingBar();
 	
 	
 	private TCPClient comm;
 	private BallHandler ballHandler;
+	private BallsWidget ballsWidget;
 
 	
     public GameScreenPlayer(Game game) {
@@ -81,6 +81,8 @@ public class GameScreenPlayer extends Screen {
 		ballHandler = new BallHandler(PussycatMinions.getScreenWidth(), PussycatMinions.getScreenHeight());
 		ServerCommunication t4 = new ServerCommunication(comm, ballHandler, null);
 		t4.start();
+		
+		ballsWidget = new BallsWidget();
 		
     }
 
@@ -113,6 +115,7 @@ public class GameScreenPlayer extends Screen {
     	
     	ballHandler.updateBalls(deltaTime);
     	ballHandler.removeBallsOutOfBounds();
+    	ballsWidget.updateBalls();
     	
     	if(animationHandler != null) {
     		animationHandler.updateAnimations(System.nanoTime());
@@ -224,31 +227,32 @@ public class GameScreenPlayer extends Screen {
     				
     				case RUN_DEVICE:
     				{
-    					Log.d("AppStates", "RUN_DEVICE");
-    					
-    					buffer = ByteBuffer.allocate(1*2 + 5*4);
-    		    		buffer.clear();
-    		    		
-    		    		buffer.putShort((short) GLOBAL_STATE__.RUN_DEVICE.ordinal());	// State: RUN_DEVICE
-    		    			
-    		    		if(index < 8) {
-	    		    		buffer.putFloat(downX);											// x1
-	    		    		buffer.putFloat(downY); 										// y1
-	    		    		buffer.putFloat(currentX);										// x2
-	    		    		buffer.putFloat(currentY);										// y2
-	    		    		buffer.putFloat(deltaTimeDragged);								// t	
-    		    		} else {
-    		    			buffer.putFloat(ptx[index-8]);									// x1
-	    		    		buffer.putFloat(pty[index-8]); 									// y1
-	    		    		buffer.putFloat(currentX);										// x2
-	    		    		buffer.putFloat(currentY);										// y2
-	    		    		buffer.putFloat(currentTime - tms[index-8]);					// t	
-    		    		}
-    		    		
-    		    		comm.sendData(buffer.array());
-    		    		
-    		    		Log.d("CLOCK", "RUNDEVICE ==== " + (System.nanoTime() + SharedVariables.getInstance().getSendDelay()) * Math.pow(10, -9));
-    		    		
+    					if( ballsWidget.pop() ) {
+	    					Log.d("AppStates", "RUN_DEVICE");
+	    					
+	    					buffer = ByteBuffer.allocate(1*2 + 5*4);
+	    		    		buffer.clear();
+	    		    		
+	    		    		buffer.putShort((short) GLOBAL_STATE__.RUN_DEVICE.ordinal());	// State: RUN_DEVICE
+	    		    			
+	    		    		if(index < 8) {
+		    		    		buffer.putFloat(downX);											// x1
+		    		    		buffer.putFloat(downY); 										// y1
+		    		    		buffer.putFloat(currentX);										// x2
+		    		    		buffer.putFloat(currentY);										// y2
+		    		    		buffer.putFloat(deltaTimeDragged);								// t	
+	    		    		} else {
+	    		    			buffer.putFloat(ptx[index-8]);									// x1
+		    		    		buffer.putFloat(pty[index-8]); 									// y1
+		    		    		buffer.putFloat(currentX);										// x2
+		    		    		buffer.putFloat(currentY);										// y2
+		    		    		buffer.putFloat(currentTime - tms[index-8]);					// t	
+	    		    		}
+	    		    		
+	    		    		comm.sendData(buffer.array());
+	    		    		
+	    		    		Log.d("CLOCK", "RUNDEVICE ==== " + (System.nanoTime() + SharedVariables.getInstance().getSendDelay()) * Math.pow(10, -9));
+    					}
     				}
     				break;
     				
@@ -259,9 +263,6 @@ public class GameScreenPlayer extends Screen {
     			dragged = false;
     			up = true;
     			drawTraceAfter = true;
-    			
-    			animationHandler.addAnimation(new Animation(testObj.getXX(), 0, 100, System.nanoTime(), 1, Animation.INTERPOLATION.FLIP, Animation.TYPE.PING_PONG));
-    			animationHandler.addAnimation(new Animation(testObj.getYY(), 0, 400, System.nanoTime(), 2, Animation.INTERPOLATION.COSINE, Animation.TYPE.ENDLESS));
     			
     			    			
     		} else if(event.type == TouchEvent.TOUCH_DOWN) {
@@ -389,17 +390,6 @@ public class GameScreenPlayer extends Screen {
         
         
     	if(animationHandler != null) {
-
-            graphics.drawScaledImage(	Assets.ball, 
-    			 	100 + (int)testObj.getXX().getValue(), 
-    			 	100 + (int)testObj.getYY().getValue(), 
-    			 	(int)(PussycatMinions.meters2Pixels(0.0075f*2)), 
-    			 	(int)(PussycatMinions.meters2Pixels(0.0075f*2)), 
-    			 	0, 
-    			 	0, 
-    			 	128, 
-    			 	128,
-    			 	0.0f	);
                         
             loadingBar.draw(graphics);
 
@@ -665,6 +655,7 @@ public class GameScreenPlayer extends Screen {
         
         
        
+        ballsWidget.drawBalls(graphics);
         ballHandler.drawBalls(graphics);
    
         if (state == GameState.Running) {
