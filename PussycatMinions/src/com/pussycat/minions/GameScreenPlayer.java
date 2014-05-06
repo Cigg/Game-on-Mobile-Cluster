@@ -61,6 +61,7 @@ public class GameScreenPlayer extends Screen {
 	private BallsWidget ballsWidget;
 	private PointsWidget pointsWidget;
 	private TimerWidget timerWidget;
+	private PointsNotificationWidget pointsNotificationsWidget;
 
 	
     public GameScreenPlayer(Game game) {
@@ -87,6 +88,7 @@ public class GameScreenPlayer extends Screen {
 		ballsWidget = new BallsWidget();
 		pointsWidget = new PointsWidget();
 		timerWidget = new TimerWidget();
+		pointsNotificationsWidget = new PointsNotificationWidget();
 		
     }
 
@@ -122,6 +124,7 @@ public class GameScreenPlayer extends Screen {
     	ballsWidget.updateBalls();
     	pointsWidget.updatePoints();
     	timerWidget.update();
+    	pointsNotificationsWidget.update();
     	
     	if(animationHandler != null) {
     		animationHandler.updateAnimations(System.nanoTime());
@@ -258,6 +261,7 @@ public class GameScreenPlayer extends Screen {
 	    		    		comm.sendData(buffer.array());
 	    		    		
 	    		    		Log.d("CLOCK", "RUNDEVICE ==== " + (System.nanoTime() + SharedVariables.getInstance().getSendDelay()) * Math.pow(10, -9));
+	    		    		pointsNotificationsWidget.addNotification((int) (Math.random() * 1000));
     					}
     				}
     				break;
@@ -666,6 +670,7 @@ public class GameScreenPlayer extends Screen {
         ballsWidget.drawBalls(graphics);
         pointsWidget.draw(graphics);
         timerWidget.draw(graphics);
+        pointsNotificationsWidget.draw(graphics);
    
         if (state == GameState.Running) {
             drawRunningUI();

@@ -61,6 +61,11 @@ public class Animation {
 	}
 	
 	
+	public void setIsFinished(final boolean isFinished) {
+		this.isFinished = isFinished;
+	}
+	
+	
 	public AnimatedValue getAnimatedValue() {
 		return animatedValue;
 	}
@@ -71,6 +76,7 @@ public class Animation {
 			animate(time);
 		}
 	}
+	
 	
 	public void animate(final float time) {
 		final double scale = (double) (time - startTime) / (double)durationTime;
@@ -101,6 +107,7 @@ public class Animation {
 					if( type == TYPE.POINT_TO_POINT ) {
 						animatedValue.setValue(to);
 				    	isAnimating = false;
+				    	isFinished = true;
 				    }	
 				}
 			} break;
