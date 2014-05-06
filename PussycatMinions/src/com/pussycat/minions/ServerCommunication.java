@@ -65,6 +65,10 @@ public class ServerCommunication extends Thread {
 							setMiddleAngle( incomingData );
 						} break;
 						
+						case SET_POINTS: {
+							setPoints( incomingData );
+						} break;
+						
 		    			default:
 		    			break;
 		    			
@@ -90,6 +94,23 @@ public class ServerCommunication extends Thread {
 	}
 	
 	
+	private void setPoints(DataPackage incomingData) {
+		ByteBuffer buffer = ByteBuffer.wrap(incomingData.getData());
+		final short state = buffer.getShort();
+		
+		final short nPlayers = buffer.getShort();
+		
+		int totalPoints = 0;
+		for(short i=0; i<nPlayers; i++) {
+			final int points = buffer.getInt();
+			SharedVariables.getInstance().setPoints(i, points);
+			totalPoints += points;
+		}
+		SharedVariables.getInstance().setTotalPoints(totalPoints);
+		SharedVariables.getInstance().setPointsIsUpdated(true);
+	}
+	
+	
 	private void setMiddleAngle(DataPackage incomingData) {
 		ByteBuffer buffer = ByteBuffer.wrap(incomingData.getData());
 		final short state = buffer.getShort();
@@ -97,20 +118,9 @@ public class ServerCommunication extends Thread {
 		final float angle = buffer.getFloat();
 		
 		Log.d("GOTANGLE", "GOTANGLE: " + angle);
-		SharedVariables.getInstance().setMiddleAngle(angle);
-		
-		/*
-		if(target != null) {
-			target.setAngle(middleAngle);
-		}
-		
-		float targetAngle = buffer.getFloat();
-		target.setRadAngle(targetAngle);
-		*/
-		
+		SharedVariables.getInstance().setMiddleAngle(angle);		
 	}
-	
-	
+
 	
 	private void addMap(DataPackage incomingData) {
 		ByteBuffer buffer = ByteBuffer.wrap(incomingData.getData());

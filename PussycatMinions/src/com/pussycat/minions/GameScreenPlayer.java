@@ -59,6 +59,7 @@ public class GameScreenPlayer extends Screen {
 	private TCPClient comm;
 	private BallHandler ballHandler;
 	private BallsWidget ballsWidget;
+	private PointsWidget pointsWidget;
 
 	
     public GameScreenPlayer(Game game) {
@@ -83,6 +84,7 @@ public class GameScreenPlayer extends Screen {
 		t4.start();
 		
 		ballsWidget = new BallsWidget();
+		pointsWidget = new PointsWidget();
 		
     }
 
@@ -116,6 +118,7 @@ public class GameScreenPlayer extends Screen {
     	ballHandler.updateBalls(deltaTime);
     	ballHandler.removeBallsOutOfBounds();
     	ballsWidget.updateBalls();
+    	pointsWidget.updatePoints();
     	
     	if(animationHandler != null) {
     		animationHandler.updateAnimations(System.nanoTime());
@@ -655,8 +658,10 @@ public class GameScreenPlayer extends Screen {
         
         
        
-        ballsWidget.drawBalls(graphics);
+        
         ballHandler.drawBalls(graphics);
+        ballsWidget.drawBalls(graphics);
+        pointsWidget.draw(graphics);
    
         if (state == GameState.Running) {
             drawRunningUI();
