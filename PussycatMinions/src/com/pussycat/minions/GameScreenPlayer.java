@@ -60,6 +60,7 @@ public class GameScreenPlayer extends Screen {
 	private BallHandler ballHandler;
 	private BallsWidget ballsWidget;
 	private PointsWidget pointsWidget;
+	private TimerWidget timerWidget;
 
 	
     public GameScreenPlayer(Game game) {
@@ -85,6 +86,7 @@ public class GameScreenPlayer extends Screen {
 		
 		ballsWidget = new BallsWidget();
 		pointsWidget = new PointsWidget();
+		timerWidget = new TimerWidget();
 		
     }
 
@@ -119,6 +121,7 @@ public class GameScreenPlayer extends Screen {
     	ballHandler.removeBallsOutOfBounds();
     	ballsWidget.updateBalls();
     	pointsWidget.updatePoints();
+    	timerWidget.update();
     	
     	if(animationHandler != null) {
     		animationHandler.updateAnimations(System.nanoTime());
@@ -662,6 +665,7 @@ public class GameScreenPlayer extends Screen {
         ballHandler.drawBalls(graphics);
         ballsWidget.drawBalls(graphics);
         pointsWidget.draw(graphics);
+        timerWidget.draw(graphics);
    
         if (state == GameState.Running) {
             drawRunningUI();
