@@ -14,15 +14,16 @@ public class BallsWidget {
 	private int activeBalls = maxNBalls;
 	
 	
-	private float SHIFTTIME = 1.0f;
+	private final float COOL_TIME = 1.0f; // seconds
+	private final float SHIFT_TIME = 1.0f; // seconds
 	private final float RADIUS = 0.0075f; // meters
-	private final float XMARIGN = 0.05f; // cm
-	private final float YMARIGN = 0.05f; // cm
+	private final float X_MARIGN = 0.05f; // cm
+	private final float Y_MARIGN = 0.05f; // cm
 	private final float BALL_MARGIN = 0.1f; // cm
-	private final float OFFSET = PussycatMinions.meters2Pixels(- RADIUS - (BALL_MARGIN / 100.0f) + (YMARIGN / 100.0f)); // meters
+	private final float OFFSET = PussycatMinions.meters2Pixels(- RADIUS - (BALL_MARGIN / 100.0f) + (Y_MARIGN / 100.0f)); // pixels
 
 
-	private int x = PussycatMinions.meters2Pixels(RADIUS + (XMARIGN / 100.0f));
+	private int x = PussycatMinions.meters2Pixels(RADIUS + (X_MARIGN / 100.0f));
 	private int maxY = PussycatMinions.meters2Pixels((2 * RADIUS + (BALL_MARGIN / 100.0f)) * maxNBalls);
 	private int dist = maxY/maxNBalls;
 	
@@ -31,7 +32,7 @@ public class BallsWidget {
 	
 	public BallsWidget() {
 		
-		adderAnimation = new Animation(adder, 0.0f, 1.0f, System.nanoTime(), 1, Animation.INTERPOLATION.FLIP, Animation.TYPE.ENDLESS);
+		adderAnimation = new Animation(adder, 0.0f, 1.0f, System.nanoTime(), COOL_TIME, Animation.INTERPOLATION.FLIP, Animation.TYPE.ENDLESS);
 		AnimationHandler.getInstance().addAnimation(adderAnimation);		
 		
 		for(int i=0; i<activeBalls; i++) {
@@ -58,7 +59,7 @@ public class BallsWidget {
 	
 	private void animateBalls() {
 		for(int i=0; i<activeBalls; i++) {			
-			AnimationHandler.getInstance().addAnimation(new Animation(animatedYs[i],animatedYs[i].getValue(), OFFSET + maxY - i*dist, System.nanoTime(), SHIFTTIME, Animation.INTERPOLATION.COSINE, Animation.TYPE.POINT_TO_POINT));		
+			AnimationHandler.getInstance().addAnimation(new Animation(animatedYs[i],animatedYs[i].getValue(), OFFSET + maxY - i*dist, System.nanoTime(), SHIFT_TIME, Animation.INTERPOLATION.COSINE, Animation.TYPE.POINT_TO_POINT));		
 		}
 	}	
 
@@ -67,7 +68,7 @@ public class BallsWidget {
 		if(!isFull()) {
 			balls[activeBalls++] = ball;
 			animatedYs[activeBalls-1] = new AnimatedValue(balls[activeBalls-1].getY());
-			AnimationHandler.getInstance().addAnimation(new Animation(animatedYs[activeBalls-1], animatedYs[activeBalls-1].getValue(), OFFSET + maxY - (activeBalls-1)*dist, System.nanoTime(), SHIFTTIME, Animation.INTERPOLATION.COSINE, Animation.TYPE.POINT_TO_POINT));
+			AnimationHandler.getInstance().addAnimation(new Animation(animatedYs[activeBalls-1], animatedYs[activeBalls-1].getValue(), OFFSET + maxY - (activeBalls-1)*dist, System.nanoTime(), SHIFT_TIME, Animation.INTERPOLATION.COSINE, Animation.TYPE.POINT_TO_POINT));
 		} 
 	}
 
