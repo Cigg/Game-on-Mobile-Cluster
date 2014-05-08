@@ -83,13 +83,12 @@ private class Vertex {
 
 	public RevoluteJoint addTarget(float xPos, float yPos, float bounce) {
 		//---------------	CREATE TARGET ------------------------------
-		// Target width: 3 cm
-		float scale = 3.0f/2.54f;
+		// Target width: 6 cm
+		float scale = 6.0f/2.54f;
 		
 		BodyDef bodyDef = new BodyDef();
-		bodyDef.position.set(xPos - originX*scale, yPos - originY*scale);
+		bodyDef.position.set(xPos - 0.5f*scale, yPos - 0.5f*scale);
 		
-		// TODO: make dynamic bodytype and add pivot
 		bodyDef.type = BodyType.DYNAMIC;
 		Body body = null;
 
@@ -235,7 +234,7 @@ private class Vertex {
 	private void loadVertices(){
 		JSONParser parser = new JSONParser();
 		try{
-			Object obj = parser.parse(new FileReader("src/frog.json"));
+			Object obj = parser.parse(new FileReader("src/octopus.json"));
 			JSONObject jsonObject = (JSONObject) obj;
 			JSONArray jsonArray = (JSONArray) jsonObject.get("rigidBodies");
 			jsonObject = (JSONObject) jsonArray.get(0);

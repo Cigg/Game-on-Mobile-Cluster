@@ -90,7 +90,7 @@ public class GameScreenMiddle extends Screen {
         exitButton = new Button(Assets.button, Assets.button_pressed, width, PussycatMinions.getScreenHeight()/2+300, paint);
         exitButton.setText("EXIT");
 
-		middleTarget = new Target(PussycatMinions.getScreenWidth()/2, PussycatMinions.getScreenHeight()/2, 0.03f);
+		middleTarget = new Target(PussycatMinions.getScreenWidth()/2, PussycatMinions.getScreenHeight()/2, 0.06f);
 		
 		previousTime = 0;		
 		SharedVariables.getInstance().setInternalState(GLOBAL_STATE__.SYNCHRONIZE_DEVICE);		
