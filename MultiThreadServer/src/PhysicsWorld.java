@@ -82,7 +82,7 @@ private class Vertex {
 	}
 
 	public RevoluteJoint addTarget(float xPos, float yPos, float bounce) {
-		
+		//---------------	CREATE TARGET ------------------------------
 		// Target width: 3 cm
 		float scale = 3.0f/2.54f;
 		
@@ -97,19 +97,11 @@ private class Vertex {
 			body = world.createBody(bodyDef);
 			System.out.println("NULLL BODYYY LOOP");
 		}
-
-		FixtureDef fixtureDef = new FixtureDef();
-		fixtureDef.density = 0;
-		fixtureDef.friction = 1; 
 		
 		System.out.println("ADDING TARGET");
 		System.out.println("Target pos: " + xPos + " " + yPos);
 
 		PolygonShape polyDef = new PolygonShape();
-		CircleShape pivot = new CircleShape();
-		pivot.m_radius = 0.05f;
-		
-		fixtureDef.shape = pivot;
 		//loadVertices();
 		//calculateNormals();
 		
@@ -127,13 +119,27 @@ private class Vertex {
 		}
 		bodyDef.type = BodyType.STATIC;
 		bodyDef.position.set(xPos, yPos);
+		
+		//-------- CREATE PIVOT --------------------------------
+		
+		FixtureDef fixtureDef = new FixtureDef();
+		fixtureDef.density = 1;
+		fixtureDef.friction = 1; 
+		
+		CircleShape pivot = new CircleShape();
+		pivot.m_radius = 0.05f;
+		
+		fixtureDef.shape = pivot;
+		
 		Body body2 = null;
 		while (body2 == null) {
 			body2 = world.createBody(bodyDef);
 			System.out.println("NULLL BODYYY LOOP");
 		}
 		body2.createFixture(fixtureDef);
-				
+		
+		
+		//--------------- CREATE JOINT ----------------------
 		RevoluteJointDef joint = new RevoluteJointDef();
 		joint.bodyA = body;
 		joint.bodyB = body2;
