@@ -6,6 +6,7 @@ import com.pussycat.framework.Image;
 public abstract class Ball {
 
 	protected int id;
+	protected int parent;
 	
 	protected float x;
 	protected float y;

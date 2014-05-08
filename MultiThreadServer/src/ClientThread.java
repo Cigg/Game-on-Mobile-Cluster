@@ -44,7 +44,7 @@ public class ClientThread extends Thread {
 	private DeviceManager deviceManager;
 	private OutputStream dout;
 
-	static final int MAX_LIFETIME = 15;
+	static final int MAX_LIFETIME = 30;
 	static final float MAX_POSITION_X = (float) (100 / 2.5);
 	static final float MAX_POSITION_Y = MAX_POSITION_X;
 
@@ -55,19 +55,23 @@ public class ClientThread extends Thread {
 		float mass, radius, lifeTime;
 		int id;
 		boolean isMoved;
+		boolean shouldBeRemoved;;
 
 		float lx, ly;
+		int parent;
 
-		public Ballz(int id, float xPos, float yPos, float xVel, float yVel) {
+		public Ballz(int parent, int id, float xPos, float yPos, float xVel, float yVel) {
 
 			this.id = id;
+			this.parent = parent;
 			this.xPos = xPos;
 			this.yPos = yPos;
 			this.xVel = xVel;
 			this.yVel = yVel;
 			this.lifeTime = 0;
-			this.radius = 0.75f;
+			this.radius = 0.75f; // cm
 			this.isMoved = false;
+			this.shouldBeRemoved = false;
 
 			lx = xPos;
 			ly = yPos;
@@ -110,9 +114,16 @@ public class ClientThread extends Thread {
 			ly = yPos;
 		}
 
+		public boolean shouldBeRemoved() {
+			return shouldBeRemoved;
+		}
+		
+		public void setShouldBeRemoved(final boolean shouldBeRemoved) {
+			this.shouldBeRemoved = shouldBeRemoved;
+		}
+		
 		public boolean isDead() {
-			if ((this.lifeTime * Math.pow(10, -9)) > MAX_LIFETIME
-					|| outOfBounds()) {
+			if ((this.lifeTime * Math.pow(10, -9)) > MAX_LIFETIME || outOfBounds()) {
 				return true;
 			}
 			return false;
@@ -482,8 +493,7 @@ public class ClientThread extends Thread {
 									// ballz.add(new
 									// Ballz(MultiThreds.sharedVariables.getInstance().getBallCounter(),xG,
 									// yG, xVel, yVel));
-									ballz.add(new Ballz(ballCount, xG, yG,
-											xVel, yVel));
+									ballz.add(new Ballz(deviceManager.getDeviceThread(ip), ballCount, xG, yG, xVel, yVel));
 									for (int j = 0; j < maxClientsCount; j++) {
 										if (threads[j] != null) {
 											threads[j].ballCount = ballCount;
@@ -551,7 +561,7 @@ public class ClientThread extends Thread {
 		
 			for(int i = 0; i < 100; i++) {
 				ballCount++;
-				ballz.add(new Ballz(ballCount, 0, 0,0, 0));
+				ballz.add(new Ballz(-2, ballCount, 0, 0,0, 0));
 			}
 			synchronized (this) {
 			for (int j = 0; j < 10; j++) {

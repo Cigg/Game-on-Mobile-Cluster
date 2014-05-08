@@ -76,8 +76,11 @@ public class MultiThreds {
 		    		if(threads[0] != null) {
 		    			for(ClientThread.Ballz ball : threads[0].ballz) {
 		    				ball.update(timeDelta);
-		    				if(ball.isDead()) {
+		    				if(ball.shouldBeRemoved()) {
 		    					threads[0].ballz.remove(ball);
+		    				} else if(ball.isDead()) {
+		    					
+		    					ball.setShouldBeRemoved(true);
 		    				}
 		    			}		
 
@@ -135,7 +138,7 @@ public class MultiThreds {
 			    				
 			    				for(ClientThread.Ballz ball : thread.ballz) {
 			    			
-			    					if(buffer.limit() - buffer.position() >= 5*4) {
+			    					if(buffer.limit() - buffer.position() >= 6*4) {
 			    						
 				    					float xG = ball.getXPos();
 					    				float yG = ball.getYPos();
@@ -160,7 +163,7 @@ public class MultiThreds {
 					    						
 					    						Vec2 vella = physicsWorld.getVelocityFromId(ball.id);
 					    						
-					    						if( ball.shouldUpdate() || ball2.getXVel() != vella.x || ball2.getYVel() != vella.y ) {   // Don't Work
+					    						if( ball.shouldUpdate() || ball2.getXVel() != vella.x || ball2.getYVel() != vella.y || ball.shouldBeRemoved()) {   // Don't Work
 					    	
 					    							ball2.setXVel(vella.x);
 					    							ball2.setYVel(vella.y);
@@ -169,6 +172,13 @@ public class MultiThreds {
 								    				float yVelL2 = deviceManager.globalToLocalVelY(thread.getIp(), ball2.getXVel(), ball2.getYVel());
 								    				
 					    							buffer.putInt(ball.id);
+					    							if(ball.shouldBeRemoved()) {
+					    								buffer.putInt(-1);
+					    								thread.ownBallz.remove(ball.id);
+					    								System.out.println("-1");
+					    							} else {
+					    								buffer.putInt(ball.parent);
+					    							}
 								    				buffer.putFloat(xPosL);
 								    				buffer.putFloat(yPosL);
 								    				
@@ -183,6 +193,13 @@ public class MultiThreds {
 					    						
 					    						thread.ownBallz.put(ball.id, ball);
 					    						buffer.putInt(ball.id);
+					    						if(ball.shouldBeRemoved()) {
+				    								buffer.putInt(-1);
+				    								thread.ownBallz.remove(ball.id);
+				    								System.out.println("-1");
+				    							} else {
+				    								buffer.putInt(ball.parent);
+				    							}
 							    				buffer.putFloat(xPosL);
 							    				buffer.putFloat(yPosL);
 							    				

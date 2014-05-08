@@ -137,7 +137,7 @@ public class GameScreenMiddle extends Screen {
     	// Thread.currentThread().setPriority(Thread.MAX_PRIORITY);
     	
     	ballHandler.updateBalls(deltaTime);
-    	ballHandler.removeBallsOutOfBounds();
+    	ballHandler.removeBallsNotWanted();
     	
     	up = false;
     	

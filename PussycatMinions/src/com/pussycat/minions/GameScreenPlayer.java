@@ -118,7 +118,7 @@ public class GameScreenPlayer extends Screen {
     	// Thread.currentThread().setPriority(Thread.MAX_PRIORITY);
     	
     	ballHandler.updateBalls(deltaTime);
-    	ballHandler.removeBallsOutOfBounds();
+    	ballHandler.removeBallsNotWanted();
     	ballsWidget.updateBalls();
     	pointsWidget.updatePoints();
     	timerWidget.update();
@@ -489,7 +489,6 @@ public class GameScreenPlayer extends Screen {
         
        
     	//Log.d("deltaTime", "deltaTime = " + deltaTime * Math.pow(10, -7));
-    	
     	
     	
     	if( drawTraceAfter ) {
