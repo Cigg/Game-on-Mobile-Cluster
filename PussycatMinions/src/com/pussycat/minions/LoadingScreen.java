@@ -26,9 +26,7 @@ public class LoadingScreen extends Screen {
         Assets.button = g.newImage("button.png", ImageFormat.RGB565);
         Assets.button_pressed = g.newImage("button_pressed.png", ImageFormat.RGB565);
         Assets.background = g.newBackground("colorspectrum.jpg", ImageFormat.RGB565);
-        
         Log.d("Debug Pussycat", "LoadingScreen update");
-        
         game.setScreen(new MainMenuScreen(game));
     }
 

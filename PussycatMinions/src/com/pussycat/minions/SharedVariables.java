@@ -1,6 +1,9 @@
 package com.pussycat.minions;
 
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
+
+import android.util.Log;
 
 public class SharedVariables {
 	
@@ -37,6 +40,10 @@ public class SharedVariables {
 	private float middleAngle;
 	private Object middleAngleMutex = new Object();
 	
+	private AtomicInteger[] points;	
+	private AtomicInteger totalPoints;	
+	private AtomicBoolean updatedPoints;
+	
 	
 	// Singleton design pattern
 	public static SharedVariables getInstance() {
@@ -58,12 +65,74 @@ public class SharedVariables {
 		setSendDelay(0.0f);
 		
 		nClocks = new AtomicInteger(0);
+		updatedPoints = new AtomicBoolean(false);
 	}
 		
+	
+	public void initializePoints(final short nPlayers) {
+		points = new AtomicInteger[nPlayers];
+		totalPoints = new AtomicInteger();
+		
+		// TODO: FIX
+		int totalPoints = 0;
+		for(short i=0; i<nPlayers; i++) {
+			points[i] = new AtomicInteger();
+			int pointz = (int)(Math.random() * 100.0f);
+			Log.d("POINTS", "POINTS: " + pointz);
+			setPoints(i, pointz);
+			totalPoints += pointz;
+		}
+		setTotalPoints(totalPoints);
+		setPointsIsUpdated(true);
+		Log.d("POINTS", "totalPoints: " + totalPoints);
+		
+		Thread t = new Thread(new Runnable() {
+			public void run() {
+				while(true) {
+					AtomicInteger[] points = SharedVariables.getInstance().getPoints();
+					AtomicInteger totalPoints = SharedVariables.getInstance().getTotalPoints();
+					
+					int totalPointsInt = 0;
+					for(short i=0; i<SharedVariables.getInstance().getPoints().length; i++) {
+						int pointz = (int)(Math.random() * 100.0f);
+						SharedVariables.getInstance().setPoints(i, pointz);
+						totalPointsInt += pointz;
+					}
+					SharedVariables.getInstance().setTotalPoints(totalPointsInt);
+					SharedVariables.getInstance().setPointsIsUpdated(true);
+					try {
+						Thread.currentThread().sleep( (int)(Math.random() * 3000));
+					} catch (InterruptedException e) {
+						e.printStackTrace();
+					}
+				}
+			}
+			
+		});
+		t.start();
+		
+	}
+	
 	
 	// =========================================
 	// Get methods
 	// =========================================
+	
+	
+	public AtomicInteger[] getPoints() {
+		return points;
+		
+	}
+	
+	
+	public AtomicInteger getTotalPoints() {
+		return totalPoints;
+	}
+	
+	
+	public boolean pointsIsUpdated() {
+		return updatedPoints.get();
+	}
 	
 	
 	public float getDeviceAngle() {
@@ -136,6 +205,21 @@ public class SharedVariables {
 	// =========================================
 	// Set methods
 	// =========================================
+	
+	
+	public void setPoints(final int id, final int points) {
+		this.points[id].set(points);
+	}
+
+
+	public void setTotalPoints(final int totalPoints) {
+		this.totalPoints.set(totalPoints);
+	}
+	
+	
+	public void setPointsIsUpdated(final boolean isUpdated) {
+		this.updatedPoints.set(isUpdated);
+	}
 	
 	
 	public void setDeviceAngle(float newDeviceAngle) {

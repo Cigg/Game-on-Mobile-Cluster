@@ -60,7 +60,7 @@ public class GameScreenMiddle extends Screen {
 	Button exitButton;
 	
 	private TCPClient comm;
-	private BallHandler ballzHandler;
+	private BallHandler ballHandler;
 	
 	// Game objects
 	private Target middleTarget;
@@ -98,8 +98,8 @@ public class GameScreenMiddle extends Screen {
 		comm = new TCPClient();
 		comm.start();
 		
-		ballzHandler = new BallHandler(PussycatMinions.getScreenWidth(), PussycatMinions.getScreenHeight());
-		ServerCommunication t4 = new ServerCommunication(comm, ballzHandler, middleTarget);
+		ballHandler = new BallHandler(PussycatMinions.getScreenWidth(), PussycatMinions.getScreenHeight());
+		ServerCommunication t4 = new ServerCommunication(comm, ballHandler, middleTarget);
 		t4.start();
 		
     }
@@ -136,8 +136,8 @@ public class GameScreenMiddle extends Screen {
     	
     	// Thread.currentThread().setPriority(Thread.MAX_PRIORITY);
     	
-    	ballzHandler.updateBalls(deltaTime);
-    	ballzHandler.removeBallsOutOfBounds();
+    	ballHandler.updateBalls(deltaTime);
+    	ballHandler.removeBallsOutOfBounds();
     	
     	up = false;
     	
@@ -342,7 +342,7 @@ public class GameScreenMiddle extends Screen {
         
     	middleTarget.drawTarget(graphics);
 
-        ballzHandler.drawBalls(graphics);
+        ballHandler.drawBalls(graphics);
    
         if (state == GameState.Running) {
             drawRunningUI();

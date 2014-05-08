@@ -415,6 +415,7 @@ public class Device {
 			
 		
 			ArrayList<IndexPair> temp = new ArrayList<IndexPair>();
+			Log.d("DEVICE", "TOTAL TILES: " + indexes.size());
 			Log.d("TILE6", "numberOfExecutionThreads: " + numberOfExecutionThreads);
 			Log.d("TILE6", "numberOfTilesForEachExecutionThread: " + numberOfTilesForEachExecutionThread);
 			Log.d("TILE6", "first: " + first);
