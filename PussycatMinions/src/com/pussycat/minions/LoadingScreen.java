@@ -26,6 +26,7 @@ public class LoadingScreen extends Screen {
         Assets.ball = g.newImage("ball.png", ImageFormat.RGB565);
         Assets.localBall = g.newImage("localBall.png", ImageFormat.RGB565);
         Assets.frog = g.newImage("frog.png", ImageFormat.RGB565);
+        Assets.octopus = g.newImage("octopus.png", ImageFormat.RGB565);
         Assets.button = g.newImage("button.png", ImageFormat.RGB565);
         Assets.button_pressed = g.newImage("button_pressed.png", ImageFormat.RGB565);
         Assets.background = g.newBackground("colorspectrum.jpg", ImageFormat.RGB565);
