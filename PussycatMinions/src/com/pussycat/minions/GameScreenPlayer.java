@@ -20,7 +20,6 @@ import com.pussycat.framework.Input.TouchEvent;
 import com.pussycat.framework.Screen;
 
 
-
 public class GameScreenPlayer extends Screen {
     enum GameState {
         Ready, Running, Paused, GameOver, AddDevice, NotMapped, Wait, MappedWait, Remap, //, Mapped
@@ -53,8 +52,16 @@ public class GameScreenPlayer extends Screen {
 	public boolean drawTraceAfter = false;
 
 	
+	private AnimationHandler animationHandler = AnimationHandler.getInstance();
+	private LoadingBar loadingBar = new LoadingBar();
+	
+	
 	private TCPClient comm;
 	private BallHandler ballHandler;
+	private BallsWidget ballsWidget;
+	private PointsWidget pointsWidget;
+	private TimerWidget timerWidget;
+	private PointsNotificationWidget pointsNotificationsWidget;
 
 	
     public GameScreenPlayer(Game game) {
@@ -77,6 +84,11 @@ public class GameScreenPlayer extends Screen {
 		ballHandler = new BallHandler(PussycatMinions.getScreenWidth(), PussycatMinions.getScreenHeight());
 		ServerCommunication t4 = new ServerCommunication(comm, ballHandler, null);
 		t4.start();
+		
+		ballsWidget = new BallsWidget();
+		pointsWidget = new PointsWidget();
+		timerWidget = new TimerWidget();
+		pointsNotificationsWidget = new PointsNotificationWidget();
 		
     }
 
@@ -109,6 +121,15 @@ public class GameScreenPlayer extends Screen {
     	
     	ballHandler.updateBalls(deltaTime);
     	ballHandler.removeBallsOutOfBounds();
+    	ballsWidget.updateBalls();
+    	pointsWidget.updatePoints();
+    	timerWidget.update();
+    	pointsNotificationsWidget.update();
+    	
+    	if(animationHandler != null) {
+    		animationHandler.updateAnimations(System.nanoTime());
+    		loadingBar.update(System.nanoTime());
+    	}
     	
     	up = false;
     	
@@ -215,31 +236,33 @@ public class GameScreenPlayer extends Screen {
     				
     				case RUN_DEVICE:
     				{
-    					Log.d("AppStates", "RUN_DEVICE");
-    					
-    					buffer = ByteBuffer.allocate(1*2 + 5*4);
-    		    		buffer.clear();
-    		    		
-    		    		buffer.putShort((short) GLOBAL_STATE__.RUN_DEVICE.ordinal());	// State: RUN_DEVICE
-    		    			
-    		    		if(index < 8) {
-	    		    		buffer.putFloat(downX);											// x1
-	    		    		buffer.putFloat(downY); 										// y1
-	    		    		buffer.putFloat(currentX);										// x2
-	    		    		buffer.putFloat(currentY);										// y2
-	    		    		buffer.putFloat(deltaTimeDragged);								// t	
-    		    		} else {
-    		    			buffer.putFloat(ptx[index-8]);									// x1
-	    		    		buffer.putFloat(pty[index-8]); 									// y1
-	    		    		buffer.putFloat(currentX);										// x2
-	    		    		buffer.putFloat(currentY);										// y2
-	    		    		buffer.putFloat(currentTime - tms[index-8]);					// t	
-    		    		}
-    		    		
-    		    		comm.sendData(buffer.array());
-    		    		
-    		    		Log.d("CLOCK", "RUNDEVICE ==== " + (System.nanoTime() + SharedVariables.getInstance().getSendDelay()) * Math.pow(10, -9));
-    		    		
+    					if( ballsWidget.pop() ) {
+	    					Log.d("AppStates", "RUN_DEVICE");
+	    					
+	    					buffer = ByteBuffer.allocate(1*2 + 5*4);
+	    		    		buffer.clear();
+	    		    		
+	    		    		buffer.putShort((short) GLOBAL_STATE__.RUN_DEVICE.ordinal());	// State: RUN_DEVICE
+	    		    			
+	    		    		if(index < 8) {
+		    		    		buffer.putFloat(downX);											// x1
+		    		    		buffer.putFloat(downY); 										// y1
+		    		    		buffer.putFloat(currentX);										// x2
+		    		    		buffer.putFloat(currentY);										// y2
+		    		    		buffer.putFloat(deltaTimeDragged);								// t	
+	    		    		} else {
+	    		    			buffer.putFloat(ptx[index-8]);									// x1
+		    		    		buffer.putFloat(pty[index-8]); 									// y1
+		    		    		buffer.putFloat(currentX);										// x2
+		    		    		buffer.putFloat(currentY);										// y2
+		    		    		buffer.putFloat(currentTime - tms[index-8]);					// t	
+	    		    		}
+	    		    		
+	    		    		comm.sendData(buffer.array());
+	    		    		
+	    		    		Log.d("CLOCK", "RUNDEVICE ==== " + (System.nanoTime() + SharedVariables.getInstance().getSendDelay()) * Math.pow(10, -9));
+	    		    		pointsNotificationsWidget.addNotification((int) (Math.random() * 1000));
+    					}
     				}
     				break;
     				
@@ -250,6 +273,7 @@ public class GameScreenPlayer extends Screen {
     			dragged = false;
     			up = true;
     			drawTraceAfter = true;
+    			
     			    			
     		} else if(event.type == TouchEvent.TOUCH_DOWN) {
     			downTime = currentTime;
@@ -375,6 +399,14 @@ public class GameScreenPlayer extends Screen {
         device.drawBackground(graphics);
         
         
+    	if(animationHandler != null) {
+                        
+            loadingBar.draw(graphics);
+
+    	}
+
+        
+        
         
         // TODO: OPTIMERA!!
         boolean tail = true;
@@ -423,7 +455,7 @@ public class GameScreenPlayer extends Screen {
 	            	    // G�r att f�renkla
 	            	    iv = (float) (iv * Math.pow(10, 6));
 	            	    iv = Math.max(iv, 1);
-	            	    iv = Math.max(1, 6 / iv);
+	            	    iv = Math.max(3, 25 / iv);
 	            	    
 	            	    paint.setStrokeWidth( iv ) ;
 	      
@@ -563,7 +595,7 @@ public class GameScreenPlayer extends Screen {
 	            	    // G�r att f�renkla
 	            	    iv = (float) (iv * Math.pow(10, 6));
 	            	    iv = Math.max(iv, 1);
-	            	    iv = Math.max(1, 6 / iv);
+	            	    iv = Math.max(3, 25 / iv);
 	            	    
 	            	    paint.setStrokeWidth( iv ) ;
 	      
@@ -631,7 +663,14 @@ public class GameScreenPlayer extends Screen {
 				 	0.0f	);
         }
         
+        
+       
+        
         ballHandler.drawBalls(graphics);
+        ballsWidget.drawBalls(graphics);
+        pointsWidget.draw(graphics);
+        timerWidget.draw(graphics);
+        pointsNotificationsWidget.draw(graphics);
    
         if (state == GameState.Running) {
             drawRunningUI();
@@ -641,8 +680,7 @@ public class GameScreenPlayer extends Screen {
             drawPausedUI();
 		} else if (state == GameState.GameOver) {
 			drawGameOverUI();
-		} else if (state == GameState.NotMapped || state == GameState.AddDevice || state == GameState.Wait ||
-				   state == GameState.MappedWait || state == GameState.Remap) {
+		} else if (state == GameState.NotMapped) {
 			drawSharedUI(state);
 		}
         
@@ -675,7 +713,10 @@ public class GameScreenPlayer extends Screen {
     	} else if (state == GameState.Remap) {
     		g.drawImage(Assets.ball, imageX, imageY);
     		g.drawString("Klicka om du vill mappa om din enhet", textX, textY, paint);
-    	}    	
+    	}
+    	
+    	
+    	
     }
 
     private void drawReadyUI() {
@@ -688,33 +729,6 @@ public class GameScreenPlayer extends Screen {
     
     private void drawRunningUI() {
         Graphics g = game.getGraphics();
-        // TODO: Score! The server should send info about everyones score when it changes.
-        // Draw rectangles based on percentage of everyones score.
-        
-        int screenHeight = PussycatMinions.getScreenHeight();
-        int screenWidth = PussycatMinions.getScreenWidth();
-        
-        int scoreHeight = screenHeight - 200;
-        
-        // TODO: getNumberOfPlayers(), getTotalScore(), getThisPlayersScore()
-        int getNumberOfPlayers = 3;
-        int getTotalScore = 14;
-        int getThisPlayersScore[] = {4,3,7};
-        
-        int start = 0;
-        
-        for(int i = 0; i < getNumberOfPlayers; i++) {
-        	int percentage = (getThisPlayersScore[i] + start)/getTotalScore;
-        	int end = percentage*screenWidth;
-        	
-        	if(i%2 != 0) {
-        		g.drawRect(start, scoreHeight, end, screenHeight, Color.BLACK);
-        	} else {
-        		g.drawRect(start, scoreHeight, end, screenHeight, Color.GREEN);
-        	}
-        	
-        	start = end;
-        }
     }
 
     

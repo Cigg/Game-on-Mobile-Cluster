@@ -10,11 +10,13 @@ public class ServerCommunication extends Thread {
 	private volatile boolean isCommunicating;
 	private TCPClient tcp;
 	private BallHandler ballHandler;
+	private BallTypesHandler ballTypesHandler;
 	private Target target;
 
 	
 	ServerCommunication(TCPClient stcp, BallHandler ballHandler, Target target ) {
 		this.ballHandler = ballHandler;
+		this.ballTypesHandler = new BallTypesHandler();
 		this.tcp = stcp;
 		this.target = target;
 		isCommunicating = true;
@@ -58,7 +60,15 @@ public class ServerCommunication extends Thread {
 						case ADD_MAP: {
 							addMap( incomingData );
 						} break;
-
+						
+						case SET_MIDDLE_ANGLE: {
+							setMiddleAngle( incomingData );
+						} break;
+						
+						case SET_POINTS: {
+							setPoints( incomingData );
+						} break;
+						
 		    			default:
 		    			break;
 		    			
@@ -84,6 +94,33 @@ public class ServerCommunication extends Thread {
 	}
 	
 	
+	private void setPoints(DataPackage incomingData) {
+		ByteBuffer buffer = ByteBuffer.wrap(incomingData.getData());
+		final short state = buffer.getShort();
+		
+		final short nPlayers = buffer.getShort();
+		
+		int totalPoints = 0;
+		for(short i=0; i<nPlayers; i++) {
+			final int points = buffer.getInt();
+			SharedVariables.getInstance().setPoints(i, points);
+			totalPoints += points;
+		}
+		SharedVariables.getInstance().setTotalPoints(totalPoints);
+		SharedVariables.getInstance().setPointsIsUpdated(true);
+	}
+	
+	
+	private void setMiddleAngle(DataPackage incomingData) {
+		ByteBuffer buffer = ByteBuffer.wrap(incomingData.getData());
+		final short state = buffer.getShort();
+		
+		final float angle = buffer.getFloat();
+		
+		Log.d("GOTANGLE", "GOTANGLE: " + angle);
+		SharedVariables.getInstance().setMiddleAngle(angle);		
+	}
+
 	
 	private void addMap(DataPackage incomingData) {
 		ByteBuffer buffer = ByteBuffer.wrap(incomingData.getData());
@@ -134,11 +171,6 @@ public class ServerCommunication extends Thread {
 		short state = buffer.getShort();
 		
 		final short nBalls = buffer.getShort();
-		
-		if(target != null) {
-			float targetAngle = buffer.getFloat();
-			target.setRadAngle(targetAngle);
-		}
 		
 		for(int i=0; i<nBalls; i++) {
 			int id = buffer.getInt();

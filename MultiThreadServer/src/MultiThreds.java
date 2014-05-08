@@ -72,10 +72,10 @@ public class MultiThreds {
 		    		serverGraphics.update();
 	    			// Update ballz	
 		    		if(threads[0] != null) {
-		    			for(Ball ball : threads[0].balls) {
+		    			for(ClientThread.Ballz ball : threads[0].ballz) {
 		    				ball.update(timeDelta);
 		    				if(ball.isDead()) {
-		    					threads[0].balls.remove(ball);
+		    					threads[0].ballz.remove(ball);
 		    				}
 		    			}		
 
@@ -83,6 +83,7 @@ public class MultiThreds {
 		        		// Send data
 		    			for(ClientThread thread : threads) {
 		    				if (thread != null) {
+		    					// Send messages from other devices
 			    				while(deviceManager.hasMessagesToSend(thread.getIp())) {
 			    					byte[] data = deviceManager.getNextMessage(thread.getIp());
 			    					if(data != null) {
@@ -94,17 +95,29 @@ public class MultiThreds {
 			    						thread.clientInfo.addSentPackageItem("SENDATA   TODO: FIX");
 			    					}
 			    				}
+			    				
+			    				// Send middleAngle to middle
+			    				if( deviceManager.isMiddle(thread.getIp()) ) {
+			    					ByteBuffer dataBuffer = ByteBuffer.allocate(1*2 + 1*4);
+			    					dataBuffer.clear();
+			    		    		
+			    					dataBuffer.putShort((short) GLOBAL_STATE__.SET_MIDDLE_ANGLE.ordinal());	// State: ADD_DEVICE
+			    		    		
+			    		    		float jointAngle = 0.0f;
+				    				if(thread.targetJoint != null){
+				    					jointAngle =  thread.targetJoint.getJointAngle();
+				    				}
+				    				
+				    				dataBuffer.putFloat(jointAngle);	
+			    		    		thread.sendData(dataBuffer.array());
+			    				}
 		    				}
 		    			}
 		    			
-			    		// Send info to device
+		    			
+			    		// Send ballz
 			    		for(ClientThread thread : threads) {
 			    			if (thread != null) {
-			    				
-			    				float jointAngle = 0.0f;
-			    				if(thread.targetJoint != null){
-			    					jointAngle =  thread.targetJoint.getJointAngle();
-			    				}
 			    				
 			    				byte[] arr = new byte[1024];
 			    				ByteBuffer buffer;
@@ -115,21 +128,17 @@ public class MultiThreds {
 			    				buffer.putShort(sendState);	// State: Add balls
 			    				short nBalls = 0;
 			    				buffer.putShort(nBalls);										// nBalls, byte 2 och 3
-
-			    				// Send angle of middle target
-			    				//System.out.println("angle: " + jointAngle);
-			    				buffer.putFloat(jointAngle);
 			    				
 			    				
-			    				// Send balls pos and vel
-			    				for(Ball ball : thread.balls) {
+			    				
+			    				for(ClientThread.Ballz ball : thread.ballz) {
 			    			
 			    					if(buffer.limit() - buffer.position() >= 5*4) {
 			    						
 				    					float xG = ball.getXPos();
 					    				float yG = ball.getYPos();
 					    				
-					    				if(deviceManager.isOnDevice(thread.getIp(), xG, yG, ball.radious)) {
+					    				if(deviceManager.isOnDevice(thread.getIp(), xG, yG, ball.radius)) {
 					    					
 					    					float xVelG = ball.getXVel();
 						    				float yVelG = ball.getYVel();
@@ -143,7 +152,7 @@ public class MultiThreds {
 						    				
 					    					if( thread.ownBallz.containsKey(ball.id) ) {
 					    						
-					    						Ball ball2 = thread.ownBallz.get(ball.id);
+					    						ClientThread.Ballz ball2 = thread.ownBallz.get(ball.id);
 					    					
 					    						//System.out.println("OOOOOOOOOOOOOOOOOOO___SAMMMME___OOOOOOOOOOOOOOOOOOO");
 					    						
@@ -204,6 +213,8 @@ public class MultiThreds {
 			    				buffer.position(2);
 			    				buffer.putShort(nBalls);
 			    				
+			    				//System.out.println(jointAngle);
+			    				//buffer.putFloat(jointAngle);
 			    				if(nBalls != 0) {
 				    				thread.sendData(buffer.array());
 				    				thread.clientInfo.addSentPackageItem(GLOBAL_STATE__.values()[sendState] + "   " + nBalls);

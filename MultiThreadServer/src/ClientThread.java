@@ -38,13 +38,126 @@ public class ClientThread extends Thread {
 	private volatile static LOCAL_STATE__ internalState;
 	private volatile static float time1;
 
-	private String ip;
+	private volatile String ip;
 	private DeviceManager deviceManager;
 	private OutputStream dout;
 
-	public volatile LinkedBlockingQueue<Ball> balls = new LinkedBlockingQueue<Ball>();
+	static final int MAX_LIFETIME = 15;
+	static final float MAX_POSITION_X = (float) (100 / 2.5);
+	static final float MAX_POSITION_Y = MAX_POSITION_X;
 
-	Hashtable<Integer, Ball> ownBallz = new Hashtable<Integer, Ball>();
+	public class Ballz {
+
+		float xPos, yPos;
+		float xVel, yVel;
+		float mass, radius, lifeTime;
+		int id;
+		boolean isMoved;
+
+		float lx, ly;
+
+		public Ballz(int id, float xPos, float yPos, float xVel, float yVel) {
+
+			this.id = id;
+			this.xPos = xPos;
+			this.yPos = yPos;
+			this.xVel = xVel;
+			this.yVel = yVel;
+			this.lifeTime = 0;
+			this.radius = 0.75f;
+			this.isMoved = false;
+
+			lx = xPos;
+			ly = yPos;
+
+			System.out.println("NEW BALL: " + id);
+			System.out.println("Added ballz: " + xPos + ", " + yPos + "    "
+					+ xVel + ", " + yVel); // * Math.pow(10, 9) * 2.5
+
+			MultiThreds.getPhysicsWorld().addBall(xPos, yPos, xVel, yVel, id,
+					0.03f, radius, 0.8f, 0.3f);
+
+		}
+
+		public boolean shouldUpdate() {
+			return this.isMoved;
+		}
+
+		public void update(float deltaTime) {
+			this.xPos += this.xVel * deltaTime;
+			this.yPos += this.yVel * deltaTime;
+			this.lifeTime += deltaTime;
+
+			Vec2 position = MultiThreds.getPhysicsWorld().getPositionFromId(
+					this.id);
+			this.xPos = position.x;
+			this.yPos = position.y;
+			
+			
+			Vec2 velocity = MultiThreds.getPhysicsWorld().getVelocityFromId(this.id);
+
+			if( Math.abs(lx - (position.x - velocity.x * deltaTime)) > 0.01 || 
+				Math.abs(ly - (position.y - velocity.y * deltaTime)) > 0.01 ) {
+				System.out.println("OOOOOOOOOOOOOOOOOOO___BALL_SHOUDL-.UPDATE___OOOOOOOOOOOOOOOOOOO");
+				this.isMoved = true;
+			} else {
+				this.isMoved = false;
+			}
+
+			lx = xPos;
+			ly = yPos;
+		}
+
+		public boolean isDead() {
+			if ((this.lifeTime * Math.pow(10, -9)) > MAX_LIFETIME
+					|| outOfBounds()) {
+				return true;
+			}
+			return false;
+		}
+
+		public boolean outOfBounds() {
+			if (Math.abs(this.xPos) < MAX_POSITION_X
+					&& Math.abs(this.yPos) < MAX_POSITION_Y) {
+				return false;
+			}
+			return true;
+		}
+
+		public void printInfo() {
+			System.out.println("Ball: " + this.xPos + ", " + this.yPos + "    "
+					+ this.xVel * Math.pow(10, 9) * 2.5 + ", " + this.yVel
+					* Math.pow(10, 9) * 2.5);
+		}
+
+		public float getXPos() {
+			return this.xPos;
+		}
+
+		public float getYPos() {
+			return this.yPos;
+		}
+
+		public float getXVel() {
+			return this.xVel;
+		}
+
+		public float getYVel() {
+			return this.yVel;
+		}
+
+		public void setXVel(float xVel) {
+			this.xVel = xVel;
+		}
+
+		public void setYVel(float yVel) {
+			this.yVel = yVel;
+		}
+	}
+
+	public volatile static LinkedBlockingQueue<Ballz> ballz = new LinkedBlockingQueue<Ballz>();
+
+	Hashtable<Integer, Ballz> ownBallz = new Hashtable<Integer, Ballz>();
 
 	
 	public RevoluteJoint targetJoint = null;
@@ -200,6 +313,7 @@ public class ClientThread extends Thread {
 								sendData(sendBuffer.array());
 								
 								clientInfo.addSentPackageItem(GLOBAL_STATE__.values()[sendState] + "   " + sendTime + "   " + reciveTime);
+								clientInfo.setClock(delta1);
 								
 								System.out.println("CLOCK === " + System.nanoTime() * Math.pow(10, -9));
 							}
@@ -216,6 +330,20 @@ public class ClientThread extends Thread {
 								deviceManager.addDevice(ip, type, xDPI, yDPI, deviceResX, deviceResY);
 								
 								clientInfo.addIncomingPackageItem(actualState.name() + "   " + type + "   " + xDPI + "   " + yDPI + "   " + deviceResX + "   " + deviceResY);
+								clientInfo.setType(type);
+								clientInfo.setXDPI(xDPI);
+								clientInfo.setYDPI(yDPI);
+								clientInfo.setResX(deviceResX);
+								clientInfo.setResY(deviceResY);
+								
+								// Dupliciation for main device
+								float l_midX = deviceManager.getMidX(ip);
+								float l_midY = deviceManager.getMidY(ip);
+
+								float g_midX = deviceManager.localToGlobalX(ip, l_midX, l_midY);
+								float g_midY = deviceManager.localToGlobalY(ip, l_midX, l_midY);
+								clientInfo.setMidX(g_midX * 2.5f);
+								clientInfo.setMidY(g_midY * 2.5f);
 							}
 								break;
 
@@ -279,6 +407,11 @@ public class ClientThread extends Thread {
 
 									sendData(sendBuffer.array());
 									clientInfo.addSentPackageItem(GLOBAL_STATE__.values()[sendState] + "   " + rotZ + "   " + g_midX + "   " + g_midY + "   " + g_main_midX + "   " + g_main_midY);
+									clientInfo.setAngle((float) (rotZ * 180 / Math.PI));
+									clientInfo.setPosX(posX * 2.5f);
+									clientInfo.setPosY(posY * 2.5f);
+									clientInfo.setMidX(g_midX * 2.5f);
+									clientInfo.setMidY(g_midY * 2.5f);
 
 								} else {
 									System.out.println("MAPPING_STEP1");
@@ -312,7 +445,6 @@ public class ClientThread extends Thread {
 									float g_main_midY = deviceManager.localToGlobalY(ipOfMiddle, l_main_midX, l_main_midY);
 
 									targetJoint = MultiThreds.getPhysicsWorld().addTarget(g_main_midX, g_main_midY, 0.8f);
-
 								}
 							}
 								break;
@@ -344,7 +476,7 @@ public class ClientThread extends Thread {
 									// ballz.add(new
 									// Ballz(MultiThreds.sharedVariables.getInstance().getBallCounter(),xG,
 									// yG, xVel, yVel));
-									balls.add(new Ball(ballCount, xG, yG,
+									ballz.add(new Ballz(ballCount, xG, yG,
 											xVel, yVel));
 									for (int j = 0; j < maxClientsCount; j++) {
 										if (threads[j] != null) {
@@ -353,7 +485,7 @@ public class ClientThread extends Thread {
 									}
 								}
 								System.out.println("Ball count: " + ballCount);
-								System.out.println("Ballz size: " + balls.size());
+								System.out.println("Ballz size: " + ballz.size());
 							}
 								break;
 
@@ -413,7 +545,7 @@ public class ClientThread extends Thread {
 		
 			for(int i = 0; i < 100; i++) {
 				ballCount++;
-				balls.add(new Ball(ballCount, 0, 0,0, 0));
+				ballz.add(new Ballz(ballCount, 0, 0,0, 0));
 			}
 			synchronized (this) {
 			for (int j = 0; j < 10; j++) {
@@ -426,7 +558,7 @@ public class ClientThread extends Thread {
 	}
 	
 	public void clearBalls() {
-		balls.clear();
+		ballz.clear();
 		synchronized (this) {
 			ballCount = 0;
 			for (int j = 0; j < 10; j++) {

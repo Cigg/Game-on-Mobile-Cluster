@@ -8,7 +8,7 @@ public class Settings {
 	private Map<String, String> map = new HashMap<String, String>();
 
 	public Settings(){
-		map.put("ballRadius", "0.0075");
+		map.put("ballRadius", "0.01");
 	}
 	
 	public String getSetting(String key)

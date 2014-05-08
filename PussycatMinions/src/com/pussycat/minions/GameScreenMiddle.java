@@ -4,7 +4,6 @@ package com.pussycat.minions;
 import java.nio.ByteBuffer;
 import java.util.List;
 
-import android.app.Activity;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
@@ -49,7 +48,7 @@ public class GameScreenMiddle extends Screen {
 	boolean up = false;
 	public Bitmap bitmap = null;
 	public Canvas bitmapCanvas = null;	  
-
+	float lastAlpha;
 	public boolean drawTraceAfter = false;
 
 	
@@ -61,7 +60,7 @@ public class GameScreenMiddle extends Screen {
 	Button exitButton;
 	
 	private TCPClient comm;
-	private BallHandler ballzHandler;
+	private BallHandler ballHandler;
 	
 	// Game objects
 	private Target middleTarget;
@@ -78,8 +77,8 @@ public class GameScreenMiddle extends Screen {
 		
 		int width = PussycatMinions.getScreenWidth()/2 - Assets.button.getWidth()/2;
 		
-		menuButton = new Button(Assets.settings, Assets.settings_pressed, PussycatMinions.getScreenWidth() - Assets.settings.getWidth() - 30, PussycatMinions.getScreenHeight()-Assets.settings.getHeight() - 30, paint);
-        //menuButton.setText("MENU");
+		menuButton = new Button(Assets.button, Assets.button_pressed, PussycatMinions.getScreenWidth() - 200, PussycatMinions.getScreenHeight()-70, paint);
+        menuButton.setText("MENU");
         resumeButton = new Button(Assets.button, Assets.button_pressed, width, PussycatMinions.getScreenHeight()/2-100, paint);
         resumeButton.setText("RESUME");
         restartButton = new Button(Assets.button, Assets.button_pressed, width, PussycatMinions.getScreenHeight()/2, paint);
@@ -99,27 +98,22 @@ public class GameScreenMiddle extends Screen {
 		comm = new TCPClient();
 		comm.start();
 		
-		ballzHandler = new BallHandler(PussycatMinions.getScreenWidth(), PussycatMinions.getScreenHeight());
-		ServerCommunication t4 = new ServerCommunication(comm, ballzHandler, middleTarget);
+		ballHandler = new BallHandler(PussycatMinions.getScreenWidth(), PussycatMinions.getScreenHeight());
+		ServerCommunication t4 = new ServerCommunication(comm, ballHandler, middleTarget);
 		t4.start();
 		
     }
-    
-    public void eventTouched(GameState state, TouchEvent event) {
-    	
-    }
-    
+
     @Override
     public void update(float deltaTime) {
         List<TouchEvent> touchEvents = game.getInput().getTouchEvents();
-        int len = touchEvents.size();
-		
+        
         if (state == GameState.Running) {
             updateRunning(touchEvents, deltaTime);
         } else if (state == GameState.Ready) {
             updateReady(touchEvents);
     	} else if (state == GameState.Paused) {
-    		updatePaused(touchEvents);
+            updatePaused(touchEvents);
 		} else if (state == GameState.GameOver) {
             updateGameOver(touchEvents);
 		}
@@ -142,8 +136,8 @@ public class GameScreenMiddle extends Screen {
     	
     	// Thread.currentThread().setPriority(Thread.MAX_PRIORITY);
     	
-    	ballzHandler.updateBalls(deltaTime);
-    	ballzHandler.removeBallsOutOfBounds();
+    	ballHandler.updateBalls(deltaTime);
+    	ballHandler.removeBallsOutOfBounds();
     	
     	up = false;
     	
@@ -153,8 +147,9 @@ public class GameScreenMiddle extends Screen {
         	currentX = event.x;
     		currentY = event.y;
     		final float currentTime = event.time;
+    		
     	
-    		if(event.pointer >= 2) {
+    		  if(event.pointer >= 2) {
      			Log.d("AppStates", "SEND SET_STATE");
      			
      			ByteBuffer buffer = ByteBuffer.allocate(2*2);
@@ -166,16 +161,8 @@ public class GameScreenMiddle extends Screen {
      			
      			SharedVariables.getInstance().setInternalState(GLOBAL_STATE__.MAP_DEVICE);
      			
-     		} else if(event.type == TouchEvent.TOUCH_DOWN) {
-     			
-     			/* 
-    			 * Försök till implementation av menyknappen i hörnet av skärmen
-    			 */
-     			if(menuButton.inBounds(event.x, event.y)) {
-            		menuButton.setPressed(true);
-            	}
-     			
-            } else if(event.type == TouchEvent.TOUCH_DRAGGED) {
+     		} 
+    		  else if(event.type == TouchEvent.TOUCH_DRAGGED) {
     			draggedX = currentX;
     			draggedY = currentY;  	
     		
@@ -188,23 +175,7 @@ public class GameScreenMiddle extends Screen {
     				index++;
     			}
     			
-    			/* 
-    			 * Försök till implementation av menyknappen i hörnet av skärmen
-    			 */
-    			if(!menuButton.inBounds(event.x, event.y)){
-            		menuButton.setPressed(false);
-            	}
-    			
     		} else if(event.type == TouchEvent.TOUCH_UP) {
-    			
-    			/* 
-    			 * Försök till implementation av menyknappen i hörnet av skärmen
-    			 */
-    			menuButton.setPressed(false);
-    			if(menuButton.inBounds(event.x, event.y)){
-            		//game.setScreen(new GameScreenPlayer(game));
-    				state = GameState.Paused;
-            	}
     			
     			final float deltaTimeDragged = currentTime - downTime;
 
@@ -335,62 +306,9 @@ public class GameScreenMiddle extends Screen {
         int len = touchEvents.size();
         for (int i = 0; i < len; i++) {
             TouchEvent event = touchEvents.get(i);
-            
-            if(event.type == TouchEvent.TOUCH_DOWN){
-            	if(resumeButton.inBounds(event.x, event.y)){
-            		resumeButton.setPressed(true);
-            	} else if (restartButton.inBounds(event.x, event.y)){
-            		restartButton.setPressed(true);
-            	} else if (remapButton.inBounds(event.x, event.y)){
-            		remapButton.setPressed(true);
-            	} else if (addButton.inBounds(event.x, event.y)){
-            		addButton.setPressed(true);
-            	} else if (exitButton.inBounds(event.x, event.y)){
-            		exitButton.setPressed(true);
-            	}
-            }
-            
-            if(event.type == TouchEvent.TOUCH_DRAGGED){
-            	if(!resumeButton.inBounds(event.x, event.y)){
-            		resumeButton.setPressed(false);
-            	} else if (restartButton.inBounds(event.x, event.y)){
-            		restartButton.setPressed(false);
-            	} else if (remapButton.inBounds(event.x, event.y)){
-            		remapButton.setPressed(false);
-            	} else if (addButton.inBounds(event.x, event.y)){
-            		addButton.setPressed(false);
-            	} else if (exitButton.inBounds(event.x, event.y)){
-            		exitButton.setPressed(false);
-            	}
-            }
-            
             if (event.type == TouchEvent.TOUCH_UP) {
-            	resumeButton.setPressed(false);
-            	restartButton.setPressed(false);
-            	remapButton.setPressed(false);
-            	addButton.setPressed(false);
-            	exitButton.setPressed(false);
-            	
-            	// TODO: Should go to SetupScreen instead
-            	if(resumeButton.inBounds(event.x, event.y)){
-            		//game.setScreen(new GameScreenPlayer(game));
-            		state = GameState.Running;
-            		
-            	} else if (restartButton.inBounds(event.x, event.y)){
-            		// TODO: Send message to clear the server. Reset scores not devices.
-            		
-            	} else if (remapButton.inBounds(event.x, event.y)){
-            		// TODO: Send message to the server that it should be
-            		// prepared to remap a device.
-            		
-            	} else if (addButton.inBounds(event.x, event.y)){
-            		// TODO: Add a device. The server should be prepared to recieve info and map the device.
-            		
-            	} else if (exitButton.inBounds(event.x, event.y)){
-            		//finish();
-                    System.exit(0);
-            	}
-            }        
+
+            }
         }
     }
 
@@ -409,50 +327,8 @@ public class GameScreenMiddle extends Screen {
         }
 
     }
-
-    
-    private float linearInterpolation(float x1, float x2, float scale) {
-		return x1 * (1 - scale) + x2 * scale;
-	}
-	
-    
-    private float cosineInterpolation(float x1, float x2, float scale) {
-		float scaleModified = (float) ((1 - Math.cos(scale * Math.PI)) / 2);
-		return x1 * (1 - scaleModified) + x2 * scaleModified;
-	}
-	
-    
-	private float cubicInterpolation(float x0, float x1, float x2, float x3, float scale) {
-		float a0, a1, a2, a3, scale2;
-		scale2 = scale * scale;
-		a0 = x3 - x2 - x0 + x1;
-		a1 = x0 - x1 - a0;
-		a2 = x2 - x0;
-		a3 = x1;
-		return (a0*scale*scale2 + a1*scale2 + a2*scale + a3); 
-	}
-	
-
 	
 	
-	// Fï¿½r trace/trigger - ska fixa fint
-	// TODO: ska fixa fint och stï¿½da
-	public float x1 = ptx[0];
-	public float y1 = pty[0];
-	public float t1 = tms[0];
-	public float v1 = 0;
-
- 	public float xk = 0;
- 	public float yk = 0;
-	
- 	public float xz = 0;
- 	public float yz = 0;
-	
- 	public float vk = 0;
- 	public float vz = 0;
-	
- 	public int lastAlpha = 255;
- 	
  	Device device = new Device();
  	
  	
@@ -462,286 +338,11 @@ public class GameScreenMiddle extends Screen {
         Graphics graphics = game.getGraphics();
         Canvas canvas = graphics.getCanvas();
         
-        //graphics.drawImage(Assets.background, 0, 0);
-       // graphics.drawRect(0, 0, PussycatMinions.getScreenWidth(),  PussycatMinions.getScreenHeight(), Color.BLACK);
-       
-       // device.drawBackground(graphics);
-       
-       /*
-        switch (SharedVariables.getInstance().getInternalState()) {
-        	case REG:
-        		device.drawBackground(graphics);
-        	break;
-        	
-        	default:
-        		graphics.drawImage(Assets.background, 0, 0);
-        	break;
-        }
-        */
     	device.drawBackground(graphics);
-       // graphics.drawImage(Assets.background, 0, 0);
-      //  device.drawBackground(graphics);
         
-        
-        
-        // TODO: OPTIMERA!!
-        boolean tail = false;
-        if( dragged && tail) {
+    	middleTarget.drawTarget(graphics);
 
-  			paint.setColor(Color.YELLOW);
-               
-        	int jump = 4;
-        	for(int i = beginIndex ; i<index ; i += jump) {
-        		
-        		float x2 = ptx[i];
-        		float y2 = pty[i];        		
-        		float t2 = tms[i];
-        		
-        		float dx = x2 - x1;
-        		float dy = y2 - y1;
-        		float dt = t2 - t1;
-        		
-        		vel[i] = (float) (Math.sqrt( Math.pow(dx, 2) + Math.pow(dy, 2) ) / dt);
-        		
-        		float v2 = vel[i];
-        		
-        		if( i > 7 ) {
-	        		int steps = 512;
-
-	        		float scale;
-	        		float ix;
-	        		float iy;
-	        		float iv;
-	        		
-	        	
-	        		for(int j=0 ; j<steps; j++) {
-	        			
-	        			scale = j / (float) steps;  // Kan rï¿½knas ut i fï¿½rvï¿½g
-	            	    ix = cubicInterpolation(xk, xz, x1, x2, scale);
-	            	    iy = cubicInterpolation(yk, yz, y1, y2, scale);
-	            	    
-	        			//float iv = cubicInterpolation(vk, vz, v1, v2, scale);
-	        			
-	        			//float ix = cosineInterpolation(x1, x2, scale);
-	        			//float iy = cosineInterpolation(y1, y2, scale);
-	            	    iv = linearInterpolation(v1, v2, scale);
-	        			
-	        			//float iv = cosineInterpolation(v1, v2, scale);
-	            	    
-	            	    // Gï¿½r att fï¿½renkla
-	            	    iv = (float) (iv * Math.pow(10, 6));
-	            	    iv = Math.max(iv, 1);
-	            	    iv = Math.max(1, 6 / iv);
-	            	    
-	            	    paint.setStrokeWidth( iv ) ;
-	      
-	            	    bitmapCanvas.drawPoint(ix, iy, paint);
-	  	            	    
-	        		}
-	        		
-	 
-	        		
-	        		beginIndex = i + jump;
-        		}
-        		
-        		/*
-        		paint.setStrokeWidth(10);
-        		paint.setColor(Color.RED);
-        		canvas.drawPoint(ptx[i], pty[i], paint);
-        		*/
-        		
-        		t1 = t2;
-        		
-        		vk = vz;
-        		vz = v1;
-        		v1 = v2;
-        		
-        		xk = xz;
-        		yk = yz;
-        		
-        		xz = x1;
-        		yz = y1;
-        		
-        		x1 = x2;
-        		y1 = y2;
-	
-        		
-        	}
-        	
-        	
-	        
-        }
-        
-        
-       
-    	//Log.d("deltaTime", "deltaTime = " + deltaTime * Math.pow(10, -7));
-    	
-    	
-    	
-    	if( drawTraceAfter ) {
-
-    		//lastAlpha = Math.max(0, lastAlpha - (int)(0.5 * deltaTime * Math.pow(10, -6)));
-        	//Log.d("NANO", "System.nanoTime() - tms[index] = " + (System.nanoTime() - tms[index]));
-        	
-        	//Log.d("NANO","index = " + index);
-        	
-        	float timeElapsed = (float) ((System.nanoTime() - tms[Math.max(0, index-1)]) *  Math.pow(10, -9));
-        	//Log.d("timeElapsed", "timeElapsed = " + timeElapsed);
-        	float seconds = 1.0f;
-        	
-        	int alpha = Math.max(0, (int) cosineInterpolation(255, 0 , (float) (timeElapsed / seconds )));
-        		        	
-        	paint.setAlpha( alpha );
-        	
-        	if( alpha == 0 ) {
-        		drawTraceAfter = false;
-        	}
-        	
-    	}
-    	
-    	if (bitmap == null) {
-		    bitmap = Bitmap.createBitmap(PussycatMinions.getScreenWidth(), PussycatMinions.getScreenHeight(), Bitmap.Config.ARGB_8888);
-		    bitmapCanvas = new Canvas(bitmap);
-		}
-    	
-	
-        canvas.drawBitmap(bitmap, 0, 0, paint);
-        
-        int beginIndexBefore = beginIndex;
-    	float x1b = x1;
-    	float y1b = y1;
-    	float t1b = t1;
-    	float v1b = v1;
-
-    	
-
-    	float xkb = xk;
-    	float ykb = yk;
-    	
-    	float xzb = xz;
-    	float yzb = yz;
-    	
-    	float vkb = vk;
-    	float vzb = vz;
-     	
-     	boolean tail2 = false;
-        if( (dragged || up ) && tail2 && beginIndex > 7) {
-        	
-        	beginIndex = beginIndex - 2 ;
-
-        	paint.setColor(Color.YELLOW);
-               
-        	int jump = 1;
-        	for(int i = beginIndex ; i<index ; i += jump) {
-        		
-        		float x2 = ptx[i];
-        		float y2 = pty[i];        		
-        		float t2 = tms[i];
-        		
-        		float dx = x2 - x1;
-        		float dy = y2 - y1;
-        		float dt = t2 - t1;
-        		
-        		vel[i] = (float) (Math.sqrt( Math.pow(dx, 2) + Math.pow(dy, 2) ) / dt);
-        		
-        		float v2 = vel[i];
-        		
-        		if( i > 7 ) {
-	        		int steps = 512;
-
-	        		float scale;
-	        		float ix;
-	        		float iy;
-	        		float iv;
-	        		
-	        		for(int j=0 ; j<steps; j++) {
-	        			
-	        			scale = j / (float) steps;  // Kan rï¿½knas ut i fï¿½rvï¿½g
-	            	    ix = cubicInterpolation(xk, xz, x1, x2, scale);
-	            	    iy = cubicInterpolation(yk, yz, y1, y2, scale);
-	            	    
-	        			//float iv = cubicInterpolation(vk, vz, v1, v2, scale);
-	        			
-	        			//float ix = cosineInterpolation(x1, x2, scale);
-	        			//float iy = cosineInterpolation(y1, y2, scale);
-	            	    iv = linearInterpolation(v1, v2, scale);
-	        			
-	        			//float iv = cosineInterpolation(v1, v2, scale);
-	            	    
-	            	    // Gï¿½r att fï¿½renkla
-	            	    iv = (float) (iv * Math.pow(10, 6));
-	            	    iv = Math.max(iv, 1);
-	            	    iv = Math.max(1, 6 / iv);
-	            	    
-	            	    paint.setStrokeWidth( iv ) ;
-	      
-	            	    if(up) {
-	            	    	bitmapCanvas.drawPoint(ix, iy, paint);
-	            	    } else {
-	            	    	canvas.drawPoint(ix, iy, paint);
-	            	    }
-	        		}	
-	 
-	        		//beginIndex = i + jump;
-        		}
-
-        		/*
-        		paint.setStrokeWidth(10);
-        		paint.setColor(Color.RED);
-        		canvas.drawPoint(ptx[i], pty[i], paint);
-        		*/
-        		
-        		t1 = t2;
-        		
-        		vk = vz;
-        		vz = v1;
-        		v1 = v2;
-        		
-        		xk = xz;
-        		yk = yz;
-        		
-        		xz = x1;
-        		yz = y1;
-        		
-        		x1 = x2;
-        		y1 = y2;
-	
-        		
-        	}
-        	 
-        }
-        
-        beginIndex = beginIndexBefore;
-        x1 = x1b;
-        y1 = y1b;
-        t1 = t1b;
-        v1 = v1b;
-
-        xk = xkb;
-        yk = ykb;
-    	
-        xz = xzb;
-        yz = yzb;
-    	
-        vk = vkb;
-        vz = vzb;
-        
-        if( dragged ) {
-        	graphics.drawScaledImage(	Assets.ball, 
-				 	(int)(draggedX - PussycatMinions.meters2Pixels(Float.parseFloat(PussycatMinions.settings.getSetting("ballRadius")))), 
-				 	(int)(draggedY - PussycatMinions.meters2Pixels(Float.parseFloat(PussycatMinions.settings.getSetting("ballRadius")))), 
-				 	(int)(PussycatMinions.meters2Pixels(Float.parseFloat(PussycatMinions.settings.getSetting("ballRadius"))*2)), 
-				 	(int)(PussycatMinions.meters2Pixels(Float.parseFloat(PussycatMinions.settings.getSetting("ballRadius"))*2)), 
-				 	0, 
-				 	0, 
-				 	Assets.ball.getWidth(), 
-				 	Assets.ball.getHeight(),
-				 	0.0f	);
-        }
-        
-        drawTarget();
-        
-        ballzHandler.drawBalls(graphics);
+        ballHandler.drawBalls(graphics);
    
         if (state == GameState.Running) {
             drawRunningUI();
@@ -754,16 +355,6 @@ public class GameScreenMiddle extends Screen {
 		}
         
     }
-    
-    private void drawTarget() {
-        Graphics g = game.getGraphics();
-        //Log.d("Debug Pussycat", "drawTarget");
-        //Log.d("Debug Pussycat", "targetWidth: " + (int)middleTarget.getPixelWidth());
-        //Log.d("Debug Pussycat", "srcWidth: " + (int)middleTarget.getImageWidth());
-        
-        g.drawScaledImage(middleTarget.getImage(), (int)middleTarget.getX(), (int)middleTarget.getY(), (int)middleTarget.getPixelWidth(), (int)middleTarget.getPixelHeight(), 0, 0, (int)middleTarget.getImageWidth(), (int)middleTarget.getImageHeight(), middleTarget.getRadAngle());
-    }
-
 
     private void drawReadyUI() {
         Graphics g = game.getGraphics();

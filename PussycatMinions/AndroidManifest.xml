@@ -16,12 +16,12 @@
        android:targetSdkVersion="19" />
 
     <application
-       android:label="Cut the Angry Hippo" >
+       android:label="SampleGame2" >
         <activity
-           android:icon="@drawable/hippo"
+           android:icon="@drawable/ic_launcher"
            android:name="com.pussycat.minions.PussycatMinions"
            android:configChanges="keyboard|keyboardHidden|orientation"
-           android:label="Cut the Angry Hippo"
+           android:label="SampleGame"
            android:screenOrientation="portrait" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

@@ -76,6 +76,16 @@ public class DeviceManager {
 	}
 	
 	
+	public boolean isMiddle(String ip) {
+		for (Device device : this.devices) {
+		    if (device.ip.equals(ip)) {
+		    	return device.type == 0;
+		    }
+		}
+		return false;
+	}
+	
+	
 	public String getMiddleIp() {
 		for (Device device : this.devices) {
 		    if (device.type == 0) {
@@ -463,8 +473,6 @@ public class DeviceManager {
 		for (Device device : this.devices) {
 		    if (device.ip.equals(ip)) {
 		    	
-		    	
-		    	
 		    	double velX = xVelG;
 		    	double velY = - yVelG;
 				
@@ -481,13 +489,19 @@ public class DeviceManager {
 	public boolean isOnDevice(String ip, float xG, float yG, float rG) {
 		for (Device device : this.devices) {
 		    if (device.ip.equals(ip)) {
-		    	float rL = rG * device.xDPI;
-		    	rL = 0;
+		    	float dLx = rG * 2 * device.xDPI;
+		    	float dLy = rG * 2 * device.yDPI;
+		    	
+		    	// TODO: FIX
+		    	dLx = 0;
+		    	dLy = 0;
+		    
+		    	//System.out.println("dLx = " + dLx + "  dLy = " + dLy);
 		    	
 		    	float xL = globalToLocalX(ip, xG, yG);
 		    	float yL = globalToLocalY(ip, xG, yG);
 		    	
-				if(xL >= 0 - rL && yL >= 0 - rL && xL <= device.resX + rL && yL <= device.resY + rL) {
+				if((xL >= -dLx) && (yL >= -dLy) && (xL <= (device.resX + dLx)) && (yL <= (device.resY + dLy))) {
 					return true;
 				}
 				return false;

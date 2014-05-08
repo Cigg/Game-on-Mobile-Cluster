@@ -43,7 +43,8 @@ public class ServerGraphics {
         mainMap = new JFrame();
         mainMap.setTitle("GAME BOARD");
         mainMap.setResizable(false);
-        mainMap.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+        mainMap.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+      //  mainMap.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         
         pw = MultiThreds.getPhysicsWorld();
         world = pw.getWorld();
@@ -76,7 +77,7 @@ public class ServerGraphics {
                 		ShapeType type = fixture.getType();
                 		Vec2 pos = body.getPosition();
                 		if(type == ShapeType.POLYGON) {
-                			//System.out.println(pos.x +", " + pos.y);
+                			System.out.println(pos.x +", " + pos.y);
                 			PolygonShape shape = (PolygonShape)fixture.getShape();
                 			
                 			poly = new Polygon();

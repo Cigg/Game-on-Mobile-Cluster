@@ -57,9 +57,9 @@ public class Device {
 	
 	private static Background bg;
 	
-	final int nRader = 32;
-	final int nKolumner = 32;
-	Bitmap[][] bitmaps = new Bitmap[nRader][nKolumner];
+	final int nRader;
+	final int nKolumner;
+	Bitmap[][] bitmaps;
 	final int numberOfExecutionThreads = 4;
 	
 	
@@ -74,6 +74,11 @@ public class Device {
 		
 		BackgroundHandler bgh = new BackgroundHandler();
 		this.bg = bgh.backgrounds[BACKGROUNDS.COORDINATES.ordinal()];
+		
+		nRader = bg.nRows;
+		nKolumner = bg.nCols;
+		bitmaps = new Bitmap[nRader][nKolumner];
+
 		
 		
 		
@@ -280,13 +285,63 @@ public class Device {
 			
 			Log.d("TILE6", "oooooooo NEW MAP ooooooooo");
 			
-			ArrayList<IndexPair> indexes = new ArrayList<IndexPair>();
+			ArrayList<IndexPair> indexes = new ArrayList<IndexPair>();	
 			
-			// TODO: FIX BUG WHEN no corner of an actual tile is inside the rectangle
+			final int lowerX = displayImageCenterX - l_half;
+			final int lowerY = displayImageCenterY - l_half; 
+			
+			final int higherX = displayImageCenterX + l_half;
+			final int higherY = displayImageCenterY + l_half;
+			
+			
+			int a = 0;
+			int b = 0;
+			
+			do {
+				if( (a+1) * widthStep > lowerX ) {
+					break;
+				}
+				a++;
+			} while(a < nKolumner);
+			
+			do {
+				if( (b+1) * heightStep > lowerY ) {
+					break;
+				}
+				b++;
+			} while(b < nRader);
+			
+
+			int c = nKolumner;
+			int d = nRader;
+			
+			do {
+				c--;
+				if(c * widthStep < higherX) {
+					break;
+				}
+			} while(c > 0);
+			
+			do {
+				d--;
+				if(d * heightStep < higherY) {
+					break;
+				}
+			} while(d > 0);
+			
+			
+			// TODO: Make functions for these
+			final int rb = b;
+			final int eb = d + 1;
+			
+			final int kb = a;
+			final int ke = c + 1;
+			
+	
 			int counter = 0;
-			for(int rad=0; rad<nRader; rad++) {
+			for(int rad=rb; rad<eb; rad++) {
 				String line = "";
-				for(int kolumn=0; kolumn<nKolumner; kolumn++) {
+				for(int kolumn=kb; kolumn<ke; kolumn++) {
 					
 					float upperLeftCornerX = kolumn * widthStep;
 					float upperLeftCornerY = rad * heightStep;
@@ -360,6 +415,7 @@ public class Device {
 			
 		
 			ArrayList<IndexPair> temp = new ArrayList<IndexPair>();
+			Log.d("DEVICE", "TOTAL TILES: " + indexes.size());
 			Log.d("TILE6", "numberOfExecutionThreads: " + numberOfExecutionThreads);
 			Log.d("TILE6", "numberOfTilesForEachExecutionThread: " + numberOfTilesForEachExecutionThread);
 			Log.d("TILE6", "first: " + first);
