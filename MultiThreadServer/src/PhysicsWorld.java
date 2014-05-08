@@ -124,7 +124,7 @@ private class Vertex {
 		
 		FixtureDef fixtureDef = new FixtureDef();
 		fixtureDef.density = 1;
-		fixtureDef.friction = 1; 
+		fixtureDef.friction = 0; 
 		
 		CircleShape pivot = new CircleShape();
 		pivot.m_radius = 0.05f;
@@ -145,10 +145,10 @@ private class Vertex {
 		joint.bodyB = body2;
 		joint.collideConnected = true;
 		// friction
-		joint.maxMotorTorque = 1.0f;
-		joint.enableMotor = true;
+		//joint.maxMotorTorque = 1.0f;
+		//joint.enableMotor = true;
 		joint.localAnchorA.set(originX*scale, originY*scale);
-		joint.localAnchorB.set(0.025f, 0.025f);
+		joint.localAnchorB.set(0.0f, 0.0f);
 		//joint.initialize(body2, body, new Vec2(xPos, yPos));
 		//joint.initialize(body2, body, new Vec2(originX,originY));
 		RevoluteJoint the_joint = (RevoluteJoint) world.createJoint(joint);
