@@ -445,7 +445,7 @@ public class GameScreenPlayer extends Screen {
 	            	    // G�r att f�renkla
 	            	    iv = (float) (iv * Math.pow(10, 6));
 	            	    iv = Math.max(iv, 1);
-	            	    iv = Math.max(3, 25 / iv);
+	            	    iv = Math.max(PussycatMinions.meters2Pixels( 0.05f / 100.0f ), PussycatMinions.meters2Pixels(25 / (iv*20000.0f)));
 	            	    
 	            	    paint.setStrokeWidth( iv ) ;
 	      
@@ -584,7 +584,8 @@ public class GameScreenPlayer extends Screen {
 	            	    // G�r att f�renkla
 	            	    iv = (float) (iv * Math.pow(10, 6));
 	            	    iv = Math.max(iv, 1);
-	            	    iv = Math.max(3, 25 / iv);
+	            	   // iv = Math.max(3, 25 / iv);
+	            	    iv = Math.max(PussycatMinions.meters2Pixels( 0.05f / 100.0f ), PussycatMinions.meters2Pixels(25 / (iv*20000.0f)));
 	            	    
 	            	    paint.setStrokeWidth( iv ) ;
 	      
