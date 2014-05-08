@@ -86,7 +86,7 @@ public class GameScreenPlayer extends Screen {
 		ballsWidget = new BallsWidget();
 		pointsWidget = new PointsWidget();
 		timerWidget = new TimerWidget();
-		pointsNotificationsWidget = new PointsNotificationWidget();
+		pointsNotificationsWidget = new PointsNotificationWidget(game.getAudio());
 		
     }
 

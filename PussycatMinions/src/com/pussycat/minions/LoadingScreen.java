@@ -13,7 +13,8 @@ import com.pussycat.framework.Graphics.ImageFormat;
 public class LoadingScreen extends Screen {
 	
 	private float startTime;
-	private float durationTime = (float) (2 * Math.pow(10, 9));
+	private float durationTime = (float) (2
+			* Math.pow(10, 9));
 	private LoadingBar loadingbar;
 	
     public LoadingScreen(Game game) {

@@ -64,6 +64,7 @@ public class GameScreenMiddle extends Screen {
 	
 	// Game objects
 	private Target middleTarget;
+	private MusicWidget musicWidget;
 
 	// Constructor
     public GameScreenMiddle(Game game) {
@@ -102,6 +103,8 @@ public class GameScreenMiddle extends Screen {
 		ServerCommunication t4 = new ServerCommunication(comm, ballHandler, middleTarget);
 		t4.start();
 		
+		musicWidget = new MusicWidget(game.getAudio());
+		musicWidget.play();
     }
 
     @Override
