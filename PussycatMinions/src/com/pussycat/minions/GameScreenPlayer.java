@@ -52,9 +52,7 @@ public class GameScreenPlayer extends Screen {
 	public boolean drawTraceAfter = false;
 
 	
-	private AnimationHandler animationHandler = AnimationHandler.getInstance();
-	private LoadingBar loadingBar = new LoadingBar();
-	
+	private AnimationHandler animationHandler = AnimationHandler.getInstance();	
 	
 	private TCPClient comm;
 	private BallHandler ballHandler;
@@ -128,7 +126,6 @@ public class GameScreenPlayer extends Screen {
     	
     	if(animationHandler != null) {
     		animationHandler.updateAnimations(System.nanoTime());
-    		loadingBar.update(System.nanoTime());
     	}
     	
     	up = false;
@@ -397,14 +394,7 @@ public class GameScreenPlayer extends Screen {
     	//.drawBackground(graphics);
        //graphics.drawImage(Assets.background, 0, 0);
         device.drawBackground(graphics);
-        
-        
-    	if(animationHandler != null) {
-                        
-            loadingBar.draw(graphics);
-
-    	}
-
+       
         
         
         
