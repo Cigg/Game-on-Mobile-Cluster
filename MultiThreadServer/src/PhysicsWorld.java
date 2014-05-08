@@ -68,7 +68,7 @@ private class Vertex {
 		// Create Shape with Properties
 		CircleShape circleShape = new CircleShape();
 
-		// Two centimeters
+		// 1.5 centimeters
 		circleShape.m_radius = 0.0075f*39.37f;
 
 		// MultiThreds.getPhysicsWorld().addBall(xPos, yPos, xVel, yVel, id,
@@ -82,9 +82,12 @@ private class Vertex {
 	}
 
 	public RevoluteJoint addTarget(float xPos, float yPos, float bounce) {
+		//---------------	CREATE TARGET ------------------------------
+		// Target width: 3 cm
+		float scale = 3.0f/2.54f;
 		
 		BodyDef bodyDef = new BodyDef();
-		bodyDef.position.set(xPos, yPos);
+		bodyDef.position.set(xPos - originX*scale, yPos - originY*scale);
 		
 		// TODO: make dynamic bodytype and add pivot
 		bodyDef.type = BodyType.DYNAMIC;
@@ -94,19 +97,11 @@ private class Vertex {
 			body = world.createBody(bodyDef);
 			System.out.println("NULLL BODYYY LOOP");
 		}
-
-		FixtureDef fixtureDef = new FixtureDef();
-		fixtureDef.density = 0;
-		fixtureDef.friction = 1; 
 		
 		System.out.println("ADDING TARGET");
 		System.out.println("Target pos: " + xPos + " " + yPos);
 
 		PolygonShape polyDef = new PolygonShape();
-		CircleShape pivot = new CircleShape();
-		pivot.m_radius = 0.1f;
-		
-		fixtureDef.shape = pivot;
 		//loadVertices();
 		//calculateNormals();
 		
@@ -116,26 +111,45 @@ private class Vertex {
 			polyDef.m_vertexCount = polygon.vertecies.size();
 			for(int j=0; j < polygon.vertecies.size(); j++) {
 				Vertex vertex = polygon.vertecies.get(j);
-				polyDef.m_vertices[j].set((originX) + 1.0f*vertex.x, (originY) + 1.0f*vertex.y);
+				polyDef.m_vertices[j].set(vertex.x*scale, vertex.y*scale);
+				//polyDef.m_vertices[j].set((originX + 1.0f*vertex.x)*scale, (originY + 1.0f*vertex.y)*scale);
 				polyDef.m_normals[j].set(vertex.normalX,vertex.normalY);
 			}
 			body.createFixture(polyDef,1.0f);
 		}
 		bodyDef.type = BodyType.STATIC;
-		bodyDef.position.set(xPos,yPos);
+		bodyDef.position.set(xPos, yPos);
+		
+		//-------- CREATE PIVOT --------------------------------
+		
+		FixtureDef fixtureDef = new FixtureDef();
+		fixtureDef.density = 1;
+		fixtureDef.friction = 0; 
+		
+		CircleShape pivot = new CircleShape();
+		pivot.m_radius = 0.05f;
+		
+		fixtureDef.shape = pivot;
+		
 		Body body2 = null;
 		while (body2 == null) {
 			body2 = world.createBody(bodyDef);
 			System.out.println("NULLL BODYYY LOOP");
 		}
 		body2.createFixture(fixtureDef);
-				
+		
+		
+		//--------------- CREATE JOINT ----------------------
 		RevoluteJointDef joint = new RevoluteJointDef();
 		joint.bodyA = body;
 		joint.bodyB = body2;
 		joint.collideConnected = true;
-		joint.localAnchorA.set(0,0);
-		joint.localAnchorB.set(originX,originY);
+		// friction
+		//joint.maxMotorTorque = 1.0f;
+		//joint.enableMotor = true;
+		joint.localAnchorA.set(originX*scale, originY*scale);
+		joint.localAnchorB.set(0.0f, 0.0f);
+		//joint.initialize(body2, body, new Vec2(xPos, yPos));
 		//joint.initialize(body2, body, new Vec2(originX,originY));
 		RevoluteJoint the_joint = (RevoluteJoint) world.createJoint(joint);
 		return the_joint;
@@ -185,7 +199,7 @@ private class Vertex {
 
 	public void update(float deltaTime) {
 		// Update Physics World
-		world.step(deltaTime, 128, 128); // vilka v�rden b�r de 2 sista
+		world.step(deltaTime, 8, 3); // vilka v�rden b�r de 2 sista
 											// parametrarna ha?
 	}
 
@@ -243,7 +257,7 @@ private class Vertex {
 					Object y =  pair.get("y");
 					System.out.println("x = " + x + ", y = " + y);
 					
-					polygon.vertecies.add(new Vertex(convertToFloat(x)-originX,convertToFloat(y)-originY));
+					polygon.vertecies.add(new Vertex(convertToFloat(x),convertToFloat(y)));
 				}
 				System.out.println();
 				polygons.add(polygon);
