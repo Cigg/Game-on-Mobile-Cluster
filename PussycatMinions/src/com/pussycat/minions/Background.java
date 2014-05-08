@@ -9,8 +9,10 @@ public class Background {
 		public final float ppiy;
 		public final int nRows;
 		public final int nCols;
+		public final String folder;
+		public final String ending;
 		
-	public Background(final String fileName, final int width, final int height, final float ppix, final float ppiy, final int nRows, final int nCols) {
+	public Background(final String folder, final String fileName, final String ending, final int width, final int height, final float ppix, final float ppiy, final int nRows, final int nCols) {
 		this.fileName = fileName;
 		this.width = width;
 		this.height = height;
@@ -18,6 +20,8 @@ public class Background {
 		this.ppiy = ppiy;
 		this.nRows = nRows;
 		this.nCols = nCols;
+		this.folder = folder;
+		this.ending = ending;
 	}
 	
 }

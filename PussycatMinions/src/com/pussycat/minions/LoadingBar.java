@@ -48,7 +48,7 @@ public class LoadingBar {
 		
 		x2 = px + (int) (Math.cos(-angle.getValue()) * -radius);
 		y2 = py + (int) (Math.sin(-angle.getValue()) * -radius);
-		*/
+		*/	
 	}
 	
 	

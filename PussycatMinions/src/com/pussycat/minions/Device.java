@@ -73,7 +73,7 @@ public class Device {
 		this.ydpi = PussycatMinions.getYDPI();
 		
 		BackgroundHandler bgh = new BackgroundHandler();
-		this.bg = bgh.backgrounds[BACKGROUNDS.COORDINATES.ordinal()];
+		this.bg = bgh.backgrounds[BACKGROUNDS.COORDINATES_SPLIT.ordinal()];
 		
 		nRader = bg.nRows;
 		nKolumner = bg.nCols;
@@ -181,7 +181,9 @@ public class Device {
 			    
 				
 	
-			    String fileName = "Coordinates_32x32" + File.separator + "Coordinates_" + indexPair.rad + "_" + indexPair.kolumn + ".png";
+			   // String fileName = "Coordinates_split" + File.separator + "Coordinates_" + indexPair.rad + "_" + indexPair.kolumn + ".png";
+				
+				String fileName = bg.folder + File.separator + bg.fileName + indexPair.rad + "_" + indexPair.kolumn + bg.ending;
 			    
 			    try {
 					istream = assets.open(fileName);
