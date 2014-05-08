@@ -1,3 +1,4 @@
+package src;
 
 public enum GLOBAL_STATE__ {
 	ADD_DEVICE,

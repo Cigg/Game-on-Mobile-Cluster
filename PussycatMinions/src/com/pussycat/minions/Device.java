@@ -463,6 +463,8 @@ public class Device {
 				nw = (indexPair.kolumn * widthStep);
 			    nh = (indexPair.rad * heightStep);
 			    
+			    Log.d("FAIL", "indexPair.rad][indexPair.kolumn : " + indexPair.rad + "  " + indexPair.kolumn);
+			    
 				backgroundCanvas.drawBitmap(bitmaps[indexPair.rad][indexPair.kolumn], nw + tx, nh + ty, new Paint());
 				bitmaps[indexPair.rad][indexPair.kolumn].recycle();
 			}
@@ -484,7 +486,7 @@ public class Device {
 			// Mark out screen center
 			Paint redPaint = new Paint();
 			redPaint.setColor(Color.RED);
-			canvas.drawCircle(screenWidth/2, screenHeight/2, 15, redPaint); // Draw to the current frame buffer
+			canvas.drawCircle(screenWidth/2, screenHeight/2, PussycatMinions.meters2Pixels(0.08f / 100.0f), redPaint); // Draw to the current frame buffer
 			
 			// Get and store the rotated background from the current frame buffer
 			backgroundFinal.recycle();

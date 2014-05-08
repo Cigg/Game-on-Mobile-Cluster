@@ -1,3 +1,5 @@
+package src;
+
 	public class GlobalCoords {
 		float minX;
 		float minY;

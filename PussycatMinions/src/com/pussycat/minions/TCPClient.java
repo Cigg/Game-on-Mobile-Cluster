@@ -11,8 +11,10 @@ import android.util.Log;
 public class TCPClient extends Thread {
 	
 	private final String SERVER_IP = "192.168.43.122";
+
+
 	private final int SERVER_PORT = 4444;
-	private final int NUMBER_OF_INCOMING_MESSAGES = 64; 
+	private final int NUMBER_OF_INCOMING_MESSAGES = 8; 
 	
 	private volatile boolean isRunning = false;
 	private OutputStream outputStream;

@@ -72,8 +72,7 @@ public class ServerCommunication extends Thread {
 		    			default:
 		    			break;
 		    			
-					}
-					
+					}			
 				} else {
 	    			synchronized( tcp.incomingMessages ) {
 						try {
