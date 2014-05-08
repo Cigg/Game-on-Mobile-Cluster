@@ -18,7 +18,7 @@ X = length(bigImage(:,1,1));
 Y = length(bigImage(1,:,1));
 
 % Create how big each chunck should be from input
-size = floor(X/split);
+size = ceil(X/split);
 
 for i = 1:size:(X - 1)
     for j = 1:size:(Y - 1)
