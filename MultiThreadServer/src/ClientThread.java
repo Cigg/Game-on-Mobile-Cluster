@@ -431,7 +431,7 @@ public class ClientThread extends Thread {
 									
 									System.out.println("MAPPING_STEP1 DONE");
 									
-									/* TESTING WITH JUST ONE DEVICE 
+									//TESTING WITH JUST ONE DEVICE 
 									float l_midX = deviceManager.getMidX(ip);
 									float l_midY = deviceManager.getMidY(ip);
 
@@ -445,8 +445,8 @@ public class ClientThread extends Thread {
 
 									float g_main_midX = deviceManager.localToGlobalX(ipOfMiddle, l_main_midX, l_main_midY);
 									float g_main_midY = deviceManager.localToGlobalY(ipOfMiddle, l_main_midX, l_main_midY);
-									*/
-									//targetJoint = MultiThreds.getPhysicsWorld().addTarget(g_main_midX, g_main_midY, 0.8f);
+									
+									targetJoint = MultiThreds.getPhysicsWorld().addTarget(g_main_midX, g_main_midY, 0.8f);
 								}
 							}
 								break;
