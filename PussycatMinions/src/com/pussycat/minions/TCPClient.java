@@ -26,7 +26,6 @@ public class TCPClient extends Thread {
 
 	}
 	
-	
 	public synchronized void sendData(final byte[] buffer) {
 		if( isValid(buffer) ) {	
 			try {

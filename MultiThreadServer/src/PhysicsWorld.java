@@ -75,7 +75,7 @@ private class Vertex {
 		// 0.03f, 0.75f, 0.8f, 0.3f);
 		bounce = 0.9f;
 		density = 1.0f;
-		friction = 0.1f;
+		friction = 0.9f;
 
 		addItem(xPos, yPos, xVel, yVel, circleShape, bounce, id, density,
 				friction);
@@ -139,7 +139,7 @@ private class Vertex {
 		joint.bodyB = body2;
 		joint.collideConnected = true;
 		// friction
-		joint.maxMotorTorque = 1.0f;
+		joint.maxMotorTorque = 20.0f;
 		joint.enableMotor = true;
 		joint.localAnchorA.set(originX*scale, originY*scale);
 		joint.localAnchorB.set(0.025f, 0.025f);
