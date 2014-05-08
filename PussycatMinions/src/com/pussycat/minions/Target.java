@@ -15,7 +15,7 @@ public class Target {
 
 	// Height in meters
 	public Target(float centerX, float centerY, float targetWidth){
-		image = Assets.frog;
+		image = Assets.octopus;
 		scale = (float)PussycatMinions.meters2Pixels(targetWidth)/(float)image.getWidth();
 		//pos = new PointF(centerX-(image.getWidth()/2)*scale, centerY-(image.getHeight()/2)*scale);
 	    

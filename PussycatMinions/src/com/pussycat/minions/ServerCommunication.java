@@ -72,8 +72,7 @@ public class ServerCommunication extends Thread {
 		    			default:
 		    			break;
 		    			
-					}
-					
+					}			
 				} else {
 	    			synchronized( tcp.incomingMessages ) {
 						try {
@@ -174,6 +173,8 @@ public class ServerCommunication extends Thread {
 		
 		for(int i=0; i<nBalls; i++) {
 			int id = buffer.getInt();
+			int parent = buffer.getInt();
+			Log.d("PARENT" ,"PARENT = " + parent);
 			float x = buffer.getFloat();
         	float y = buffer.getFloat();	
 			float vx = buffer.getFloat();	
@@ -181,7 +182,7 @@ public class ServerCommunication extends Thread {
 			Log.d("BALLINFO", "ADD: " + id + "  " + x + "  " + y + "  " + vx + "  " + vy);
 			
 			// TODO: FIX ALLL BALL TYPES
-			ballHandler.addBall(new BallRegular(id, x, y, vx, vy));			
+			ballHandler.addBall(new BallRegular(id, parent, x, y, vx, vy));			
 			//SharedVariables.getInstance().setMiddleAngle(middleAngle);
 
 		}

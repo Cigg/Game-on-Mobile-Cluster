@@ -1,3 +1,5 @@
+package src;
+
  class OldBall {
 		public int threadId;
 		public int ballId;

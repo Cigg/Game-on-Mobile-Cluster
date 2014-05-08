@@ -52,13 +52,21 @@ public class BallHandler {
 	}
 
 	
-	public void removeBallsOutOfBounds() {
+	public void removeBallsNotWanted() {
 		Enumeration<Integer> enumKey = balls.keys();
 		while( enumKey.hasMoreElements() ) {
 		    int key = enumKey.nextElement();
 		    Ball ball = balls.get(key);		 
+		   	removeIfNotInGame(ball);
 		    removeIfOutOfBounds(ball);
 		}	
+	}
+	
+	
+	private void removeIfNotInGame(Ball ball) {
+		if( ball.parent == -1) {
+	    	balls.remove(ball.id);
+		}
 	}
 
 	
@@ -70,10 +78,10 @@ public class BallHandler {
 	
 	
 	private boolean isOutOfBounds(final float x, final float y, final float radius) {
-		return ( 	x < - 2*radius						||
-					y < - 2*radius 						|| 
-					x > this.screenWidth + 2*radius		|| 
-					y > this.screenHeight + 2*radius		);
+		return ( 	x < - radius						||
+					y < - radius 						|| 
+					x > this.screenWidth + radius		|| 
+					y > this.screenHeight + radius		);
 	}
 	
 	

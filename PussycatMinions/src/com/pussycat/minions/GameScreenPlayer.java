@@ -52,9 +52,7 @@ public class GameScreenPlayer extends Screen {
 	public boolean drawTraceAfter = false;
 
 	
-	private AnimationHandler animationHandler = AnimationHandler.getInstance();
-	private LoadingBar loadingBar = new LoadingBar();
-	
+	private AnimationHandler animationHandler = AnimationHandler.getInstance();	
 	
 	private TCPClient comm;
 	private BallHandler ballHandler;
@@ -88,7 +86,7 @@ public class GameScreenPlayer extends Screen {
 		ballsWidget = new BallsWidget();
 		pointsWidget = new PointsWidget();
 		timerWidget = new TimerWidget();
-		pointsNotificationsWidget = new PointsNotificationWidget();
+		pointsNotificationsWidget = new PointsNotificationWidget(game.getAudio());
 		
     }
 
@@ -120,7 +118,7 @@ public class GameScreenPlayer extends Screen {
     	// Thread.currentThread().setPriority(Thread.MAX_PRIORITY);
     	
     	ballHandler.updateBalls(deltaTime);
-    	ballHandler.removeBallsOutOfBounds();
+    	ballHandler.removeBallsNotWanted();
     	ballsWidget.updateBalls();
     	pointsWidget.updatePoints();
     	timerWidget.update();
@@ -128,7 +126,6 @@ public class GameScreenPlayer extends Screen {
     	
     	if(animationHandler != null) {
     		animationHandler.updateAnimations(System.nanoTime());
-    		loadingBar.update(System.nanoTime());
     	}
     	
     	up = false;
@@ -397,14 +394,7 @@ public class GameScreenPlayer extends Screen {
     	//.drawBackground(graphics);
        //graphics.drawImage(Assets.background, 0, 0);
         device.drawBackground(graphics);
-        
-        
-    	if(animationHandler != null) {
-                        
-            loadingBar.draw(graphics);
-
-    	}
-
+       
         
         
         
@@ -455,7 +445,7 @@ public class GameScreenPlayer extends Screen {
 	            	    // G�r att f�renkla
 	            	    iv = (float) (iv * Math.pow(10, 6));
 	            	    iv = Math.max(iv, 1);
-	            	    iv = Math.max(3, 25 / iv);
+	            	    iv = Math.max(PussycatMinions.meters2Pixels( 0.05f / 100.0f ), PussycatMinions.meters2Pixels(25 / (iv*20000.0f)));
 	            	    
 	            	    paint.setStrokeWidth( iv ) ;
 	      
@@ -499,7 +489,6 @@ public class GameScreenPlayer extends Screen {
         
        
     	//Log.d("deltaTime", "deltaTime = " + deltaTime * Math.pow(10, -7));
-    	
     	
     	
     	if( drawTraceAfter ) {
@@ -595,7 +584,8 @@ public class GameScreenPlayer extends Screen {
 	            	    // G�r att f�renkla
 	            	    iv = (float) (iv * Math.pow(10, 6));
 	            	    iv = Math.max(iv, 1);
-	            	    iv = Math.max(3, 25 / iv);
+	            	   // iv = Math.max(3, 25 / iv);
+	            	    iv = Math.max(PussycatMinions.meters2Pixels( 0.05f / 100.0f ), PussycatMinions.meters2Pixels(25 / (iv*20000.0f)));
 	            	    
 	            	    paint.setStrokeWidth( iv ) ;
 	      

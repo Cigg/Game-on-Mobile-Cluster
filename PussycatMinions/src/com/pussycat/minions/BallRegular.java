@@ -4,8 +4,9 @@ import android.util.Log;
 
 public class BallRegular extends Ball {
 	
-	public BallRegular (final int id, final float x, final float y, final float vx, final float vy) {
+	public BallRegular (final int id, final int parent, final float x, final float y, final float vx, final float vy) {
 		this.id = id;
+		this.parent = parent;
 		
 		this.x = x;
 		this.y = y;

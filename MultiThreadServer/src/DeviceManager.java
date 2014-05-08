@@ -1,3 +1,4 @@
+package src;
 
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
@@ -75,6 +76,16 @@ public class DeviceManager {
 		this.devices = new ArrayList<Device>();
 	}
 	
+	
+    public int meters2Pixels(String ip, float meters) {
+    	for (Device device : this.devices) {
+		    if (device.ip.equals(ip)) {
+		    	return (int) (meters * device.xDPI * 100 / 2.54);
+		    }
+		}
+    	return 0;
+    }
+    
 	
 	public boolean isMiddle(String ip) {
 		for (Device device : this.devices) {
@@ -489,19 +500,16 @@ public class DeviceManager {
 	public boolean isOnDevice(String ip, float xG, float yG, float rG) {
 		for (Device device : this.devices) {
 		    if (device.ip.equals(ip)) {
-		    	float dLx = rG * 2 * device.xDPI;
-		    	float dLy = rG * 2 * device.yDPI;
+		    	rG = meters2Pixels(ip, rG / 100.0f );
 		    	
-		    	// TODO: FIX
-		    	dLx = 0;
-		    	dLy = 0;
+
 		    
 		    	//System.out.println("dLx = " + dLx + "  dLy = " + dLy);
 		    	
 		    	float xL = globalToLocalX(ip, xG, yG);
 		    	float yL = globalToLocalY(ip, xG, yG);
 		    	
-				if((xL >= -dLx) && (yL >= -dLy) && (xL <= (device.resX + dLx)) && (yL <= (device.resY + dLy))) {
+				if((xL >= -rG) && (yL >= -rG) && (xL <= (device.resX + rG)) && (yL <= (device.resY + rG))) {
 					return true;
 				}
 				return false;

@@ -64,6 +64,7 @@ public class GameScreenMiddle extends Screen {
 	
 	// Game objects
 	private Target middleTarget;
+	private MusicWidget musicWidget;
 
 	// Constructor
     public GameScreenMiddle(Game game) {
@@ -90,7 +91,7 @@ public class GameScreenMiddle extends Screen {
         exitButton = new Button(Assets.button, Assets.button_pressed, width, PussycatMinions.getScreenHeight()/2+300, paint);
         exitButton.setText("EXIT");
 
-		middleTarget = new Target(PussycatMinions.getScreenWidth()/2, PussycatMinions.getScreenHeight()/2, 0.03f);
+		middleTarget = new Target(PussycatMinions.getScreenWidth()/2, PussycatMinions.getScreenHeight()/2, 0.06f);
 		
 		previousTime = 0;		
 		SharedVariables.getInstance().setInternalState(GLOBAL_STATE__.SYNCHRONIZE_DEVICE);		
@@ -102,6 +103,8 @@ public class GameScreenMiddle extends Screen {
 		ServerCommunication t4 = new ServerCommunication(comm, ballHandler, middleTarget);
 		t4.start();
 		
+		musicWidget = new MusicWidget(game.getAudio());
+		musicWidget.play();
     }
 
     @Override
@@ -137,7 +140,7 @@ public class GameScreenMiddle extends Screen {
     	// Thread.currentThread().setPriority(Thread.MAX_PRIORITY);
     	
     	ballHandler.updateBalls(deltaTime);
-    	ballHandler.removeBallsOutOfBounds();
+    	ballHandler.removeBallsNotWanted();
     	
     	up = false;
     	

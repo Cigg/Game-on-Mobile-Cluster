@@ -1,3 +1,5 @@
+package src;
+
 import org.jbox2d.common.Vec2;
 
 	public class Ball {

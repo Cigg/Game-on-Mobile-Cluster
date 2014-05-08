@@ -1,3 +1,5 @@
+package src;
+
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics;
@@ -77,7 +79,7 @@ public class ServerGraphics {
                 		ShapeType type = fixture.getType();
                 		Vec2 pos = body.getPosition();
                 		if(type == ShapeType.POLYGON) {
-                			System.out.println(pos.x +", " + pos.y);
+                			//System.out.println(pos.x +", " + pos.y);
                 			PolygonShape shape = (PolygonShape)fixture.getShape();
                 			
                 			poly = new Polygon();

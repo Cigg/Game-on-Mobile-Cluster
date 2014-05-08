@@ -16,12 +16,12 @@
        android:targetSdkVersion="19" />
 
     <application
-       android:label="SampleGame2" >
+       android:label="Octoshooter" >
         <activity
-           android:icon="@drawable/ic_launcher"
+           android:icon="@drawable/octopus_icon_fat"
            android:name="com.pussycat.minions.PussycatMinions"
            android:configChanges="keyboard|keyboardHidden|orientation"
-           android:label="SampleGame"
+           android:label="Octoshooter"
            android:screenOrientation="portrait" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

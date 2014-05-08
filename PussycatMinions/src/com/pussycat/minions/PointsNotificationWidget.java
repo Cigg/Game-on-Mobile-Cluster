@@ -10,8 +10,14 @@ import android.graphics.Paint;
 import android.graphics.Rect;
 import android.graphics.Typeface;
 
+import com.pussycat.framework.Audio;
 import com.pussycat.framework.Graphics;
+import com.pussycat.framework.Music;
+import com.pussycat.framework.Sound;
+import com.pussycat.framework.implementation.AndroidAudio;
+import com.pussycat.framework.implementation.AndroidGame;
 import com.pussycat.framework.implementation.AndroidGraphics;
+import com.pussycat.framework.implementation.AndroidMusic;
 
 public class PointsNotificationWidget {
 	
@@ -48,9 +54,9 @@ public class PointsNotificationWidget {
 	private final int SIZE = PussycatMinions.meters2Pixels( 1.0f / 100.0f);
 	private Paint paint;
 	Rect bounds;
-
+	private Sound sound;
 	
-	public PointsNotificationWidget() {
+	public PointsNotificationWidget(Audio audio) {
 		notifications = new ConcurrentHashMap<Integer, Notifcation>();
 			
 		AssetManager assets = AndroidGraphics.getAssets();
@@ -64,13 +70,15 @@ public class PointsNotificationWidget {
 		bounds = new Rect();
 		String abc = "1356";
 		paint.getTextBounds(abc, 0, abc.length(), bounds);
-			
+
+		sound = audio.createSound("sounds" + File.separator + "pling.wav");
 	}
 	
 	
 	public void addNotification(final int points) {
 		Notifcation notification = new Notifcation(points);
 		notifications.put(notification.hashCode(), notification);
+		sound.play(1.0f);
 	}
 	
 	

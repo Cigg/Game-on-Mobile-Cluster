@@ -1,10 +1,15 @@
+package src;
+
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Iterator;
 
+import org.jbox2d.callbacks.ContactListener;
 import org.jbox2d.callbacks.DebugDraw;
+import org.jbox2d.collision.Manifold;
+import org.jbox2d.collision.WorldManifold;
 import org.jbox2d.collision.shapes.CircleShape;
 import org.jbox2d.collision.shapes.PolygonShape;
 import org.jbox2d.collision.shapes.Shape;
@@ -16,6 +21,7 @@ import org.jbox2d.dynamics.BodyDef;
 import org.jbox2d.dynamics.BodyType;
 import org.jbox2d.dynamics.FixtureDef;
 import org.jbox2d.dynamics.World;
+import org.jbox2d.dynamics.contacts.Contact;
 import org.jbox2d.dynamics.joints.RevoluteJoint;
 import org.jbox2d.dynamics.joints.RevoluteJointDef;
 import org.json.simple.JSONArray;
@@ -83,13 +89,12 @@ private class Vertex {
 
 	public RevoluteJoint addTarget(float xPos, float yPos, float bounce) {
 		//---------------	CREATE TARGET ------------------------------
-		// Target width: 3 cm
-		float scale = 3.0f/2.54f;
+		// Target width: 6 cm
+		float scale = 6.0f/2.54f;
 		
 		BodyDef bodyDef = new BodyDef();
-		bodyDef.position.set(xPos - originX*scale, yPos - originY*scale);
+		bodyDef.position.set(xPos - 0.5f*scale, yPos - 0.5f*scale);
 		
-		// TODO: make dynamic bodytype and add pivot
 		bodyDef.type = BodyType.DYNAMIC;
 		Body body = null;
 
@@ -124,7 +129,7 @@ private class Vertex {
 		
 		FixtureDef fixtureDef = new FixtureDef();
 		fixtureDef.density = 1;
-		fixtureDef.friction = 1; 
+		fixtureDef.friction = 0; 
 		
 		CircleShape pivot = new CircleShape();
 		pivot.m_radius = 0.05f;
@@ -145,17 +150,46 @@ private class Vertex {
 		joint.bodyB = body2;
 		joint.collideConnected = true;
 		// friction
-		joint.maxMotorTorque = 1.0f;
-		joint.enableMotor = true;
+		//joint.maxMotorTorque = 1.0f;
+		//joint.enableMotor = true;
 		joint.localAnchorA.set(originX*scale, originY*scale);
-		joint.localAnchorB.set(0.025f, 0.025f);
+		joint.localAnchorB.set(0.0f, 0.0f);
 		//joint.initialize(body2, body, new Vec2(xPos, yPos));
 		//joint.initialize(body2, body, new Vec2(originX,originY));
 		RevoluteJoint the_joint = (RevoluteJoint) world.createJoint(joint);
 		return the_joint;
 		//the_joint.getJointAngle();
+		
+		//------------- CHECK BALL COLLISION WITH PIVOT ----------->
+		/*for(ContactEdge* ce = myBody->GetContactList(); ce; ce = ce->next){ 
+			 Contact* c = ce->contact; 
+			 // process c 
+		} */
 				
 	}
+	
+	//TODO: make sure it works to check collision between pivot and ball
+	
+	/*WorldManifold worldManifold; 
+	worldManifold.Initialize(manifold, transformA, shapeA.m_radius, transformB, shapeB.m_radius);
+	
+	for(int i = 0; i < manifold.pointCount; ++i) 
+	{ 
+	 Vec2 point = worldManifold.points[i]; 
+	} 
+
+	
+	public void PreSolve(Contact contact, Manifold oldManifold) 
+	{ 
+	 WorldManifold worldManifold;
+	 contact.getWorldManifold(worldManifold); 
+	 if (worldManifold.normal.y < -0.5f) 
+	 { 
+	 contact.setEnabled(false); 
+	 } 
+	}*/
+
+
 
 	private void addItem(float xPos, float yPos, float xVel, float yVel,
 			Shape shape, float bounce, int id, float density, float friction) {
@@ -235,11 +269,11 @@ private class Vertex {
 	private void loadVertices(){
 		JSONParser parser = new JSONParser();
 		try{
-			Object obj = parser.parse(new FileReader("src/frog.json"));
+			Object obj = parser.parse(new FileReader("src/octopus.json"));
 			JSONObject jsonObject = (JSONObject) obj;
 			JSONArray jsonArray = (JSONArray) jsonObject.get("rigidBodies");
 			jsonObject = (JSONObject) jsonArray.get(0);
-			
+				
 			JSONObject origin = (JSONObject) jsonObject.get("origin");
 			originX = convertToFloat(origin.get("x"));
 			originY = convertToFloat(origin.get("y"));
@@ -304,7 +338,9 @@ private class Vertex {
 		}else if (x.getClass() == Long.class) {
 			return ((Long)x).floatValue();
 		} else {
-			return (float) x;
+			return 20.0f;
+			// TODO!???
+			//return (float) x;
 		}
 	}
 	

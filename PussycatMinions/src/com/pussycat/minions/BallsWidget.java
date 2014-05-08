@@ -36,7 +36,7 @@ public class BallsWidget {
 		AnimationHandler.getInstance().addAnimation(adderAnimation);		
 		
 		for(int i=0; i<activeBalls; i++) {
-			balls[i] = new BallRegular(i, x, OFFSET + maxY - i*dist, 0, 0);
+			balls[i] = new BallRegular(i, -1, x, OFFSET + maxY - i*dist, 0, 0);
 			animatedYs[i] = new AnimatedValue(balls[i].getY());
 		}
 	}
@@ -91,7 +91,7 @@ public class BallsWidget {
 		if(adder.getValue() == 1.0f) {
 			Log.d("WID", "ADD BALL");
 			adder.setValue(0.0f);
-			addBall(new BallRegular(0, x, OFFSET + maxY - (maxNBalls-1) * dist, 0, 0));
+			addBall(new BallRegular(0, -1, x, OFFSET + maxY - (maxNBalls-1) * dist, 0, 0));
 			if(activeBalls < maxNBalls) {
 				adderAnimation.start();
 			}

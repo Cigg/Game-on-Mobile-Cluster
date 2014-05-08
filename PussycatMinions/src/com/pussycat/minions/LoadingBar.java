@@ -1,5 +1,7 @@
 package com.pussycat.minions;
 
+import android.graphics.Color;
+
 import com.pussycat.framework.Graphics;
 
 public class LoadingBar {
@@ -13,28 +15,45 @@ public class LoadingBar {
 	
 	private int px;
 	private int py;
+	
+	private AnimatedValue animatedXImg;
+	private int xImg;
+	private int yImg;
+	private final float TIME_SIFT = 1.3f;
+	private int diff = PussycatMinions.meters2Pixels(1.50f / 100.0f);
+	private Animation animation;
 
 	
 	public LoadingBar() {
-		px = (PussycatMinions.getScreenWidth() / 2);
-		py = (PussycatMinions.getScreenHeight() / 2);
+		//px = (PussycatMinions.getScreenWidth() / 2);
+		//py = (PussycatMinions.getScreenHeight() / 2);
 		
-		AnimationHandler.getInstance().addAnimation(new Animation(angle, 0, 2* Math.PI, System.nanoTime(), 2, Animation.INTERPOLATION.COSINE, Animation.TYPE.PING_PONG));
-		AnimationHandler.getInstance().addAnimation(new Animation(animatedRadius, 0, 300, System.nanoTime(), 4, Animation.INTERPOLATION.COSINE, Animation.TYPE.PING_PONG));
+		xImg = (PussycatMinions.getScreenWidth() / 2);
+		yImg = (PussycatMinions.getScreenHeight() / 2);
+		animatedXImg = new AnimatedValue(0);
+		
+		animation = new Animation(animatedXImg, -diff / 2.0f, diff / 2.0f, System.nanoTime(), TIME_SIFT, Animation.INTERPOLATION.COSINE, Animation.TYPE.ENDLESS);
+		AnimationHandler.getInstance().addAnimation(animation);
+		
+		//AnimationHandler.getInstance().addAnimation(new Animation(angle, 0, 2* Math.PI, System.nanoTime(), 2, Animation.INTERPOLATION.COSINE, Animation.TYPE.PING_PONG));
+		//AnimationHandler.getInstance().addAnimation(new Animation(animatedRadius, 0, 300, System.nanoTime(), 4, Animation.INTERPOLATION.COSINE, Animation.TYPE.PING_PONG));
 	}
 	
 	
 	public void update(final float time) {
+		/*
 		radius = (int) animatedRadius.getValue();
 		x = px + (int) (Math.cos(angle.getValue()) * radius);
 		y = py + (int) (Math.sin(angle.getValue()) * radius);
 		
 		x2 = px + (int) (Math.cos(-angle.getValue()) * -radius);
 		y2 = py + (int) (Math.sin(-angle.getValue()) * -radius);
+		*/	
 	}
 	
 	
 	public void draw(Graphics graphics) {
+		/*
 		 graphics.drawScaledImage(	
 			Assets.localBall, 
 			x - (int)(PussycatMinions.meters2Pixels(0.0075f*2)) / 2, 
@@ -58,8 +77,26 @@ public class LoadingBar {
 		 	128, 
 		 	128,
 		 	0.0f	);
+		 */
+		
+		 graphics.getCanvas().drawColor(Color.BLACK);
+		 graphics.drawScaledImage(	
+			Assets.localBall, 
+			xImg + (int)animatedXImg.getValue() - (int)(PussycatMinions.meters2Pixels(0.0075f)) , 
+			yImg - (int)(PussycatMinions.meters2Pixels(0.0075f)), 
+		 	(int)(PussycatMinions.meters2Pixels(0.0075f*2)), 
+		 	(int)(PussycatMinions.meters2Pixels(0.0075f*2)), 
+		 	0, 
+		 	0, 
+		 	128, 
+		 	128,
+		 	0.0f	);
 	}
 	
+	
+	public void setFinished(final boolean isFinished) {
+		animation.setIsFinished(isFinished);
+	}
 	
 	public void setPx(final int px) {
 		this.px = px;

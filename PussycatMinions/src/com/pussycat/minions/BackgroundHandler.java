@@ -7,14 +7,15 @@ public class BackgroundHandler {
 	public static enum BACKGROUNDS {
 		COORDINATES,
 		COORDINATES_LOW_RES_3,
-		COLORSPECTRUM
+		COLORSPECTRUM,
+		COORDINATES_SPLIT
 	}
 	
 	public BackgroundHandler()  {
 		
 		backgrounds = new Background[BACKGROUNDS.values().length];		
 		
-		backgrounds [BACKGROUNDS.COORDINATES.ordinal()] = new Background(		"coordinates.png", 							
+		backgrounds [BACKGROUNDS.COORDINATES.ordinal()] = new Background(		"Coordinates_32x32", "Coordinates_", ".png",							
 																				16540, 											
 																				16540,											
 																				295.35714285714285714285714285714f,				
@@ -22,6 +23,7 @@ public class BackgroundHandler {
 																				32,
 																				32										);		
 		
+		/*
 		backgrounds [BACKGROUNDS.COLORSPECTRUM.ordinal()] = new Background(		"colorspectrum.jpg", 		
 																				5000, 							
 																				4000,							
@@ -37,6 +39,16 @@ public class BackgroundHandler {
 																						72,
 																						32,
 																						32								);
+		*/
+		
+		
+		backgrounds [BACKGROUNDS.COORDINATES_SPLIT.ordinal()] = new Background(		"Coordinates_split",  "Coordinates_", ".png",							
+																					8270, 											
+																					8270,											
+																					150.0f,				
+																					150.0f,
+																					20,
+																					20										);		
 		
 	}
 	

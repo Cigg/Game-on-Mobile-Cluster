@@ -1,3 +1,5 @@
+package src;
+
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
@@ -25,7 +27,6 @@ public class ServerBoard extends JFrame {
 		
 		btnStart = new JButton("Start");
         btnStart.addActionListener(new ActionListener() {
-            @Override
             public void actionPerformed(ActionEvent e) {
             	System.out.println("Server started");
             	btnStart.setEnabled(false);
@@ -38,7 +39,6 @@ public class ServerBoard extends JFrame {
         
         btnClearDevices = new JButton("Clear Devices");
         btnClearDevices.addActionListener(new ActionListener(){
-			@Override
 			public void actionPerformed(ActionEvent e) {
 				System.out.println("All devices cleared");
 				//server.clearBalls();
@@ -49,7 +49,6 @@ public class ServerBoard extends JFrame {
         
         btnClearBalls = new JButton("Clear Balls");
         btnClearBalls.addActionListener(new ActionListener(){
-			@Override
 			public void actionPerformed(ActionEvent e) {
 				System.out.println("Balls cleared");
 				server.clearBalls();
@@ -58,7 +57,6 @@ public class ServerBoard extends JFrame {
         
         btnAddBalls = new JButton("Add balls");
         btnAddBalls.addActionListener(new ActionListener(){
-			@Override
 			public void actionPerformed(ActionEvent e) {
 				server.addBalls();
 			}
