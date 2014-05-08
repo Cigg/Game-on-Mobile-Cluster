@@ -11,13 +11,16 @@ public class Target {
 	Image image;
 	private PointF pos;
 	private float scale;
-	private float radAngle;
+	private float centerX, centerY;
 
 	// Height in meters
-	public Target(float centerX, float centerY, float height){
+	public Target(float centerX, float centerY, float targetWidth){
 		image = Assets.frog;
-		scale = PussycatMinions.meters2Pixels(height)/image.getHeight();
-		pos = new PointF(centerX-(image.getWidth()/2)*scale, centerY-(image.getHeight()/2)*scale);
+		scale = (float)PussycatMinions.meters2Pixels(targetWidth)/(float)image.getWidth();
+		//pos = new PointF(centerX-(image.getWidth()/2)*scale, centerY-(image.getHeight()/2)*scale);
+	    
+		this.centerX = centerX;
+        this.centerY = centerY;
 	}
 	
 	public Image getImage(){
@@ -25,11 +28,11 @@ public class Target {
 	}
 	
 	public float getX() {
-		return pos.x;
+		return (float) (centerX - scale*(image.getWidth()*Math.abs(Math.cos(SharedVariables.getInstance().getMiddleAngle())) + image.getHeight()*Math.abs(Math.sin(SharedVariables.getInstance().getMiddleAngle())))/2);
 	}
 
 	public float getY() {
-		return pos.y;
+		return (float) (centerY - scale*(image.getHeight()*Math.abs(Math.cos(SharedVariables.getInstance().getMiddleAngle())) + image.getWidth()*Math.abs(Math.sin(SharedVariables.getInstance().getMiddleAngle())))/2);
 	}
 	
 	public float getImageWidth() {
@@ -47,17 +50,9 @@ public class Target {
 	public float getPixelHeight() {
 		return image.getHeight()*scale;
 	}
-	
-	public float getRadAngle(){
-		return radAngle;
-	}
-	
-	public void setRadAngle(float radAngle){
-		this.radAngle = radAngle;
-	}
 
 	public void drawTarget(Graphics graphics) {
-		graphics.drawScaledImage(image, (int)pos.x, (int)pos.y, (int)getPixelWidth(), (int)getPixelHeight(), 0, 0, (int)getImageWidth(), (int)getImageHeight(), SharedVariables.getInstance().getMiddleAngle());
+		graphics.drawScaledImage(image, (int)getX(), (int)getY(), (int)getPixelWidth(), (int)getPixelHeight(), 0, 0, (int)getImageWidth(), (int)getImageHeight(), SharedVariables.getInstance().getMiddleAngle());
 		
 	}
 }
