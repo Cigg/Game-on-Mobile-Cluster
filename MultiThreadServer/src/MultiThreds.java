@@ -170,6 +170,11 @@ public class MultiThreds {
 					    							float xVelL2 = deviceManager.globalToLocalVelX(thread.getIp(), ball2.getXVel(), ball2.getYVel());
 								    				float yVelL2 = deviceManager.globalToLocalVelY(thread.getIp(), ball2.getXVel(), ball2.getYVel());
 								    				
+								    				if(ball2.removed){
+								    					xPosL = 1337;
+								    					yPosL = 1337;
+								    				}
+								    				
 					    							buffer.putInt(ball.id);
 					    							if(ball.shouldBeRemoved()) {
 					    								buffer.putInt(-1);
@@ -211,7 +216,6 @@ public class MultiThreds {
 						    				
 					    				} else {
 					    					thread.ownBallz.remove(ball.id);
-					    					//PhysicsWorld.removeBall(ball.id);;
 					    				}
 				    				
 			    					} else {

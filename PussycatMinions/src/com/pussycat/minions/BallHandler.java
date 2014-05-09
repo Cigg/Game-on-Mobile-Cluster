@@ -27,11 +27,10 @@ public class BallHandler {
 
 	public void updateBalls(final float timeStep) {
 		//forAllBallsCall("update", timeStep);
-		
 		Enumeration<Integer> enumKey = balls.keys();
 		while( enumKey.hasMoreElements() ) {
 		    int key = enumKey.nextElement();
-		    Ball ball = balls.get(key);		 
+		    Ball ball = balls.get(key);
 			ball.update(timeStep);
 		}	
 		

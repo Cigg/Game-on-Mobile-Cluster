@@ -356,8 +356,6 @@ private class Vertex {
 		System.out.println("Removing ball from world");
 		Body body = bodies.get(id-1).body;
 		toDestroy.add(body);
-		//world.destroyBody(body);
-		//bodies.remove(id-1);
 	}
 	
 }
