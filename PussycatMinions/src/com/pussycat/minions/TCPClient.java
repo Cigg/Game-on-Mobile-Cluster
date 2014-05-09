@@ -10,7 +10,8 @@ import android.util.Log;
 
 public class TCPClient extends Thread {
 	
-	private final String SERVER_IP = "192.168.43.56";
+	private final String SERVER_IP = "192.168.43.213";
+
 
 
 	private final int SERVER_PORT = 4444;
