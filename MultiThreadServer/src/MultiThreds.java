@@ -94,7 +94,7 @@ public class MultiThreds {
 			    						
 			    						ByteBuffer test = ByteBuffer.wrap(data);
 			    						System.out.println("SEND to " + thread.getIp() + ": " + test.getShort() + "  " + test.getShort());
-			    						
+					    				
 			    						thread.sendData(data);
 			    						thread.clientInfo.addSentPackageItem("SENDATA   TODO: FIX");
 			    					}
@@ -113,7 +113,11 @@ public class MultiThreds {
 				    				}
 				    				
 				    				dataBuffer.putFloat(jointAngle);	
-			    		    		thread.sendData(dataBuffer.array());
+				    				
+				    	    		int position = dataBuffer.position();
+				    	    		byte[] sendBytes = new byte[position];
+				    				System.arraycopy( dataBuffer.array(), 0, sendBytes, 0, position);
+			    		    		thread.sendData(sendBytes);
 			    				}
 		    				}
 		    			}
@@ -162,7 +166,7 @@ public class MultiThreds {
 					    						
 					    						Vec2 vella = physicsWorld.getVelocityFromId(ball.id);
 					    						
-					    						if( ball.shouldUpdate() || ball2.getXVel() != vella.x || ball2.getYVel() != vella.y || ball.shouldBeRemoved()) {   // Don't Work
+					    						if(ball.shouldUpdate() || ball2.getXVel() != vella.x || ball2.getYVel() != vella.y || ball.shouldBeRemoved()) {  
 					    	
 					    							ball2.setXVel(vella.x);
 					    							ball2.setYVel(vella.y);
@@ -213,11 +217,14 @@ public class MultiThreds {
 					    				}
 				    				
 			    					} else {
+			    						final int position = buffer.position();
 			    						buffer.position(2);
 					    				buffer.putShort(nBalls);
 					    				if(nBalls != 0) {
-						    				thread.sendData(buffer.array());
-						    				thread.clientInfo.addSentPackageItem(GLOBAL_STATE__.values()[sendState] + "   " + nBalls);
+					    					byte[] sendBytes = new byte[position];
+					    					System.arraycopy( buffer.array(), 0, sendBytes, 0, position);
+						    				thread.sendData(sendBytes);
+						    				thread.clientInfo.addSentPackageItem(GLOBAL_STATE__.values()[sendState] + "   " + nBalls + " Array Size: " + sendBytes.length);
 					    				}
 					    				nBalls = 0;
 					    				buffer.clear();
@@ -227,15 +234,18 @@ public class MultiThreds {
 			    					}
 			    					
 			    				}
-			    				
+			    		
+			    				final int position = buffer.position();
 			    				buffer.position(2);
 			    				buffer.putShort(nBalls);
 			    				
-			    				//System.out.println(jointAngle);
-			    				//buffer.putFloat(jointAngle);
+			    				
 			    				if(nBalls != 0) {
-				    				thread.sendData(buffer.array());
-				    				thread.clientInfo.addSentPackageItem(GLOBAL_STATE__.values()[sendState] + "   " + nBalls);
+			    					byte[] sendBytes = new byte[position];
+			    					System.arraycopy( buffer.array(), 0, sendBytes, 0, position);
+				    				thread.sendData(sendBytes);
+	
+				    				thread.clientInfo.addSentPackageItem(GLOBAL_STATE__.values()[sendState] + "   " + nBalls + " Array Size: " + sendBytes.length);
 			    				}
 			
 			    			}

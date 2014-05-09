@@ -322,7 +322,11 @@ public class DeviceManager {
 	    		buffer.putShort((short) GLOBAL_STATE__.SET_STATE.ordinal());	// State: 		SET_STATE
 	    		buffer.putShort((short) GLOBAL_STATE__.MAP_DEVICE.ordinal());	// New state: 	MAP_DEVICE
 	    		
-	    		device.messagesToSend.add(buffer.array());
+	    		int position = buffer.position();
+	    		byte[] sendBytes = new byte[position];
+				System.arraycopy( buffer.array(), 0, sendBytes, 0, position);
+				
+	    		device.messagesToSend.add(sendBytes);
 		    }
 		}
 	}
@@ -337,7 +341,11 @@ public class DeviceManager {
 	    		buffer.putShort((short) GLOBAL_STATE__.SET_STATE.ordinal());	// State: 		SET_STATE
 	    		buffer.putShort((short) GLOBAL_STATE__.MAP_DEVICE.ordinal());	// New state: 	MAP_DEVICE
 	    		
-	    		device.messagesToSend.add(buffer.array());
+	    		int position = buffer.position();
+	    		byte[] sendBytes = new byte[position];
+				System.arraycopy( buffer.array(), 0, sendBytes, 0, position);
+				
+	    		device.messagesToSend.add(sendBytes);
 		}
 	}
 	

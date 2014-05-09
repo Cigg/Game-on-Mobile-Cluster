@@ -361,7 +361,7 @@ public class ClientThread extends Thread {
 								clientInfo.setMidY(g_midY * 2.5f);
 								
 								if(type == 0) {
-									targetJoint = MultiThreds.getPhysicsWorld().addTarget(g_midX, g_midY, 0.8f);
+									targetJoint = MultiThreds.getPhysicsWorld().addTarget(g_midX, g_midY, 0);
 								}
 							}
 								break;
