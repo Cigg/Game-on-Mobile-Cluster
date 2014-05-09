@@ -105,7 +105,7 @@ public class MultiThreds {
 			    					ByteBuffer dataBuffer = ByteBuffer.allocate(1*2 + 1*4);
 			    					dataBuffer.clear();
 			    		    		
-			    					dataBuffer.putShort((short) GLOBAL_STATE__.SET_MIDDLE_ANGLE.ordinal());	// State: ADD_DEVICE
+			    					dataBuffer.putShort((short) GLOBAL_STATE__.SET_MIDDLE_ANGLE.ordinal());
 			    		    		
 			    		    		float jointAngle = 0.0f;
 				    				if(ClientThread.targetJoint != null){

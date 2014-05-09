@@ -359,6 +359,10 @@ public class ClientThread extends Thread {
 								float g_midY = deviceManager.localToGlobalY(ip, l_midX, l_midY);
 								clientInfo.setMidX(g_midX * 2.5f);
 								clientInfo.setMidY(g_midY * 2.5f);
+								
+								if(type == 0) {
+									targetJoint = MultiThreds.getPhysicsWorld().addTarget(g_midX, g_midY, 0.8f);
+								}
 							}
 								break;
 
@@ -411,9 +415,6 @@ public class ClientThread extends Thread {
 									float g_main_midX = deviceManager.localToGlobalX(ipOfMiddle, l_main_midX, l_main_midY);
 									float g_main_midY = deviceManager.localToGlobalY(ipOfMiddle, l_main_midX, l_main_midY);
 									
-									
-									targetJoint = MultiThreds.getPhysicsWorld().addTarget(g_main_midX, g_main_midY, 0.8f);
-
 									sendBuffer.putFloat(rotZ);
 									sendBuffer.putFloat(g_midX);
 									sendBuffer.putFloat(g_midY);
