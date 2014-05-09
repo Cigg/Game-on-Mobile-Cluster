@@ -25,6 +25,7 @@ public class DeviceManager {
 		int resY;
 		boolean needsMapping;
 		short type;
+		int score;
 		
 		private LinkedBlockingQueue<byte[]> messagesToSend = new LinkedBlockingQueue <byte[]>();
 		
@@ -40,6 +41,7 @@ public class DeviceManager {
 			
 			this.type = type;
 			
+			int score = 0;
 			
 			if(type == 0) { // type == 0 is middle device
 				needsMapping = false;
@@ -58,6 +60,12 @@ public class DeviceManager {
 		}
 		public float getRotZ(){
 			return rotZ;
+		}
+		
+		public void incrementScore(){
+			score++;
+			System.out.print(score);
+			System.out.println();
 		}
 	}
 	
@@ -626,4 +634,8 @@ public class DeviceManager {
 		}		
 	}
 	
+	public void score(int id){
+		System.out.print("Score now is: ");
+		devices.get(id).incrementScore();
+	}
 }

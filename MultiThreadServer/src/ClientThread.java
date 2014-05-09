@@ -10,6 +10,8 @@ import java.util.Hashtable;
 import java.util.concurrent.LinkedBlockingQueue;
 
 
+
+
 import org.jbox2d.common.Vec2;
 import org.jbox2d.dynamics.joints.RevoluteJoint;
 
@@ -41,7 +43,7 @@ public class ClientThread extends Thread {
 	private volatile static float time1;
 
 	private volatile String ip;
-	private DeviceManager deviceManager;
+	private static DeviceManager deviceManager;
 	private OutputStream dout;
 
 	static final int MAX_LIFETIME = 30;
@@ -582,6 +584,21 @@ public class ClientThread extends Thread {
 					threads[j].ballCount = ballCount;
 				}
 			}
+		}
+	}
+	
+	public static void removeAndScore(int id){
+		Ballz theBall = null;
+		for(Ballz ball : ballz){
+			if(ball.id == id){
+				theBall = ball;
+			}
+		}
+		if(theBall != null) {
+			System.out.println("I got touched by ball: " + theBall.id); 
+			System.out.println("Score to player: " + theBall.parent);
+			theBall.setShouldBeRemoved(true);
+			deviceManager.score(theBall.parent);
 		}
 	}
 }// END OF clientThread

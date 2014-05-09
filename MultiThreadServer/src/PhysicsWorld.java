@@ -28,7 +28,6 @@ import org.json.simple.parser.ParseException;
 
 public class PhysicsWorld {
 	//public volatile static Hashtable<Integer, Body> bodies = new Hashtable<Integer, Body>();		
-
 private class Vertex {
 	float x;
 	float y;
@@ -105,6 +104,7 @@ private class Vertex {
 		calculateNormals();
 		
 		//---------- DEFENITION OF VERTECIES FROM FILE ---------
+		System.out.println("Polygon size is: " + polygons.size());
 		for(int i=0; i < polygons.size(); i++){
 			Polygon polygon = polygons.get(i);
 			polyDef.m_vertexCount = polygon.vertecies.size();
@@ -114,7 +114,7 @@ private class Vertex {
 				//polyDef.m_vertices[j].set((originX + 1.0f*vertex.x)*scale, (originY + 1.0f*vertex.y)*scale);
 				polyDef.m_normals[j].set(vertex.normalX,vertex.normalY);
 			}
-			body.createFixture(polyDef,1.0f).setUserData("Target");
+			while(body.createFixture(polyDef,1.0f) == null);
 		}
 		bodyDef.type = BodyType.STATIC;
 		bodyDef.position.set(xPos, yPos);
@@ -216,7 +216,7 @@ private class Vertex {
 
 		while (true) {
 			try {
-				body.createFixture(fixtureDef).setUserData("Ball: " + id);;
+				body.createFixture(fixtureDef).setUserData(id);
 				break;
 			} catch (Exception e) {
 				System.out.println("Erorror fixtureDef");
@@ -284,11 +284,11 @@ private class Vertex {
 					JSONObject pair = (JSONObject) j.next();
 					Object x =  pair.get("x");
 					Object y =  pair.get("y");
-					System.out.println("x = " + x + ", y = " + y);
+					//System.out.println("x = " + x + ", y = " + y);
 					
 					polygon.vertecies.add(new Vertex(convertToFloat(x),convertToFloat(y)));
 				}
-				System.out.println();
+				//System.out.println();
 				polygons.add(polygon);
 			}
 		} catch (FileNotFoundException e) {
