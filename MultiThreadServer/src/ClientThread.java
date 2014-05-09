@@ -57,7 +57,8 @@ public class ClientThread extends Thread {
 		float mass, radius, lifeTime;
 		int id;
 		boolean isMoved;
-		boolean shouldBeRemoved;;
+		boolean shouldBeRemoved;
+		boolean removed;
 
 		float lx, ly;
 		int parent;
@@ -74,7 +75,8 @@ public class ClientThread extends Thread {
 			this.radius = 0.75f; // cm
 			this.isMoved = false;
 			this.shouldBeRemoved = false;
-
+			this.removed = false;
+			
 			lx = xPos;
 			ly = yPos;
 
@@ -100,7 +102,6 @@ public class ClientThread extends Thread {
 					this.id);
 			this.xPos = position.x;
 			this.yPos = position.y;
-			
 			
 			Vec2 velocity = MultiThreds.getPhysicsWorld().getVelocityFromId(this.id);
 
@@ -168,6 +169,14 @@ public class ClientThread extends Thread {
 		public void setYVel(float yVel) {
 			this.yVel = yVel;
 		}
+		
+		public void setPosX(float xPos) {
+			this.xPos = xPos;
+		}
+		
+		public void setPosY(float yPos) {
+			this.yPos = yPos;
+		}
 	}
 
 	public volatile static LinkedBlockingQueue<Ballz> ballz = new LinkedBlockingQueue<Ballz>();
@@ -175,7 +184,7 @@ public class ClientThread extends Thread {
 	Hashtable<Integer, Ballz> ownBallz = new Hashtable<Integer, Ballz>();
 
 	
-	public RevoluteJoint targetJoint = null;
+	public static RevoluteJoint targetJoint = null;
 	/**
 	 * Get the ip of the client
 	 * 
@@ -598,8 +607,10 @@ public class ClientThread extends Thread {
 		if(theBall != null) {
 			System.out.println("I got touched by ball: " + theBall.id); 
 			System.out.println("Score to player: " + theBall.parent);
-			theBall.setShouldBeRemoved(true);
 			deviceManager.score(theBall.parent);
+			theBall.removed = true;
+			theBall.setXVel(0);
+			theBall.setYVel(0);
 		}
 	}
 }// END OF clientThread

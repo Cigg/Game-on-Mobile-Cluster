@@ -74,10 +74,10 @@ public class MultiThreds {
 		    		serverGraphics.update();
 	    			// Update ballz	
 		    		if(threads[0] != null) {
-		    			for(ClientThread.Ballz ball : threads[0].ballz) {
+		    			for(ClientThread.Ballz ball : ClientThread.ballz) {
 		    				ball.update(timeDelta);
 		    				if(ball.shouldBeRemoved()) {
-		    					threads[0].ballz.remove(ball);
+		    					ClientThread.ballz.remove(ball);
 		    				} else if(ball.isDead()) {
 		    					ball.setShouldBeRemoved(true);
 		    				}
@@ -108,8 +108,8 @@ public class MultiThreds {
 			    					dataBuffer.putShort((short) GLOBAL_STATE__.SET_MIDDLE_ANGLE.ordinal());
 			    		    		
 			    		    		float jointAngle = 0.0f;
-				    				if(thread.targetJoint != null){
-				    					jointAngle =  thread.targetJoint.getJointAngle();
+				    				if(ClientThread.targetJoint != null){
+				    					jointAngle =  ClientThread.targetJoint.getJointAngle();
 				    				}
 				    				
 				    				dataBuffer.putFloat(jointAngle);	
@@ -174,10 +174,16 @@ public class MultiThreds {
 					    							float xVelL2 = deviceManager.globalToLocalVelX(thread.getIp(), ball2.getXVel(), ball2.getYVel());
 								    				float yVelL2 = deviceManager.globalToLocalVelY(thread.getIp(), ball2.getXVel(), ball2.getYVel());
 								    				
+								    				if(ball2.removed){
+								    					xPosL = 1337;
+								    					yPosL = 1337;
+								    				}
+								    				
 					    							buffer.putInt(ball.id);
 					    							if(ball.shouldBeRemoved()) {
 					    								buffer.putInt(-1);
 					    								thread.ownBallz.remove(ball.id);
+					    								System.out.println("Removing ball for mobile");
 					    								System.out.println("-1");
 					    							} else {
 					    								buffer.putInt(ball.parent);
