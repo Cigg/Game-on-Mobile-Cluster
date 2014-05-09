@@ -8,6 +8,7 @@ import java.net.Socket;
 import java.nio.ByteBuffer;
 import java.util.Hashtable;
 import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.atomic.AtomicInteger;
 
 
 
@@ -41,12 +42,13 @@ public class ClientThread extends Thread {
 
 	private volatile static LOCAL_STATE__ internalState;
 	private volatile static float time1;
+	private volatile AtomicInteger isReady = new AtomicInteger(0);
 
 	private volatile String ip;
 	private static DeviceManager deviceManager;
 	private OutputStream dout;
 
-	static final int MAX_LIFETIME = 30;
+	static final int MAX_LIFETIME = 15;
 	static final float MAX_POSITION_X = (float) (100 / 2.5);
 	static final float MAX_POSITION_Y = MAX_POSITION_X;
 
@@ -191,6 +193,14 @@ public class ClientThread extends Thread {
 	 */
 	public String getIp() {
 		return this.ip;
+	}
+	
+	public int getIsReady() {
+		return isReady.get();
+	}
+	
+	public void setIsReady(final int ready) {
+		isReady.set(ready);
 	}
 
 	/**
@@ -530,12 +540,16 @@ public class ClientThread extends Thread {
 									GLOBAL_STATE__ toState = GLOBAL_STATE__.values()[newState];
 
 									switch (toState) {
-									case MAP_MAIN: {
-										// deviceManager.setMappingAtMainDevice();
-										deviceManager.setMappingAtAllDevices();
-										deviceManager.setNeedsMapping(ip, true);
-									}
+										case MAP_MAIN: {
+											deviceManager.setMappingAtMainDevice();
+											deviceManager.setNeedsMapping(ip, true);
+										}
 										break;
+										
+										case MAP_ALL: {
+											deviceManager.setMappingAtAllDevices();
+											deviceManager.setNeedsMapping(ip, true);
+										}
 									}
 								} catch (Exception e) {
 									// Do nothing
@@ -543,6 +557,12 @@ public class ClientThread extends Thread {
 								}
 							}
 								break;
+								
+							case IS_READY: {
+								isReady.set(buffer.getInt());;
+								
+								clientInfo.addIncomingPackageItem(actualState.name() + "   " + isReady);
+							}
 
 							case REG:
 								break;

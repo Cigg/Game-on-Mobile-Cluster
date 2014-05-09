@@ -31,6 +31,8 @@ public class ServerBoard extends JFrame {
             	System.out.println("Server started");
             	btnStart.setEnabled(false);
                	server = new MultiThreds();
+               	
+               	
    				server.update.start();
    				server.deviceUpdate.start();
             }

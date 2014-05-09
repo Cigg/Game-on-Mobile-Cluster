@@ -11,7 +11,7 @@ import android.graphics.Typeface;
 import com.pussycat.framework.Graphics;
 import com.pussycat.framework.implementation.AndroidGraphics;
 
-public class TimerWidget {
+public class TimerWidget implements Widget {
 	
 	private final String FONT = "DS-DIGIB.TTF";
 	private final int DECIMALS = 2;
@@ -20,13 +20,13 @@ public class TimerWidget {
 	private final int Y_MARGIN = PussycatMinions.meters2Pixels( 0.2f / 100.0f);
 	private int X_MARGIN = - PussycatMinions.meters2Pixels( 0.2f / 100.0f);
 	
-	private final int SECONDS = 12; 
+	private final int SECONDS = 60; 
 	private float time = (float)SECONDS;
 	private long startTime;
 	private long totalTime = SECONDS * 1000;
 	
 	private Paint paint;
-	private String text;
+	private String text;;
 	Rect bounds;
 	
 	public TimerWidget() {
@@ -47,6 +47,7 @@ public class TimerWidget {
 	
 	public void start() {
 		startTime = System.currentTimeMillis();
+		update();
 	}
 	
 	

@@ -25,7 +25,8 @@ public class MultiThreds {
 	
 	
 	private static final int maxClientCount = 10;
-	private  static final ClientThread[] threads = new ClientThread[maxClientCount];
+	private static final ClientThread[] threads = new ClientThread[maxClientCount];
+	private static final int[] scores = new int[maxClientCount];
 	private static final UpdateLoop updateLoop = new UpdateLoop(threads, maxClientCount);
 	
 	volatile static DeviceManager deviceManager;
@@ -58,11 +59,59 @@ public class MultiThreds {
 		deviceManager = new DeviceManager();
 		serverGraphics = new ServerGraphics(deviceManager);
 		
-	   final float tickRate = 128;
+		final float tickRate = 128;
 		
+	
+	   
 		update = new Thread() {
 		    public void run() {
 		    	
+		    	
+				
+		    	boolean allReady = false;
+		    	short nPlayers = 0;
+		    	while(!allReady) {
+		    		allReady = true;
+		    		for(ClientThread thread : threads) {
+						if (thread != null) {
+							nPlayers ++;
+							if(thread.getIsReady() != 1) {
+								allReady = false;
+							}
+						}
+		    		}
+		    		if(nPlayers <= 1 || !allReady) {
+		    			allReady = false;
+		    			nPlayers = 0;
+		    			
+		    			try {
+							Thread.currentThread().sleep(100);
+						} catch (InterruptedException e) {
+							e.printStackTrace();
+						}
+		    		}
+
+		    	}
+		    	
+				for(ClientThread thread : threads) {
+					if (thread != null) {
+						ByteBuffer dataBuffer = ByteBuffer.allocate(2*2 + 0*4);
+						dataBuffer.clear();
+	    				short sendState = (short) GLOBAL_STATE__.START_GAME.ordinal();
+						dataBuffer.putShort(sendState);
+						dataBuffer.putShort(nPlayers);	
+						
+			    		int position = dataBuffer.position();
+			    		byte[] sendBytes = new byte[position];
+						System.arraycopy( dataBuffer.array(), 0, sendBytes, 0, position);
+						
+			    		thread.sendData(sendBytes);
+			    		thread.clientInfo.addSentPackageItem(GLOBAL_STATE__.values()[sendState] + "   " + nPlayers);
+					}
+				}
+				System.out.println("DONE");
+				
+				
 		    	float timeBegin, timeEnd = 0, timeDelta = 1 / tickRate, timeDelay;
 		    	while(true) {
 		    		//System.out.println("Update-----------------------------------------------");
@@ -82,7 +131,6 @@ public class MultiThreds {
 		    					ball.setShouldBeRemoved(true);
 		    				}
 		    			}		
-
 		    			
 		        		// Send data
 		    			for(ClientThread thread : threads) {
@@ -101,7 +149,7 @@ public class MultiThreds {
 			    				}
 			    				
 			    				// Send middleAngle to middle
-			    				if( deviceManager.isMiddle(thread.getIp()) ) {
+			    				if(deviceManager.isMiddle(thread.getIp())) {
 			    					ByteBuffer dataBuffer = ByteBuffer.allocate(1*2 + 1*4);
 			    					dataBuffer.clear();
 			    		    		
@@ -119,8 +167,42 @@ public class MultiThreds {
 				    				System.arraycopy( dataBuffer.array(), 0, sendBytes, 0, position);
 			    		    		thread.sendData(sendBytes);
 			    				}
+			    				
 		    				}
 		    			}
+		    			
+		    			
+		    			if(deviceManager.shouldUpdateScores()) {
+	    					ByteBuffer dataBuffer = ByteBuffer.allocate(2*2 + maxClientCount*4);
+	    					dataBuffer.clear();
+	    					
+	    					dataBuffer.putShort((short) GLOBAL_STATE__.SET_POINTS.ordinal());
+	    					dataBuffer.putShort((short) 0);
+	    					
+	    					short nScores = 0;
+	    					for(ClientThread thread : threads) {
+			    				if (thread != null) {
+			    					dataBuffer.putInt(deviceManager.getScore(thread.getIp()));
+			    					nScores ++;
+			    				}
+	    					}
+	    					
+	    					final int position = dataBuffer.position();
+	    					dataBuffer.position(2);
+	    					dataBuffer.putShort(nScores);
+	    					
+	    					byte[] sendBytes = new byte[position];
+	    					System.arraycopy( dataBuffer.array(), 0, sendBytes, 0, position);
+	    					
+	    					for(ClientThread thread : threads) {
+			    				if (thread != null) {
+			    					thread.sendData(sendBytes);
+			    				}
+	    					}	
+	    				}
+		    			
+		    			
+		    			
 		    			
 		    			
 			    		// Send ballz
@@ -259,6 +341,8 @@ public class MultiThreds {
 			    				    		
 			    		
 		    		}
+		   
+		    		deviceManager.setUpdateScores(false);
 		    		
 		    		timeDelay = Math.max(0, (float)((1 / tickRate)*Math.pow(10, 9)) - (System.nanoTime() - timeBegin));
 		 
@@ -270,7 +354,6 @@ public class MultiThreds {
 					}
 		    		timeEnd = System.nanoTime();
 		    		timeDelta = timeEnd - timeBegin;
-		    		//System.out.println(timeDelta*Math.pow(10, -9));
 		    	}
 		    }
 		};

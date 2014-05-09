@@ -3,6 +3,7 @@ package src;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 
 // TODO: Make all computations based on new data types like vectors and
@@ -11,6 +12,16 @@ import java.util.concurrent.LinkedBlockingQueue;
 // This class handles the interaction between the server and the devices.
 public class DeviceManager {
 
+	private volatile static AtomicBoolean shouldUpdateScores = new AtomicBoolean(true);
+	
+	public static boolean shouldUpdateScores() {
+		return shouldUpdateScores.get();
+	}
+	
+	public static void setUpdateScores(final boolean upd) {
+		shouldUpdateScores.set(upd);
+	}
+	
 	// Data type for a device.
 	// Only the DeviceManager should be able to modify this class.
 	private class Device {
@@ -63,12 +74,12 @@ public class DeviceManager {
 		}
 		
 		public void incrementScore(){
+			setUpdateScores(true);
 			score++;
 			System.out.print(score);
 			System.out.println();
 		}
 	}
-	
 	
 	// Container with all added devices.
 	public ArrayList<Device> devices;
@@ -645,5 +656,14 @@ public class DeviceManager {
 	public void score(int id){
 		System.out.print("Score now is: ");
 		devices.get(id).incrementScore();
+	}
+	
+	public int getScore(String ip) {
+		for (Device device : this.devices) {
+		    if (device.ip.equals(ip)) {
+		    	return device.score;
+		    }
+		}
+		return 0;
 	}
 }
