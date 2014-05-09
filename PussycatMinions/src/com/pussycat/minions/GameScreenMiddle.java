@@ -78,8 +78,8 @@ public class GameScreenMiddle extends Screen {
 		
 		int width = PussycatMinions.getScreenWidth()/2 - Assets.button.getWidth()/2;
 		
-		menuButton = new Button(Assets.button, Assets.button_pressed, PussycatMinions.getScreenWidth() - 200, PussycatMinions.getScreenHeight()-70, paint);
-        menuButton.setText("MENU");
+		menuButton = new Button(Assets.settings, Assets.settings_pressed, PussycatMinions.getScreenWidth() - Assets.settings.getWidth() - 30, PussycatMinions.getScreenHeight()-Assets.settings.getHeight() - 30, paint);
+        //menuButton.setText("MENU");
         resumeButton = new Button(Assets.button, Assets.button_pressed, width, PussycatMinions.getScreenHeight()/2-100, paint);
         resumeButton.setText("RESUME");
         restartButton = new Button(Assets.button, Assets.button_pressed, width, PussycatMinions.getScreenHeight()/2, paint);
@@ -309,9 +309,57 @@ public class GameScreenMiddle extends Screen {
         int len = touchEvents.size();
         for (int i = 0; i < len; i++) {
             TouchEvent event = touchEvents.get(i);
-            if (event.type == TouchEvent.TOUCH_UP) {
-
-            }
+            if(event.type == TouchEvent.TOUCH_DOWN){
+		     	if(resumeButton.inBounds(event.x, event.y)){
+		     		resumeButton.setPressed(true);
+		     	} else if (restartButton.inBounds(event.x, event.y)){
+		     		restartButton.setPressed(true);
+		     	} else if (remapButton.inBounds(event.x, event.y)){
+		     		remapButton.setPressed(true);
+		     	} else if (addButton.inBounds(event.x, event.y)){
+		     		addButton.setPressed(true);
+		     	} else if (exitButton.inBounds(event.x, event.y)){
+		     		exitButton.setPressed(true);
+		     	}
+		     }
+		     
+		     if(event.type == TouchEvent.TOUCH_DRAGGED){
+		     	if(!resumeButton.inBounds(event.x, event.y)){
+		     		resumeButton.setPressed(false);
+		    	} else if (restartButton.inBounds(event.x, event.y)){
+		     		restartButton.setPressed(false);
+		     	} else if (remapButton.inBounds(event.x, event.y)){
+		     		remapButton.setPressed(false);
+		     	} else if (addButton.inBounds(event.x, event.y)){
+		     		addButton.setPressed(false);
+		     	} else if (exitButton.inBounds(event.x, event.y)){
+		     		exitButton.setPressed(false);
+		     	}
+		      }
+		     
+		     if (event.type == TouchEvent.TOUCH_UP) {
+		     	resumeButton.setPressed(false);
+		     	restartButton.setPressed(false);
+		     	remapButton.setPressed(false);
+		     	addButton.setPressed(false);
+		     	exitButton.setPressed(false);
+		     	
+		    	// TODO: Should go to SetupScreen instead
+		     	if(resumeButton.inBounds(event.x, event.y)){
+		     		//game.setScreen(new GameScreenPlayer(game));
+		     		state = GameState.Running;
+		     		
+		     	} else if (restartButton.inBounds(event.x, event.y)){
+		     		
+		     	} else if (remapButton.inBounds(event.x, event.y)){
+		     		
+		     	} else if (addButton.inBounds(event.x, event.y)){
+		     		
+		     	} else if (exitButton.inBounds(event.x, event.y)){
+	     		//finish();
+                 System.exit(0);
+		     	}
+		    }        
         }
     }
 

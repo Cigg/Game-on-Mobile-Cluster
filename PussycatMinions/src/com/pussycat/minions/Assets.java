@@ -13,5 +13,7 @@ public class Assets {
     public static Image background;
     public static Sound click;
 	public static Image localBall;
+	public static Image settings;
+	public static Image settings_pressed;
 	
 }
