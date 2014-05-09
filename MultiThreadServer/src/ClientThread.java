@@ -104,7 +104,7 @@ public class ClientThread extends Thread {
 
 			if( Math.abs(lx - (position.x - velocity.x * deltaTime)) > 0.01 || 
 				Math.abs(ly - (position.y - velocity.y * deltaTime)) > 0.01 ) {
-				System.out.println("OOOOOOOOOOOOOOOOOOO___BALL_SHOUDL-.UPDATE___OOOOOOOOOOOOOOOOOOO");
+				//System.out.println("OOOOOOOOOOOOOOOOOOO___BALL_SHOUDL-.UPDATE___OOOOOOOOOOOOOOOOOOO");
 				this.isMoved = true;
 			} else {
 				this.isMoved = false;
