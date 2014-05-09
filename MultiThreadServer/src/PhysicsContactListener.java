@@ -18,6 +18,7 @@ public class PhysicsContactListener implements ContactListener{
 			if(fb.getUserData() instanceof Integer) {
 				int id = (Integer) fb.getUserData();
 				ClientThread.removeAndScore(id);
+				PhysicsWorld.removeBall(id);
 			}
 		}
 		
@@ -26,6 +27,7 @@ public class PhysicsContactListener implements ContactListener{
 			if(fa.getUserData() instanceof Integer) {
 				int id = (Integer) fa.getUserData();
 				ClientThread.removeAndScore(id);
+				PhysicsWorld.removeBall(id);
 			}
 		}
 	}

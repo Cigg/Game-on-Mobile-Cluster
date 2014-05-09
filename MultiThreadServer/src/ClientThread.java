@@ -175,7 +175,7 @@ public class ClientThread extends Thread {
 	Hashtable<Integer, Ballz> ownBallz = new Hashtable<Integer, Ballz>();
 
 	
-	public RevoluteJoint targetJoint = null;
+	public static RevoluteJoint targetJoint = null;
 	/**
 	 * Get the ip of the client
 	 * 

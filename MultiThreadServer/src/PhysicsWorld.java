@@ -5,6 +5,7 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
 
 import org.jbox2d.collision.shapes.CircleShape;
 import org.jbox2d.collision.shapes.PolygonShape;
@@ -49,8 +50,8 @@ private class Vertex {
 	private float originY;
 	
 	public volatile static ArrayList<PhysicsBody> bodies = new ArrayList<PhysicsBody>();
-
-	private World world;
+	private static ArrayList<Body> toDestroy= new ArrayList<Body>();
+	private static World world;
 	
 
 	public void create(Vec2 gravity) {
@@ -127,7 +128,7 @@ private class Vertex {
 		fixtureDef.isSensor = true;
 		
 		CircleShape pivot = new CircleShape();
-		pivot.m_radius = 0.25f;
+		pivot.m_radius = 0.30f;
 		
 		fixtureDef.shape = pivot;
 		
@@ -200,12 +201,11 @@ private class Vertex {
 			body = world.createBody(bodyDef);
 			System.out.println("NULLL BODYYY LOOP");
 		}
-
 		// body.setAngularVelocity(5); // la till
 
 		// bodies.put(id, body);
 
-		bodies.add(new PhysicsBody(id - 1, body));
+		
 
 		// Assign shape to Body
 		FixtureDef fixtureDef = new FixtureDef();
@@ -222,6 +222,7 @@ private class Vertex {
 				System.out.println("Erorror fixtureDef");
 			}
 		}
+		bodies.add(new PhysicsBody(id - 1, body));
 		// body.resetMassData();
 
 	}
@@ -229,7 +230,15 @@ private class Vertex {
 	public void update(float deltaTime) {
 		// Update Physics World
 		world.step(deltaTime, 8, 3); // vilka v�rden b�r de 2 sista
-											// parametrarna ha?
+									// parametrarna ha?
+		if (toDestroy.size()>0){
+			System.out.println("Before: " + world.getBodyCount());
+	         for (Body body:toDestroy){
+	              world.destroyBody(body);
+	          }
+	         System.out.println("After: " + world.getBodyCount());
+	         toDestroy.clear();
+	      }
 	}
 
 	public World getWorld() {
@@ -264,7 +273,7 @@ private class Vertex {
 	private void loadVertices(){
 		JSONParser parser = new JSONParser();
 		try{
-			Object obj = parser.parse(new FileReader("src/octopus.json"));
+			Object obj = parser.parse(new FileReader("src/octopus_detailed.json"));
 			JSONObject jsonObject = (JSONObject) obj;
 			JSONArray jsonArray = (JSONArray) jsonObject.get("rigidBodies");
 			jsonObject = (JSONObject) jsonArray.get(0);
@@ -341,6 +350,14 @@ private class Vertex {
 	
 	public void drawDebug(){
 		world.drawDebugData();
+	}
+	
+	public static void removeBall(int id) {
+		System.out.println("Removing ball from world");
+		Body body = bodies.get(id-1).body;
+		toDestroy.add(body);
+		//world.destroyBody(body);
+		//bodies.remove(id-1);
 	}
 	
 }
