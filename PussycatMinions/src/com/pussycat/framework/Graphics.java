@@ -41,5 +41,5 @@ public interface Graphics {
 
 	public Bitmap getFrameBuffer();
 
-	public Image newScaledImage(Image imageNormal, float width);
+	public Image newScaledImage(Image imageNormal, int pixelWidth);
 }

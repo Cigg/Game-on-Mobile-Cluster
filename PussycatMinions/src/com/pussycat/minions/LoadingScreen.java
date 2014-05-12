@@ -1,13 +1,18 @@
 package com.pussycat.minions;
 
 
+import java.io.File;
+
+import android.content.res.AssetManager;
 import android.graphics.Canvas;
+import android.graphics.Typeface;
 import android.util.Log;
 
 import com.pussycat.framework.Game;
 import com.pussycat.framework.Graphics;
 import com.pussycat.framework.Screen;
 import com.pussycat.framework.Graphics.ImageFormat;
+import com.pussycat.framework.implementation.AndroidGraphics;
 
 
 public class LoadingScreen extends Screen {
@@ -33,6 +38,9 @@ public class LoadingScreen extends Screen {
         Assets.background = g.newBackground("colorspectrum.jpg", ImageFormat.RGB565);
         Assets.settings = g.newImage("settings.png",  ImageFormat.RGB565);
         Assets.settings_pressed = g.newImage("settings_pressed.png", ImageFormat.RGB565);
+        
+        AssetManager assets = AndroidGraphics.getAssets();
+        Assets.menu_font = Typeface.createFromAsset(assets, "fonts" + File.separator + "angrybirds-regular.ttf");
 
         AnimationHandler.getInstance();
         loadingbar = new LoadingBar();

@@ -81,7 +81,7 @@ public class GameScreenMiddle extends Screen {
 		
 		menuButton = new Button(Assets.settings, Assets.settings_pressed, PussycatMinions.getScreenWidth() - Assets.settings.getWidth() - 30, PussycatMinions.getScreenHeight()-Assets.settings.getHeight() - 30, paint);
         //menuButton.setText("MENU");
-		menuButton.scaleButton(game.getGraphics(), 0.015f);
+		menuButton.scaleButton(game.getGraphics(), (int)(PussycatMinions.getScreenWidth()*0.02));
         resumeButton = new Button(Assets.button, Assets.button_pressed, width, PussycatMinions.getScreenHeight()/2-100, paint);
         resumeButton.setText("RESUME");
         restartButton = new Button(Assets.button, Assets.button_pressed, width, PussycatMinions.getScreenHeight()/2, paint);
