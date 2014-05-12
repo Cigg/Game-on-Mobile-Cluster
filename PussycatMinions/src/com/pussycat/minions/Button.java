@@ -50,6 +50,26 @@ public class Button {
 			return imageNormal;
 	}
 	
+	/**
+	 * Scale button to input width
+	 * width prefix is centimeters
+	 * @param width
+	 */
+	public void scaleButton(double width) {
+		// input centimeter bredd 
+		
+		if(this.getWidth() == width) {
+			// Don't do anything
+			
+		} else {
+			// 
+			
+			this.imageNormal = new Image()
+			
+		}
+		
+	}
+	
 	public int getX() {
 		return posX;
 	}
