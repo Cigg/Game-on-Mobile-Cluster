@@ -25,17 +25,25 @@ public class MainMenuScreen extends Screen {
         
         // Defining a paint object
 		paint = new Paint();
-		paint.setTextSize(30);
+		paint.setTextSize(42);
 		paint.setTextAlign(Paint.Align.CENTER);
 		paint.setAntiAlias(true);
-		paint.setColor(Color.BLACK);
+		paint.setColor(Color.WHITE);
 		
-		playerButton = new Button(Assets.button, Assets.button_pressed, PussycatMinions.getScreenWidth()/2 - Assets.button.getWidth()/2, PussycatMinions.getScreenHeight()/2-100, paint);
+		Graphics g = game.getGraphics();
+		
+		playerButton = new Button(Assets.button, Assets.button_pressed, PussycatMinions.getScreenWidth()/2 - Assets.button.getWidth()/2, PussycatMinions.getScreenHeight()/2, paint);
 		playerButton.setText("PLAYER");
-		middleButton = new Button(Assets.button, Assets.button_pressed, PussycatMinions.getScreenWidth()/2 - Assets.button.getWidth()/2, PussycatMinions.getScreenHeight()/2+100, paint);
+		playerButton.scaleButton(g, 0.05f);
+		playerButton.setX(PussycatMinions.getScreenWidth()/2 - playerButton.getWidth()/2);
+		middleButton = new Button(Assets.button, Assets.button_pressed, PussycatMinions.getScreenWidth()/2 - Assets.button.getWidth()/2, PussycatMinions.getScreenHeight()/2+250, paint);
 		middleButton.setText("MIDDLE");
-        aboutButton = new Button(Assets.button, Assets.button_pressed, PussycatMinions.getScreenWidth()/2 - Assets.button.getWidth()/2, PussycatMinions.getScreenHeight()/2+200, paint);
+		middleButton.scaleButton(g, 0.05f);
+		middleButton.setX(PussycatMinions.getScreenWidth()/2 - playerButton.getWidth()/2);
+        aboutButton = new Button(Assets.button, Assets.button_pressed, PussycatMinions.getScreenWidth()/2 - Assets.button.getWidth()/2, PussycatMinions.getScreenHeight()/2+500, paint);
         aboutButton.setText("ABOUT");
+        aboutButton.scaleButton(g, 0.05f);
+        aboutButton.setX(PussycatMinions.getScreenWidth()/2 - playerButton.getWidth()/2);
     }
     
     @Override

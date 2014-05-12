@@ -1,10 +1,13 @@
 package com.pussycat.minions;
 
 import android.graphics.Paint;
+import android.graphics.Bitmap.Config;
 import android.util.Log;
 
 import com.pussycat.framework.Graphics;
 import com.pussycat.framework.Image;
+import com.pussycat.framework.Graphics.ImageFormat;
+import com.pussycat.framework.implementation.AndroidImage;
 
 public class Button {
 
@@ -20,7 +23,7 @@ public class Button {
 	private Paint paint;
 	private float textHeight;
 	
-	public Button(Image imageNormal, Image imagePressed,int posX, int posY, Paint paint){
+	public Button(Image imageNormal, Image imagePressed, int posX, int posY, Paint paint){
 		this.imageNormal = imageNormal;
 		this.imagePressed = imagePressed;
 		
@@ -52,22 +55,14 @@ public class Button {
 	
 	/**
 	 * Scale button to input width
-	 * width prefix is centimeters
-	 * @param width
+	 * @param width Button width in meters
 	 */
-	public void scaleButton(double width) {
-		// input centimeter bredd 
+	public void scaleButton(Graphics g, float width) {
+		imageNormal = g.newScaledImage(imageNormal, width);
+		imagePressed = g.newScaledImage(imagePressed, width);
 		
-		if(this.getWidth() == width) {
-			// Don't do anything
-			
-		} else {
-			// 
-			
-		//	this.imageNormal = new Image()
-			
-		}
-		
+		this.width = imageNormal.getWidth();
+		this.height = imageNormal.getHeight();
 	}
 	
 	public int getX() {
