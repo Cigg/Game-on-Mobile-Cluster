@@ -8,7 +8,8 @@ public class BackgroundHandler {
 		COORDINATES,
 		COORDINATES_LOW_RES_3,
 		COLORSPECTRUM,
-		COORDINATES_SPLIT
+		COORDINATES_SPLIT,
+		SAND
 	}
 	
 	public BackgroundHandler()  {
@@ -50,6 +51,13 @@ public class BackgroundHandler {
 																					20,
 																					20										);		
 		
+		backgrounds [BACKGROUNDS.SAND.ordinal()] = new Background(		"sand_split",  "Coordinates_", ".png",							
+																					4134, 											
+																					4134,											
+																					150.0f,				
+																					150.0f,
+																					20,
+																					20										);	
 	}
 	
 }
