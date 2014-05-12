@@ -710,8 +710,8 @@ public class GameScreenPlayer extends Screen {
 				 	(int)(PussycatMinions.meters2Pixels(0.0075f*2)), 
 				 	0, 
 				 	0, 
-				 	128, 
-				 	128,
+				 	Assets.ball.getWidth(), 
+				 	Assets.ball.getHeight(),
 				 	0.0f	);
         }
         

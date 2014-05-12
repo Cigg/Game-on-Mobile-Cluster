@@ -37,8 +37,8 @@ public abstract class Ball {
 			    				 	this.radius * 2, 
 			    				 	0, 
 			    				 	0, 
-			    				 	128, 
-			    				 	128, 0.0f	);		
+			    				 	this.image.getWidth(), 
+			    				 	this.image.getHeight(), 0.0f	);		
 	}
 	
 	

@@ -8,7 +8,7 @@ import com.pussycat.framework.Sound;
 public class Assets {
 
     public static Image ball;
-    public static Image frog;
+    // public static Image frog;
     public static Image octopus;
     public static Image button;
     public static Image button_pressed;
