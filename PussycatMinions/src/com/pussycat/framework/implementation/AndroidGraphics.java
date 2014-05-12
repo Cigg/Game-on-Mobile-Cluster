@@ -16,9 +16,11 @@ import android.graphics.Paint;
 import android.graphics.Paint.Style;
 import android.graphics.Rect;
 import android.graphics.RectF;
+import android.util.Log;
 
 import com.pussycat.framework.Graphics;
 import com.pussycat.framework.Image;
+import com.pussycat.framework.Graphics.ImageFormat;
 import com.pussycat.minions.PussycatMinions;
 
 public class AndroidGraphics implements Graphics {
@@ -161,6 +163,28 @@ public class AndroidGraphics implements Graphics {
 
         return new AndroidImage(bitmap, format);
     }
+    
+    public Image newScaledImage(Image image, float width) {
+		ImageFormat format;
+        if (((AndroidImage)image).bitmap.getConfig() == Config.RGB_565)
+            format = ImageFormat.RGB565;
+        else if (((AndroidImage)image).bitmap.getConfig() == Config.ARGB_4444)
+        	format = ImageFormat.ARGB4444;
+        else
+            format = ImageFormat.ARGB8888;
+        
+        int newWidth = PussycatMinions.meters2Pixels(width);
+        int newHeight = (int)(((float)newWidth/(float)image.getWidth())*(float)image.getHeight());
+        
+        Log.d("Debug Pussycat" , "newWidth: " + newWidth);
+        Log.d("Debug Pussycat" , "newHeight: " + newHeight);
+        Log.d("Debug Pussycat" , "width meters: " + width);
+        
+        Bitmap resizedBitmap = Bitmap.createScaledBitmap(((AndroidImage)image).bitmap, newWidth, newHeight, false);
+		
+		return new AndroidImage(resizedBitmap, format);
+    }
+    
     
     @Override
     public void clearScreen(int color) {
