@@ -5,6 +5,7 @@ import com.pussycat.framework.Image;
 
 import android.R.bool;
 import android.graphics.PointF;
+import android.util.Log;
 
 public class Target {
 	

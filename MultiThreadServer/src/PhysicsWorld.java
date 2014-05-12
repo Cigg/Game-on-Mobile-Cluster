@@ -6,22 +6,15 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Iterator;
 
-import org.jbox2d.callbacks.ContactListener;
-import org.jbox2d.callbacks.DebugDraw;
-import org.jbox2d.collision.Manifold;
-import org.jbox2d.collision.WorldManifold;
 import org.jbox2d.collision.shapes.CircleShape;
 import org.jbox2d.collision.shapes.PolygonShape;
 import org.jbox2d.collision.shapes.Shape;
-import org.jbox2d.common.IViewportTransform;
-import org.jbox2d.common.OBBViewportTransform;
 import org.jbox2d.common.Vec2;
 import org.jbox2d.dynamics.Body;
 import org.jbox2d.dynamics.BodyDef;
 import org.jbox2d.dynamics.BodyType;
 import org.jbox2d.dynamics.FixtureDef;
 import org.jbox2d.dynamics.World;
-import org.jbox2d.dynamics.contacts.Contact;
 import org.jbox2d.dynamics.joints.RevoluteJoint;
 import org.jbox2d.dynamics.joints.RevoluteJointDef;
 import org.json.simple.JSONArray;
@@ -63,9 +56,10 @@ private class Vertex {
 
 	public void create(Vec2 gravity) {
 		boolean doSleep = false;
-		world = new World(gravity, doSleep);		
-		loadVertices();
-		calculateNormals();
+		world = new World(gravity, doSleep);
+		world.setContactListener(new PhysicsContactListener());
+		//loadVertices();
+		//calculateNormals();
 		System.out.println("PhysicsWorld created");
 	}
 
@@ -107,8 +101,8 @@ private class Vertex {
 		System.out.println("Target pos: " + xPos + " " + yPos);
 
 		PolygonShape polyDef = new PolygonShape();
-		//loadVertices();
-		//calculateNormals();
+		loadVertices();
+		calculateNormals();
 		
 		//---------- DEFENITION OF VERTECIES FROM FILE ---------
 		for(int i=0; i < polygons.size(); i++){
@@ -120,7 +114,7 @@ private class Vertex {
 				//polyDef.m_vertices[j].set((originX + 1.0f*vertex.x)*scale, (originY + 1.0f*vertex.y)*scale);
 				polyDef.m_normals[j].set(vertex.normalX,vertex.normalY);
 			}
-			body.createFixture(polyDef,1.0f);
+			body.createFixture(polyDef,1.0f).setUserData("Target");
 		}
 		bodyDef.type = BodyType.STATIC;
 		bodyDef.position.set(xPos, yPos);
@@ -130,9 +124,10 @@ private class Vertex {
 		FixtureDef fixtureDef = new FixtureDef();
 		fixtureDef.density = 1;
 		fixtureDef.friction = 0; 
+		fixtureDef.isSensor = true;
 		
 		CircleShape pivot = new CircleShape();
-		pivot.m_radius = 0.05f;
+		pivot.m_radius = 0.25f;
 		
 		fixtureDef.shape = pivot;
 		
@@ -141,7 +136,7 @@ private class Vertex {
 			body2 = world.createBody(bodyDef);
 			System.out.println("NULLL BODYYY LOOP");
 		}
-		body2.createFixture(fixtureDef);
+		body2.createFixture(fixtureDef).setUserData("Pivot");;
 		
 		
 		//--------------- CREATE JOINT ----------------------
@@ -221,7 +216,7 @@ private class Vertex {
 
 		while (true) {
 			try {
-				body.createFixture(fixtureDef);
+				body.createFixture(fixtureDef).setUserData("Ball: " + id);;
 				break;
 			} catch (Exception e) {
 				System.out.println("Erorror fixtureDef");
