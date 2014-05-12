@@ -263,6 +263,7 @@ public class GameScreenPlayer extends Screen {
     				case MAP_DEVICE:
     				{
     					mapDevice(deltaTimeDragged, currentTime);
+    					SharedVariables.getInstance().setIsRemapping(false);
     					if(SharedVariables.getInstance().isRunning()) {
 							SharedVariables.getInstance().setInternalState(GLOBAL_STATE__.RUN_DEVICE);
 						} else {

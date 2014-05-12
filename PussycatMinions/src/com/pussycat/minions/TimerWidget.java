@@ -26,7 +26,7 @@ public class TimerWidget implements Widget {
 	private long totalTime = SECONDS * 1000;
 	
 	private Paint paint;
-	private String text;;
+	private String text;
 	Rect bounds;
 	
 	public TimerWidget() {

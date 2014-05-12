@@ -171,7 +171,6 @@ public class ServerCommunication extends Thread {
 		Log.d("ADDMAP", "GOT: " + angle + "  " + deviceMiddleX + "  " + deviceMiddleY + "  " + mainMiddleX + "  " + mainMiddleY);
 		
 		SharedVariables.getInstance().setMapDone(true);
-		SharedVariables.getInstance().setIsRemapping(false);
 	}
 	
 	
