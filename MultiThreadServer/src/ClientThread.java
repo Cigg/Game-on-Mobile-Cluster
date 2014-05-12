@@ -8,6 +8,9 @@ import java.net.Socket;
 import java.nio.ByteBuffer;
 import java.util.Hashtable;
 import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.atomic.AtomicInteger;
+
+
 
 
 import org.jbox2d.common.Vec2;
@@ -39,12 +42,13 @@ public class ClientThread extends Thread {
 
 	private volatile static LOCAL_STATE__ internalState;
 	private volatile static float time1;
+	private volatile AtomicInteger isReady = new AtomicInteger(0);
 
 	private volatile String ip;
-	private DeviceManager deviceManager;
+	private static DeviceManager deviceManager;
 	private OutputStream dout;
 
-	static final int MAX_LIFETIME = 30;
+	static final int MAX_LIFETIME = 15;
 	static final float MAX_POSITION_X = (float) (100 / 2.5);
 	static final float MAX_POSITION_Y = MAX_POSITION_X;
 
@@ -55,7 +59,8 @@ public class ClientThread extends Thread {
 		float mass, radius, lifeTime;
 		int id;
 		boolean isMoved;
-		boolean shouldBeRemoved;;
+		boolean shouldBeRemoved;
+		boolean removed;
 
 		float lx, ly;
 		int parent;
@@ -72,7 +77,8 @@ public class ClientThread extends Thread {
 			this.radius = 0.75f; // cm
 			this.isMoved = false;
 			this.shouldBeRemoved = false;
-
+			this.removed = false;
+			
 			lx = xPos;
 			ly = yPos;
 
@@ -98,7 +104,6 @@ public class ClientThread extends Thread {
 					this.id);
 			this.xPos = position.x;
 			this.yPos = position.y;
-			
 			
 			Vec2 velocity = MultiThreds.getPhysicsWorld().getVelocityFromId(this.id);
 
@@ -166,6 +171,14 @@ public class ClientThread extends Thread {
 		public void setYVel(float yVel) {
 			this.yVel = yVel;
 		}
+		
+		public void setPosX(float xPos) {
+			this.xPos = xPos;
+		}
+		
+		public void setPosY(float yPos) {
+			this.yPos = yPos;
+		}
 	}
 
 	public volatile static LinkedBlockingQueue<Ballz> ballz = new LinkedBlockingQueue<Ballz>();
@@ -173,13 +186,21 @@ public class ClientThread extends Thread {
 	Hashtable<Integer, Ballz> ownBallz = new Hashtable<Integer, Ballz>();
 
 	
-	public RevoluteJoint targetJoint = null;
+	public static RevoluteJoint targetJoint = null;
 	/**
 	 * Get the ip of the client
 	 * 
 	 */
 	public String getIp() {
 		return this.ip;
+	}
+	
+	public int getIsReady() {
+		return isReady.get();
+	}
+	
+	public void setIsReady(final int ready) {
+		isReady.set(ready);
 	}
 
 	/**
@@ -357,6 +378,10 @@ public class ClientThread extends Thread {
 								float g_midY = deviceManager.localToGlobalY(ip, l_midX, l_midY);
 								clientInfo.setMidX(g_midX * 2.5f);
 								clientInfo.setMidY(g_midY * 2.5f);
+								
+								if(type == 0) {
+									targetJoint = MultiThreds.getPhysicsWorld().addTarget(g_midX, g_midY, 0);
+								}
 							}
 								break;
 
@@ -409,9 +434,6 @@ public class ClientThread extends Thread {
 									float g_main_midX = deviceManager.localToGlobalX(ipOfMiddle, l_main_midX, l_main_midY);
 									float g_main_midY = deviceManager.localToGlobalY(ipOfMiddle, l_main_midX, l_main_midY);
 									
-									
-									targetJoint = MultiThreds.getPhysicsWorld().addTarget(g_main_midX, g_main_midY, 0.8f);
-
 									sendBuffer.putFloat(rotZ);
 									sendBuffer.putFloat(g_midX);
 									sendBuffer.putFloat(g_midY);
@@ -518,12 +540,16 @@ public class ClientThread extends Thread {
 									GLOBAL_STATE__ toState = GLOBAL_STATE__.values()[newState];
 
 									switch (toState) {
-									case MAP_MAIN: {
-										// deviceManager.setMappingAtMainDevice();
-										deviceManager.setMappingAtAllDevices();
-										deviceManager.setNeedsMapping(ip, true);
-									}
+										case MAP_MAIN: {
+											deviceManager.setMappingAtMainDevice();
+											deviceManager.setNeedsMapping(ip, true);
+										}
 										break;
+										
+										case MAP_ALL: {
+											deviceManager.setMappingAtAllDevices();
+											deviceManager.setNeedsMapping(ip, true);
+										}
 									}
 								} catch (Exception e) {
 									// Do nothing
@@ -531,6 +557,12 @@ public class ClientThread extends Thread {
 								}
 							}
 								break;
+								
+							case IS_READY: {
+								isReady.set(buffer.getInt());;
+								
+								clientInfo.addIncomingPackageItem(actualState.name() + "   " + isReady);
+							}
 
 							case REG:
 								break;
@@ -582,6 +614,23 @@ public class ClientThread extends Thread {
 					threads[j].ballCount = ballCount;
 				}
 			}
+		}
+	}
+	
+	public static void removeAndScore(int id){
+		Ballz theBall = null;
+		for(Ballz ball : ballz){
+			if(ball.id == id){
+				theBall = ball;
+			}
+		}
+		if(theBall != null) {
+			System.out.println("I got touched by ball: " + theBall.id); 
+			System.out.println("Score to player: " + theBall.parent);
+			deviceManager.score(theBall.parent);
+			theBall.removed = true;
+			theBall.setXVel(0);
+			theBall.setYVel(0);
 		}
 	}
 }// END OF clientThread

@@ -65,6 +65,7 @@ public class GameScreenMiddle extends Screen {
 	// Game objects
 	private Target middleTarget;
 	private MusicWidget musicWidget;
+	private RemapWidget remapWidget;
 
 	// Constructor
     public GameScreenMiddle(Game game) {
@@ -92,20 +93,46 @@ public class GameScreenMiddle extends Screen {
         exitButton = new Button(Assets.button, Assets.button_pressed, width, PussycatMinions.getScreenHeight()/2+300, paint);
         exitButton.setText("EXIT");
 
-		middleTarget = new Target(PussycatMinions.getScreenWidth()/2, PussycatMinions.getScreenHeight()/2, 0.06f);
+		middleTarget = new Target(PussycatMinions.getScreenWidth()/2, PussycatMinions.getScreenHeight()/2, 0.06f, game.getGraphics());
 		
 		previousTime = 0;		
-		SharedVariables.getInstance().setInternalState(GLOBAL_STATE__.SYNCHRONIZE_DEVICE);		
+		SharedVariables.getInstance().setInternalState(GLOBAL_STATE__.MAP_DEVICE);		
 		
 		comm = new TCPClient();
 		comm.start();
 		
 		ballHandler = new BallHandler(PussycatMinions.getScreenWidth(), PussycatMinions.getScreenHeight());
-		ServerCommunication t4 = new ServerCommunication(comm, ballHandler, middleTarget);
-		t4.start();
+		ServerCommunication serverComm = new ServerCommunication(comm, ballHandler, middleTarget);
+		serverComm.start();
 		
 		musicWidget = new MusicWidget(game.getAudio());
-		musicWidget.play();
+		remapWidget = new RemapWidget();
+		
+		if(!comm.isRunning()) {
+			try {
+				synchronized(comm) {
+					comm.wait();
+				}
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+		
+		if(!serverComm.isCommunicating()) {
+			try {
+				synchronized(serverComm) {
+					serverComm.wait();
+				}
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+		
+		syncDevice();
+		addDevice();
+
     }
 
     @Override
@@ -135,10 +162,54 @@ public class GameScreenMiddle extends Screen {
             state = GameState.Running;
     }
     
-    
+    private void syncDevice() {
+  		ByteBuffer buffer;
+  		buffer = ByteBuffer.allocate(1*2);
+  		buffer.clear();
+  		buffer.putShort((short) GLOBAL_STATE__.SYNCHRONIZE_DEVICE.ordinal()); 	
+  		comm.sendData(buffer.array());
+      }
+      
+      private void addDevice() {
+      	ByteBuffer buffer;
+  		buffer = ByteBuffer.allocate(2*2 + 4*4);
+  		buffer.clear();
+  		
+  		buffer.putShort((short) GLOBAL_STATE__.ADD_DEVICE.ordinal());	// State: ADD_DEVICE
+  		buffer.putShort((short) 0);										// type, 0 är hårdkodat till main-device - sätt 1 för alla andra devices
+  		buffer.putInt(PussycatMinions.getXDPI());						// XDPI
+  		buffer.putInt(PussycatMinions.getYDPI());						// YDPI
+  		buffer.putInt(PussycatMinions.getScreenWidth());				// ResX
+  		buffer.putInt(PussycatMinions.getScreenHeight());				// ResY
+  		
+   		comm.sendData(buffer.array());
+      }
+      
+      private void mapDevice(final float deltaTimeDragged, final float currentTime) {
+      	ByteBuffer buffer;
+  		buffer = ByteBuffer.allocate(1*2 + 6*4);
+  		buffer.clear();
+  		    		
+  		buffer.putShort((short) GLOBAL_STATE__.MAP_DEVICE.ordinal());	// State: MAP_DEVICE
+  		buffer.putFloat(downX);											// x1
+  		buffer.putFloat(downY); 										// y1
+  		buffer.putFloat(currentX);										// x2
+  		buffer.putFloat(currentY);										// y2
+  		buffer.putFloat(deltaTimeDragged);    							// t
+  		buffer.putFloat(currentTime + SharedVariables.getInstance().getSendDelay());	
+
+  		comm.sendData(buffer.array());
+      }
+
     private void updateRunning(List<TouchEvent> touchEvents, float deltaTime) {   
     	
     	// Thread.currentThread().setPriority(Thread.MAX_PRIORITY);
+    	if(SharedVariables.getInstance().shouldStartGame()) {
+    		SharedVariables.getInstance().setStartGame(false);
+    		SharedVariables.getInstance().setIsRunning(true);
+    		SharedVariables.getInstance().setInternalState(GLOBAL_STATE__.RUN_DEVICE);
+    		musicWidget.play();
+    	}
     	
     	ballHandler.updateBalls(deltaTime);
     	ballHandler.removeBallsNotWanted();
@@ -152,21 +223,8 @@ public class GameScreenMiddle extends Screen {
     		currentY = event.y;
     		final float currentTime = event.time;
     		
-    	
-    		  if(event.pointer >= 2) {
-     			Log.d("AppStates", "SEND SET_STATE");
-     			
-     			ByteBuffer buffer = ByteBuffer.allocate(2*2);
-     			
-     			buffer.putShort((short) GLOBAL_STATE__.SET_STATE.ordinal());	// State: SET_STATE
-     			buffer.putShort((short) 6);										// New state: MAP_MAIN
-     			
-     			comm.sendData(buffer.array());
-     			
-     			SharedVariables.getInstance().setInternalState(GLOBAL_STATE__.MAP_DEVICE);
-     			
-     		} 
-    		  else if(event.type == TouchEvent.TOUCH_DRAGGED) {
+ 
+    		 if(event.type == TouchEvent.TOUCH_DRAGGED) {
     			draggedX = currentX;
     			draggedY = currentY;  	
     		
@@ -185,64 +243,40 @@ public class GameScreenMiddle extends Screen {
 
     			ByteBuffer buffer; 
     		
-    			switch(SharedVariables.getInstance().getInternalState()) {    			
-	    			case SYNCHRONIZE_DEVICE:
-	    			{
-	    				Log.d("AppStates", "SYNCHRONZE_DEVICE");
-	    				
-	    				buffer = ByteBuffer.allocate(1*2);
-	    				buffer.clear();
-	    				
-	    				buffer.putShort((short) GLOBAL_STATE__.SYNCHRONIZE_DEVICE.ordinal()); 	// State: SYNCHRONZE_DEVICE
-	    				
-	    				comm.sendData(buffer.array());
-	    				SharedVariables.getInstance().setInternalState(GLOBAL_STATE__.ADD_DEVICE);
-	    			}
-	    			break;
+    			switch(SharedVariables.getInstance().getInternalState()) {    		
     			
-    				case ADD_DEVICE:
+	    			case MAP_DEVICE:
+					{
+						mapDevice(deltaTimeDragged, currentTime);
+						if(SharedVariables.getInstance().isRunning()) {
+							SharedVariables.getInstance().setInternalState(GLOBAL_STATE__.RUN_DEVICE);
+						} else {
+							SharedVariables.getInstance().setInternalState(GLOBAL_STATE__.IS_READY);
+						}
+					}
+					break;
+	    				
+    				case IS_READY:
     				{
-    					Log.d("AppStates", "ADD_DEVICE");
+    					buffer = ByteBuffer.allocate(1*2 + 1*4);
+    					buffer.putShort((short) GLOBAL_STATE__.IS_READY.ordinal());	// State: IS_READY
+    					buffer.putInt(1);
+    					comm.sendData(buffer.array());
     					
-    					buffer = ByteBuffer.allocate(2*2 + 4*4);
-    		    		buffer.clear();
-    		    		
-    		    		buffer.putShort((short) GLOBAL_STATE__.ADD_DEVICE.ordinal());	// State: ADD_DEVICE
+    					SharedVariables.getInstance().setInternalState(GLOBAL_STATE__.REG);
+    				}
+    				break;
 
-    		    		buffer.putShort((short) 0);										// type, 0 ï¿½r hï¿½rdkodat till main-device - sï¿½tt 1 fï¿½r alla andra devices
-    		    		buffer.putInt(PussycatMinions.getXDPI());						// XDPI
-    		    		buffer.putInt(PussycatMinions.getYDPI());						// YDPI
-    		    		buffer.putInt(PussycatMinions.getScreenWidth());				// ResX
-    		    		buffer.putInt(PussycatMinions.getScreenHeight());				// ResY
-    		    		
-    		     		comm.sendData(buffer.array());
-    		     		SharedVariables.getInstance().setInternalState(GLOBAL_STATE__.MAP_DEVICE);
- 
+					case REG: {
+    					
     				}
     				break;
     				
-    				case MAP_DEVICE:
-    				{
-    					Log.d("AppStates", "MAP_DEVICE");
-    					
-    					buffer = ByteBuffer.allocate(1*2 + 6*4);
-    		    		buffer.clear();
-    					    		
-    		    		buffer.putShort((short) GLOBAL_STATE__.MAP_DEVICE.ordinal());	// State: MAP_DEVICE
-    		    		
-    		    		buffer.putFloat(downX);											// x1
-    		    		buffer.putFloat(downY); 										// y1
-    		    		buffer.putFloat(currentX);										// x2
-    		    		buffer.putFloat(currentY);										// y2
-    		    		buffer.putFloat(deltaTimeDragged);    							// t
-    		    		buffer.putFloat(currentTime + SharedVariables.getInstance().getSendDelay());	
-
-    		    		comm.sendData(buffer.array());
-
-    		    		SharedVariables.getInstance().setInternalState(GLOBAL_STATE__.RUN_DEVICE);
-    				}
-    				break;
     				
+					case START_GAME: {
+					}
+    				
+					
     				case RUN_DEVICE:
     				{
     					Log.d("AppStates", "RUN_DEVICE");
@@ -273,6 +307,7 @@ public class GameScreenMiddle extends Screen {
     				}
     				break;
     				
+    			    				
     				default:
     				break;
     			}
@@ -395,6 +430,8 @@ public class GameScreenMiddle extends Screen {
     	middleTarget.drawTarget(graphics);
 
         ballHandler.drawBalls(graphics);
+        
+        remapWidget.draw(graphics);
    
         if (state == GameState.Running) {
             drawRunningUI();

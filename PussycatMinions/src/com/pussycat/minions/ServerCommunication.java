@@ -2,12 +2,13 @@ package com.pussycat.minions;
 
 
 import java.nio.ByteBuffer;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import android.util.Log;
 
 public class ServerCommunication extends Thread {
 
-	private volatile boolean isCommunicating;
+	private AtomicBoolean isCommunicating = new AtomicBoolean(false);
 	private TCPClient tcp;
 	private BallHandler ballHandler;
 	private BallTypesHandler ballTypesHandler;
@@ -19,14 +20,20 @@ public class ServerCommunication extends Thread {
 		this.ballTypesHandler = new BallTypesHandler();
 		this.tcp = stcp;
 		this.target = target;
-		isCommunicating = true;
 	}
 
+	
+	public boolean isCommunicating() {
+		return isCommunicating.get();
+	}
+	
 	
 	public void run() {
 		Thread.currentThread().setName("ServerCommunication");
 		
-		while( isCommunicating ) {
+		setIsCommunicating(true);
+		
+		while( isCommunicating.get()) {
 
 			if( tcp != null ) {
 				DataPackage incomingData = tcp.incomingMessages.popFront();
@@ -69,6 +76,10 @@ public class ServerCommunication extends Thread {
 							setPoints( incomingData );
 						} break;
 						
+						case START_GAME: {
+							startGames( incomingData );
+						}
+						
 		    			default:
 		    			break;
 		    			
@@ -89,7 +100,22 @@ public class ServerCommunication extends Thread {
 	
 	
 	public void setIsCommunicating(final boolean isCommunicating) {
-		this.isCommunicating = isCommunicating;
+		this.isCommunicating.set(isCommunicating);
+		synchronized(this) {
+			if(isCommunicating) {
+				this.notifyAll();
+			}
+		}
+	}
+		
+	
+	private void startGames(DataPackage incomingData) {
+		ByteBuffer buffer = ByteBuffer.wrap(incomingData.getData());
+		final short state = buffer.getShort();
+		final short nPlayers = buffer.getShort();
+		
+		SharedVariables.getInstance().initializePoints(nPlayers);
+		SharedVariables.getInstance().setStartGame(true);
 	}
 	
 	
@@ -143,6 +169,8 @@ public class ServerCommunication extends Thread {
 		//SharedVariables.getInstance().setInternalState(GLOBAL_STATE__.REG);
 		Device.setOnce();
 		Log.d("ADDMAP", "GOT: " + angle + "  " + deviceMiddleX + "  " + deviceMiddleY + "  " + mainMiddleX + "  " + mainMiddleY);
+		
+		SharedVariables.getInstance().setMapDone(true);
 	}
 	
 	

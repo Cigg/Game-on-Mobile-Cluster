@@ -6,7 +6,7 @@ import com.pussycat.framework.Graphics;
 import com.pussycat.minions.Animation.INTERPOLATION;
 import com.pussycat.minions.Animation.TYPE;
 
-public class BallsWidget {
+public class BallsWidget implements Widget {
 	
 	private final int maxNBalls = 5;
 	private Ball[] balls = new Ball[maxNBalls];
@@ -83,7 +83,7 @@ public class BallsWidget {
 	}
 	
 	
-	public void updateBalls() {
+	public void update() {
 		for(int i=0; i<activeBalls; i++) {
 			balls[i].setY((float)animatedYs[i].getValue());
 		}
@@ -99,7 +99,7 @@ public class BallsWidget {
 	}
 	
 	
-	public void drawBalls(Graphics graphics) {
+	public void draw(Graphics graphics) {
 		for(int i=0; i<activeBalls; i++) {
 			balls[i].draw(graphics);
 		}

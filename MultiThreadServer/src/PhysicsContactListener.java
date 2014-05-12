@@ -7,18 +7,28 @@ import org.jbox2d.dynamics.Fixture;
 import org.jbox2d.dynamics.contacts.Contact;
 
 public class PhysicsContactListener implements ContactListener{
-
+	
 	public void beginContact(Contact c) {
 		// TODO Auto-generated method stub
 		Fixture fa = c.getFixtureA();
 		Fixture fb = c.getFixtureB();
 		
-		if(fa.getUserData() != null && fa.getUserData().equals("Pivot")) {
-			System.out.println("I got touched by " + fb.getUserData()); 
+		if(fa.getUserData() != null && fa.getUserData().equals("Pivot")) {			
+			System.out.println("-------------------Touched!-------------------");
+			if(fb.getUserData() instanceof Integer) {
+				int id = (Integer) fb.getUserData();
+				ClientThread.removeAndScore(id);
+				PhysicsWorld.removeBall(id);
+			}
 		}
 		
 		if(fb.getUserData() != null && fb.getUserData().equals("Pivot")) {
-			System.out.println("I got touched by " + fa.getUserData()); 
+			System.out.println("-------------------Touched!-------------------");
+			if(fa.getUserData() instanceof Integer) {
+				int id = (Integer) fa.getUserData();
+				ClientThread.removeAndScore(id);
+				PhysicsWorld.removeBall(id);
+			}
 		}
 	}
 

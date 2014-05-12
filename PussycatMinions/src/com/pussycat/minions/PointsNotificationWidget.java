@@ -19,7 +19,7 @@ import com.pussycat.framework.implementation.AndroidGame;
 import com.pussycat.framework.implementation.AndroidGraphics;
 import com.pussycat.framework.implementation.AndroidMusic;
 
-public class PointsNotificationWidget {
+public class PointsNotificationWidget implements Widget {
 	
 	private final int X_MARGIN = PussycatMinions.meters2Pixels(0.8f / 100.0f);
 	private final int Y_MARGIN = PussycatMinions.meters2Pixels(1.0f / 100.0f);
