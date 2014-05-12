@@ -22,10 +22,11 @@ import com.pussycat.framework.Screen;
 
 public class GameScreenPlayer extends Screen {
     enum GameState {
-        Ready, Running, Paused, GameOver, AddDevice, NotMapped, Wait, MappedWait, Remap, //, Mapped
+        //Ready, Running, Paused, GameOver, AddDevice, NotMapped, Wait, MappedWait, Remap, //, Mapped
+    	Mapping, MappingDone, Ready, Running, Paused, GameOver, //, Mapped    
     }
 
-    private GameState state = GameState.Running; //We don't need to start at GameState.Ready now. Changed to Running instead.
+    private GameState state = GameState.Mapping; //We don't need to start at GameState.Ready now. Changed to Running instead.
 
     private Paint paint;
     Context context;
@@ -78,7 +79,7 @@ public class GameScreenPlayer extends Screen {
 		
 		
 		paint = new Paint();
-		paint.setTextSize(30);
+		paint.setTextSize(40);
 		paint.setTextAlign(Paint.Align.CENTER);
 		paint.setAntiAlias(true);
 		paint.setColor(Color.WHITE);
@@ -118,80 +119,6 @@ public class GameScreenPlayer extends Screen {
     @Override
     public void update(float deltaTime) {
         List<TouchEvent> touchEvents = game.getInput().getTouchEvents();
-        
-        if (state == GameState.Running) {
-            updateRunning(touchEvents, deltaTime);
-        } else if (state == GameState.Ready) {
-            updateReady(touchEvents);
-    	} else if (state == GameState.Paused) {
-            updatePaused(touchEvents);
-		} else if (state == GameState.GameOver) {
-            updateGameOver(touchEvents);
-		}
-        
-    }
-    
-    private void updateReady(List<TouchEvent> touchEvents) {
-        if (touchEvents.size() > 0) {
-            state = GameState.Running;
-        }
-    }
-    
-    private void syncDevice() {
-		ByteBuffer buffer;
-		buffer = ByteBuffer.allocate(1*2);
-		buffer.clear();
-		buffer.putShort((short) GLOBAL_STATE__.SYNCHRONIZE_DEVICE.ordinal()); 	
-		comm.sendData(buffer.array());
-    }
-    
-    private void addDevice() {
-    	ByteBuffer buffer;
-		buffer = ByteBuffer.allocate(2*2 + 4*4);
-		buffer.clear();
-		
-		buffer.putShort((short) GLOBAL_STATE__.ADD_DEVICE.ordinal());	// State: ADD_DEVICE
-		buffer.putShort((short) 1);										// type, 0 är hårdkodat till main-device - sätt 1 för alla andra devices
-		buffer.putInt(PussycatMinions.getXDPI());						// XDPI
-		buffer.putInt(PussycatMinions.getYDPI());						// YDPI
-		buffer.putInt(PussycatMinions.getScreenWidth());				// ResX
-		buffer.putInt(PussycatMinions.getScreenHeight());				// ResY
-		
- 		comm.sendData(buffer.array());
-    }
-    
-    private void mapDevice(final float deltaTimeDragged, final float currentTime) {
-    	ByteBuffer buffer;
-		buffer = ByteBuffer.allocate(1*2 + 6*4);
-		buffer.clear();
-		    		
-		buffer.putShort((short) GLOBAL_STATE__.MAP_DEVICE.ordinal());	// State: MAP_DEVICE
-		buffer.putFloat(downX);											// x1
-		buffer.putFloat(downY); 										// y1
-		buffer.putFloat(currentX);										// x2
-		buffer.putFloat(currentY);										// y2
-		buffer.putFloat(deltaTimeDragged);    							// t
-		buffer.putFloat(currentTime + SharedVariables.getInstance().getSendDelay());	
-
-		comm.sendData(buffer.array());
-    }
-    
-    private void remapDevice() {
-		ByteBuffer buffer = ByteBuffer.allocate(2*2);
-		
-		buffer.putShort((short) GLOBAL_STATE__.SET_STATE.ordinal());	// State: SET_STATE
-		buffer.putShort((short) GLOBAL_STATE__.MAP_MAIN.ordinal());		// New state: MAP_MAIN
-		
-		comm.sendData(buffer.array());
-		
-		SharedVariables.getInstance().setIsRemapping(true);
-		SharedVariables.getInstance().setMapDone(false);
-		SharedVariables.getInstance().setInternalState(GLOBAL_STATE__.MAP_DEVICE);
-    }
-    
-    private void updateRunning(List<TouchEvent> touchEvents, float deltaTime) {   
-    	
-    	// Thread.currentThread().setPriority(Thread.MAX_PRIORITY);
     	
     	if(SharedVariables.getInstance().shouldStartGame()) {
     		SharedVariables.getInstance().setStartGame(false);
@@ -214,6 +141,8 @@ public class GameScreenPlayer extends Screen {
     		syncDevice();    
 			
     		SharedVariables.getInstance().setInternalState(GLOBAL_STATE__.RUN_DEVICE);
+    		
+    		state = GameState.Running;
     	}
 
     	ballHandler.updateBalls(deltaTime);
@@ -262,6 +191,8 @@ public class GameScreenPlayer extends Screen {
 
     				case MAP_DEVICE:
     				{
+    					state = GameState.MappingDone;
+    					Log.d("STATEZ", "PLAYER MAP_DEVICE");
     					mapDevice(deltaTimeDragged, currentTime);
     					SharedVariables.getInstance().setIsRemapping(false);
     					if(SharedVariables.getInstance().isRunning()) {
@@ -274,6 +205,8 @@ public class GameScreenPlayer extends Screen {
     				
     				case IS_READY:
     				{
+    					state = GameState.Ready;
+    					Log.d("STATEZ", "PLAYER IS_READY");
     					buffer = ByteBuffer.allocate(1*2 + 1*4);
     					buffer.putShort((short) GLOBAL_STATE__.IS_READY.ordinal());	// State: IS_READY
     					buffer.putInt(1);
@@ -284,7 +217,7 @@ public class GameScreenPlayer extends Screen {
     				break;
 
 					case REG: {
-    					
+						Log.d("STATEZ", "PLAYER REG");
     				}
     				break;
     				
@@ -295,6 +228,7 @@ public class GameScreenPlayer extends Screen {
     				
     				case RUN_DEVICE:
     				{
+    					Log.d("STATEZ", "PLAYER RUN_DEVICE");
     					if( ballsWidget.pop() ) {
 	    					Log.d("AppStates", "RUN_DEVICE");
 	    					
@@ -355,35 +289,93 @@ public class GameScreenPlayer extends Screen {
     		}
     		
         }  
-                
+        
     }
-
     
-    private void updatePaused(List<TouchEvent> touchEvents) {
-        int len = touchEvents.size();
-        for (int i = 0; i < len; i++) {
-            TouchEvent event = touchEvents.get(i);
-            if (event.type == TouchEvent.TOUCH_UP) {
-
-            }
-        }
+    private void syncDevice() {
+		ByteBuffer buffer;
+		buffer = ByteBuffer.allocate(1*2);
+		buffer.clear();
+		buffer.putShort((short) GLOBAL_STATE__.SYNCHRONIZE_DEVICE.ordinal()); 	
+		comm.sendData(buffer.array());
     }
-
     
-    private void updateGameOver(List<TouchEvent> touchEvents) {
-        int len = touchEvents.size();
-        for (int i = 0; i < len; i++) {
-            TouchEvent event = touchEvents.get(i);
-            if (event.type == TouchEvent.TOUCH_UP) {
-                if (event.x > 300 && event.x < 980 && event.y > 100 && event.y < 500) {
-                    nullify();
-                    game.setScreen(new MainMenuScreen(game));
-                    return;
-                }
-            }
-        }
-
+    private void addDevice() {
+    	ByteBuffer buffer;
+		buffer = ByteBuffer.allocate(2*2 + 4*4);
+		buffer.clear();
+		
+		buffer.putShort((short) GLOBAL_STATE__.ADD_DEVICE.ordinal());	// State: ADD_DEVICE
+		buffer.putShort((short) 1);										// type, 0 är hårdkodat till main-device - sätt 1 för alla andra devices
+		buffer.putInt(PussycatMinions.getXDPI());						// XDPI
+		buffer.putInt(PussycatMinions.getYDPI());						// YDPI
+		buffer.putInt(PussycatMinions.getScreenWidth());				// ResX
+		buffer.putInt(PussycatMinions.getScreenHeight());				// ResY
+		
+ 		comm.sendData(buffer.array());
     }
+    
+    private void mapDevice(final float deltaTimeDragged, final float currentTime) {
+    	ByteBuffer buffer;
+		buffer = ByteBuffer.allocate(1*2 + 6*4);
+		buffer.clear();
+		    		
+		buffer.putShort((short) GLOBAL_STATE__.MAP_DEVICE.ordinal());	// State: MAP_DEVICE
+		buffer.putFloat(downX);											// x1
+		buffer.putFloat(downY); 										// y1
+		buffer.putFloat(currentX);										// x2
+		buffer.putFloat(currentY);										// y2
+		buffer.putFloat(deltaTimeDragged);    							// t
+		buffer.putFloat(currentTime + SharedVariables.getInstance().getSendDelay());	
+
+		comm.sendData(buffer.array());
+    }
+    
+    private void remapDevice() {
+		ByteBuffer buffer = ByteBuffer.allocate(2*2);
+		
+		buffer.putShort((short) GLOBAL_STATE__.SET_STATE.ordinal());	// State: SET_STATE
+		buffer.putShort((short) GLOBAL_STATE__.MAP_MAIN.ordinal());		// New state: MAP_MAIN
+		
+		comm.sendData(buffer.array());
+		
+		SharedVariables.getInstance().setIsRemapping(true);
+		SharedVariables.getInstance().setMapDone(false);
+		SharedVariables.getInstance().setInternalState(GLOBAL_STATE__.MAP_DEVICE);
+    }
+    
+//    private void updateRunning(List<TouchEvent> touchEvents, float deltaTime) {   
+//    	
+//    	
+//                
+//    }
+//
+//    
+//    private void updatePaused(List<TouchEvent> touchEvents) {
+//        int len = touchEvents.size();
+//        for (int i = 0; i < len; i++) {
+//            TouchEvent event = touchEvents.get(i);
+//            if (event.type == TouchEvent.TOUCH_UP) {
+//
+//            }
+//        }
+//    }
+
+//    
+//    private void updateGameOver(List<TouchEvent> touchEvents) {
+//        int len = touchEvents.size();
+//        for (int i = 0; i < len; i++) {
+//            TouchEvent event = touchEvents.get(i);
+//            if (event.type == TouchEvent.TOUCH_UP) {
+//                if (event.x > 300 && event.x < 980 && event.y > 100 && event.y < 500) {
+//                    nullify();
+//                    game.setScreen(new MainMenuScreen(game));
+//                    return;
+//                }
+//            }
+//        }
+//
+//    }
 
     
     private float linearInterpolation(float x1, float x2, float scale) {
@@ -729,78 +721,86 @@ public class GameScreenPlayer extends Screen {
        // timerWidget.draw(graphics);
        // pointsNotificationsWidget.draw(graphics);
    
-        if (state == GameState.Running) {
-            drawRunningUI();
-    	} else if (state == GameState.Ready) {
-            drawReadyUI();
-        } else if (state == GameState.Paused) {
-            drawPausedUI();
-		} else if (state == GameState.GameOver) {
-			drawGameOverUI();
-		} else if (state == GameState.NotMapped) {
-			drawSharedUI(state);
-		}
+        drawUI();
         
     }
     
- // TODO - Centrera bilden och texten.
-    private void drawSharedUI(GameState state) {
+    private void drawUI() {
     	
-    	Graphics g = game.getGraphics();
-    	paint.setTextSize(16);     	    	
+    	Log.d("UI STATEZ", "STATE: " + state);
+    	Graphics g = game.getGraphics();    	    	
     	
-    	int imageX = PussycatMinions.getScreenWidth()/2;
-    	int imageY = 20;
     	int textX = PussycatMinions.getScreenWidth()/2;
     	int textY = PussycatMinions.getScreenHeight()/2;
     	
-    	//AddDevice, NotMapped, Mapped, Wait, MappedWait, Remap, 
-    	if (state == GameState.AddDevice) {
-    		g.drawImage(Assets.ball, imageX, imageY);
-    		g.drawString("Klicka fï¿½r att gï¿½ med i spelet", textX, textY, paint);
-    	} else if (state == GameState.NotMapped) {
-    		g.drawImage(Assets.ball, imageX, imageY);
-    		g.drawString("Lyckost! Det ï¿½r din tur att mappa nu.", textX, textY, paint);
-    	} else if (state == GameState.Wait) {
-    		g.drawImage(Assets.ball, imageX, imageY);
-    		g.drawString("Vï¿½nta! Nï¿½gon annan mappar.", textX, textY, paint);
-    	} else if (state == GameState.MappedWait) {
-    		g.drawImage(Assets.ball, imageX, imageY);
-    		g.drawString("Vï¿½nta medans de andra mappar sina enheter", textX, textY, paint);
-    	} else if (state == GameState.Remap) {
-    		g.drawImage(Assets.ball, imageX, imageY);
-    		g.drawString("Klicka om du vill mappa om din enhet", textX, textY, paint);
+    	paint.setColor(Color.WHITE);
+    	
+//    	//AddDevice, NotMapped, Mapped, Wait, MappedWait, Remap, 
+//    	if (state == GameState.AddDevice) {
+//    		Log.d("UI STATEZ", "AddDevice");
+//    		g.drawImage(Assets.ball, imageX, imageY);
+//    		g.drawString("Klicka fï¿½r att gï¿½ med i spelet", textX, textY, paint);
+//    	} else if (state == GameState.NotMapped) {
+//    		Log.d("UI STATEZ", "NotMapped");
+//    		g.drawImage(Assets.ball, imageX, imageY);
+//    		g.drawString("Lyckost! Det ï¿½r din tur att mappa nu.", textX, textY, paint);
+//    	} else if (state == GameState.Wait) {
+//    		Log.d("UI STATEZ", "Wait");
+//    		g.drawImage(Assets.ball, imageX, imageY);
+//    		g.drawString("Vï¿½nta! Nï¿½gon annan mappar.", textX, textY, paint);
+//    	} else if (state == GameState.MappedWait) {
+//    		Log.d("UI STATEZ", "MappedWait");
+//    		g.drawImage(Assets.ball, imageX, imageY);
+//    		g.drawString("Vï¿½nta medans de andra mappar sina enheter", textX, textY, paint);
+//    	} else if (state == GameState.Remap) {
+//    		Log.d("UI STATEZ", "Remap");
+//    		g.drawImage(Assets.ball, imageX, imageY);
+//    		g.drawString("Klicka om du vill mappa om din enhet", textX, textY, paint);
+//    	}
+    	
+    	//Mapping, MappingDone, Ready, Running, 
+    	if (state == GameState.Mapping) {
+    		Log.d("UI STATEZ", "Mapping");
+    		g.drawARGB(155, 0, 0, 0);
+    		g.drawString("...to this device", textX, textY, paint);
+    	} else if (state == GameState.MappingDone) {
+    		Log.d("UI STATEZ", "MappingDone");
+    		g.drawARGB(155, 0, 0, 0);
+    		g.drawString("Tap when you are ready", textX, textY, paint);
+    	} else if (state == GameState.Ready) {
+    		Log.d("UI STATEZ", "Ready! Waiting...");
+    		g.drawARGB(155, 0, 0, 0);
+    		g.drawString("Ready!", textX, textY, paint);
+    	} else if (state == GameState.Running) {
+    		Log.d("UI STATEZ", "Running");
     	}
-    	
-    	
-    	
     }
 
-    private void drawReadyUI() {
-        Graphics g = game.getGraphics();
-        
-        g.drawARGB(155, 0, 0, 0);
-        g.drawString("Tap to create a ball", 640, 300, paint);
-    }
-
-    
-    private void drawRunningUI() {
-        Graphics g = game.getGraphics();
-    }
-
-    
-    private void drawPausedUI() {
-        Graphics g = game.getGraphics();
-        // Darken the entire screen so you can display the Paused screen.
-        g.drawARGB(155, 0, 0, 0);
-    }
-
-    
-    private void drawGameOverUI() {
-        Graphics g = game.getGraphics();
-        g.drawRect(0, 0, 1281, 801, Color.BLACK);
-        g.drawString("GAME OVER.", 640, 300, paint);
-    }
+//    private void drawReadyUI() {
+//        Graphics g = game.getGraphics();
+//        
+//        g.drawARGB(155, 0, 0, 0);
+//        g.drawString("Tap to create a ball", 640, 300, paint);
+//    }
+//
+//    
+//    private void drawRunningUI() {
+//        Graphics g = game.getGraphics();
+//    }
+//
+//    
+//    private void drawPausedUI() {
+//        Graphics g = game.getGraphics();
+//        // Darken the entire screen so you can display the Paused screen.
+//        g.drawARGB(155, 0, 0, 0);
+//    }
+//
+//    
+//    private void drawGameOverUI() {
+//        Graphics g = game.getGraphics();
+//        g.drawRect(0, 0, 1281, 801, Color.BLACK);
+//        g.drawString("GAME OVER.", 640, 300, paint);
+//    }
     
     
     private void nullify() {
