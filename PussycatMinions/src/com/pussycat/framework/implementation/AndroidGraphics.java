@@ -218,82 +218,30 @@ public class AndroidGraphics implements Graphics {
     }
     
     public void drawScaledImage(Image Image, int x, int y, int width, int height, int srcX, int srcY, int srcWidth, int srcHeight, float angle){
-    	
-//	 	srcRectF.left = srcX;
-//    srcRectF.top = srcY;
-//    srcRectF.right = srcX + srcWidth;
-//    srcRectF.bottom = srcY + srcHeight;
-//    
-//    
-//    dstRectF.left = 0;
-//    dstRectF.top = 0;
-//    dstRectF.right = width;
-//    dstRectF.bottom = height;
-//    
-//    bitmap = ((AndroidImage) Image).bitmap;
-//    
-//    float angleInDegrees = angle*(180.0f/3.14f); 
-//    
-//    /**
-//     * Improves resizing quality of bitmaps a lot, but possibly much heavier to calculate
-//     */
-//    
-//    Paint paint = new Paint();
-//    paint.setAntiAlias(true);
-//    paint.setFilterBitmap(true);
-//    paint.setDither(true);
-//    
-//    /*
-//     * Code from Arvis at http://stackoverflow.com/questions/4166917/android-how-to-rotate-a-bitmap-on-a-center-point #2
-//     */
-//    
-//    
-//    //Bitmap scaledBitmap = Bitmap.createScaledBitmap(bitmap ,width, height, true);
-//    
-//    matrix.reset();
-//    matrix.postRotate(45);
-//    //Bitmap rotatedBitmap = Bitmap.createBitmap(bitmap, 0, 0, bitmap.getWidth(), bitmap.getHeight(), matrix, true);
-//    
-//    //canvas.rotate(angleInDegrees);
-//    matrix.mapRect(srcRectF);
-//    matrix.mapRect(dstRectF);
-//    srcRectF.round(srcRect);
-//    dstRectF.round(dstRect);
-//    
-//    dstRectF.left += x;
-//    dstRectF.top += y;
-//    dstRectF.right += x;
-//    dstRectF.bottom += y;
-//    
-//    canvas.drawBitmap(bitmap, matrix, paint);
-//    //canvas.rotate(-angleInDegrees);
-   
+	    	
+		bitmap = ((AndroidImage) Image).bitmap;
+		 
+	    // calculate the scale
+	    float scaleWidth = ((float) width) / srcWidth;
+	    float scaleHeight = ((float) height) / srcHeight;
+	   
+	    // create a matrix for the manipulation
+	    matrix.reset();
+	    // resize the Bitmap
+	    matrix.postScale(scaleWidth, scaleHeight);
+	    // rotate the Bitmap
+	    float angleInDegrees = angle*(180.0f/3.14f);
+	    matrix.postRotate(angleInDegrees);
 	
-	//
-	
-	bitmap = ((AndroidImage) Image).bitmap;
-	 
-    // calculate the scale
-    float scaleWidth = ((float) width) / srcWidth;
-    float scaleHeight = ((float) height) / srcHeight;
-   
-    // create a matrix for the manipulation
-    matrix.reset();
-    // resize the Bitmap
-    matrix.postScale(scaleWidth, scaleHeight);
-    // rotate the Bitmap
-    float angleInDegrees = angle*(180.0f/3.14f);
-    matrix.postRotate(angleInDegrees);
-
-    // recreate the new Bitmap
-    Bitmap resizedBitmap = Bitmap.createBitmap(bitmap, srcX, srcY,
-                      srcWidth, srcHeight, matrix, true);
-    
-    // x and y are top left coordinates
-    // x and y must be calculated if the image isn't square
-    // Question: should x and y be center of image instead?
-    canvas.drawBitmap(resizedBitmap, x, y, paint);
-}
+	    // recreate the new Bitmap
+	    Bitmap resizedBitmap = Bitmap.createBitmap(bitmap, srcX, srcY,
+	                      srcWidth, srcHeight, matrix, true);
+	    
+	    // x and y are top left coordinates
+	    // x and y must be calculated if the image isn't square
+	    // Question: should x and y be center of image instead?
+	    canvas.drawBitmap(resizedBitmap, x, y, paint);
+	}
    
     @Override
     public int getWidth() {
