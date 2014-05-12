@@ -25,7 +25,8 @@ public class MultiThreds {
 	
 	
 	private static final int maxClientCount = 10;
-	private  static final ClientThread[] threads = new ClientThread[maxClientCount];
+	private static final ClientThread[] threads = new ClientThread[maxClientCount];
+	private static final int[] scores = new int[maxClientCount];
 	private static final UpdateLoop updateLoop = new UpdateLoop(threads, maxClientCount);
 	
 	volatile static DeviceManager deviceManager;
@@ -58,11 +59,59 @@ public class MultiThreds {
 		deviceManager = new DeviceManager();
 		serverGraphics = new ServerGraphics(deviceManager);
 		
-	   final float tickRate = 128;
+		final float tickRate = 128;
 		
+	
+	   
 		update = new Thread() {
 		    public void run() {
 		    	
+		    	
+				
+		    	boolean allReady = false;
+		    	short nPlayers = 0;
+		    	while(!allReady) {
+		    		allReady = true;
+		    		for(ClientThread thread : threads) {
+						if (thread != null) {
+							nPlayers ++;
+							if(thread.getIsReady() != 1) {
+								allReady = false;
+							}
+						}
+		    		}
+		    		if(nPlayers <= 1 || !allReady) {
+		    			allReady = false;
+		    			nPlayers = 0;
+		    			
+		    			try {
+							Thread.currentThread().sleep(100);
+						} catch (InterruptedException e) {
+							e.printStackTrace();
+						}
+		    		}
+
+		    	}
+		    	
+				for(ClientThread thread : threads) {
+					if (thread != null) {
+						ByteBuffer dataBuffer = ByteBuffer.allocate(2*2 + 0*4);
+						dataBuffer.clear();
+	    				short sendState = (short) GLOBAL_STATE__.START_GAME.ordinal();
+						dataBuffer.putShort(sendState);
+						dataBuffer.putShort(nPlayers);	
+						
+			    		int position = dataBuffer.position();
+			    		byte[] sendBytes = new byte[position];
+						System.arraycopy( dataBuffer.array(), 0, sendBytes, 0, position);
+						
+			    		thread.sendData(sendBytes);
+			    		thread.clientInfo.addSentPackageItem(GLOBAL_STATE__.values()[sendState] + "   " + nPlayers);
+					}
+				}
+				System.out.println("DONE");
+				
+				
 		    	float timeBegin, timeEnd = 0, timeDelta = 1 / tickRate, timeDelay;
 		    	while(true) {
 		    		//System.out.println("Update-----------------------------------------------");
@@ -74,16 +123,14 @@ public class MultiThreds {
 		    		serverGraphics.update();
 	    			// Update ballz	
 		    		if(threads[0] != null) {
-		    			for(ClientThread.Ballz ball : threads[0].ballz) {
+		    			for(ClientThread.Ballz ball : ClientThread.ballz) {
 		    				ball.update(timeDelta);
 		    				if(ball.shouldBeRemoved()) {
-		    					threads[0].ballz.remove(ball);
+		    					ClientThread.ballz.remove(ball);
 		    				} else if(ball.isDead()) {
-		    					
 		    					ball.setShouldBeRemoved(true);
 		    				}
 		    			}		
-
 		    			
 		        		// Send data
 		    			for(ClientThread thread : threads) {
@@ -95,32 +142,67 @@ public class MultiThreds {
 			    						
 			    						ByteBuffer test = ByteBuffer.wrap(data);
 			    						System.out.println("SEND to " + thread.getIp() + ": " + test.getShort() + "  " + test.getShort());
-			    						
+					    				
 			    						thread.sendData(data);
 			    						thread.clientInfo.addSentPackageItem("SENDATA   TODO: FIX");
 			    					}
 			    				}
 			    				
 			    				// Send middleAngle to middle
-			    				if( deviceManager.isMiddle(thread.getIp()) ) {
+			    				if(deviceManager.isMiddle(thread.getIp())) {
 			    					ByteBuffer dataBuffer = ByteBuffer.allocate(1*2 + 1*4);
 			    					dataBuffer.clear();
 			    		    		
-			    					dataBuffer.putShort((short) GLOBAL_STATE__.SET_MIDDLE_ANGLE.ordinal());	// State: ADD_DEVICE
+			    					dataBuffer.putShort((short) GLOBAL_STATE__.SET_MIDDLE_ANGLE.ordinal());
 			    		    		
-			    					//System.out.println("middle IP: " + thread.getIp());
-			    					
 			    		    		float jointAngle = 0.0f;
 				    				if(ClientThread.targetJoint != null){
-				    					
 				    					jointAngle =  ClientThread.targetJoint.getJointAngle();
 				    				}
 				    				
 				    				dataBuffer.putFloat(jointAngle);	
-			    		    		thread.sendData(dataBuffer.array());
+				    				
+				    	    		int position = dataBuffer.position();
+				    	    		byte[] sendBytes = new byte[position];
+				    				System.arraycopy( dataBuffer.array(), 0, sendBytes, 0, position);
+			    		    		thread.sendData(sendBytes);
 			    				}
+			    				
 		    				}
 		    			}
+		    			
+		    			
+		    			if(deviceManager.shouldUpdateScores()) {
+	    					ByteBuffer dataBuffer = ByteBuffer.allocate(2*2 + maxClientCount*4);
+	    					dataBuffer.clear();
+	    					
+	    					dataBuffer.putShort((short) GLOBAL_STATE__.SET_POINTS.ordinal());
+	    					dataBuffer.putShort((short) 0);
+	    					
+	    					short nScores = 0;
+	    					for(ClientThread thread : threads) {
+			    				if (thread != null) {
+			    					dataBuffer.putInt(deviceManager.getScore(thread.getIp()));
+			    					nScores ++;
+			    				}
+	    					}
+	    					
+	    					final int position = dataBuffer.position();
+	    					dataBuffer.position(2);
+	    					dataBuffer.putShort(nScores);
+	    					
+	    					byte[] sendBytes = new byte[position];
+	    					System.arraycopy( dataBuffer.array(), 0, sendBytes, 0, position);
+	    					
+	    					for(ClientThread thread : threads) {
+			    				if (thread != null) {
+			    					thread.sendData(sendBytes);
+			    				}
+	    					}	
+	    				}
+		    			
+		    			
+		    			
 		    			
 		    			
 			    		// Send ballz
@@ -166,7 +248,7 @@ public class MultiThreds {
 					    						
 					    						Vec2 vella = physicsWorld.getVelocityFromId(ball.id);
 					    						
-					    						if( ball.shouldUpdate() || ball2.getXVel() != vella.x || ball2.getYVel() != vella.y || ball.shouldBeRemoved()) {   // Don't Work
+					    						if(ball.shouldUpdate() || ball2.getXVel() != vella.x || ball2.getYVel() != vella.y || ball.shouldBeRemoved()) {  
 					    	
 					    							ball2.setXVel(vella.x);
 					    							ball2.setYVel(vella.y);
@@ -174,10 +256,16 @@ public class MultiThreds {
 					    							float xVelL2 = deviceManager.globalToLocalVelX(thread.getIp(), ball2.getXVel(), ball2.getYVel());
 								    				float yVelL2 = deviceManager.globalToLocalVelY(thread.getIp(), ball2.getXVel(), ball2.getYVel());
 								    				
+								    				if(ball2.removed){
+								    					xPosL = 1337;
+								    					yPosL = 1337;
+								    				}
+								    				
 					    							buffer.putInt(ball.id);
 					    							if(ball.shouldBeRemoved()) {
 					    								buffer.putInt(-1);
 					    								thread.ownBallz.remove(ball.id);
+					    								System.out.println("Removing ball for mobile");
 					    								System.out.println("-1");
 					    							} else {
 					    								buffer.putInt(ball.parent);
@@ -217,11 +305,14 @@ public class MultiThreds {
 					    				}
 				    				
 			    					} else {
+			    						final int position = buffer.position();
 			    						buffer.position(2);
 					    				buffer.putShort(nBalls);
 					    				if(nBalls != 0) {
-						    				thread.sendData(buffer.array());
-						    				thread.clientInfo.addSentPackageItem(GLOBAL_STATE__.values()[sendState] + "   " + nBalls);
+					    					byte[] sendBytes = new byte[position];
+					    					System.arraycopy( buffer.array(), 0, sendBytes, 0, position);
+						    				thread.sendData(sendBytes);
+						    				thread.clientInfo.addSentPackageItem(GLOBAL_STATE__.values()[sendState] + "   " + nBalls + " Array Size: " + sendBytes.length);
 					    				}
 					    				nBalls = 0;
 					    				buffer.clear();
@@ -231,15 +322,18 @@ public class MultiThreds {
 			    					}
 			    					
 			    				}
-			    				
+			    		
+			    				final int position = buffer.position();
 			    				buffer.position(2);
 			    				buffer.putShort(nBalls);
 			    				
-			    				//System.out.println(jointAngle);
-			    				//buffer.putFloat(jointAngle);
+			    				
 			    				if(nBalls != 0) {
-				    				thread.sendData(buffer.array());
-				    				thread.clientInfo.addSentPackageItem(GLOBAL_STATE__.values()[sendState] + "   " + nBalls);
+			    					byte[] sendBytes = new byte[position];
+			    					System.arraycopy( buffer.array(), 0, sendBytes, 0, position);
+				    				thread.sendData(sendBytes);
+	
+				    				thread.clientInfo.addSentPackageItem(GLOBAL_STATE__.values()[sendState] + "   " + nBalls + " Array Size: " + sendBytes.length);
 			    				}
 			
 			    			}
@@ -247,6 +341,8 @@ public class MultiThreds {
 			    				    		
 			    		
 		    		}
+		   
+		    		deviceManager.setUpdateScores(false);
 		    		
 		    		timeDelay = Math.max(0, (float)((1 / tickRate)*Math.pow(10, 9)) - (System.nanoTime() - timeBegin));
 		 
@@ -258,7 +354,6 @@ public class MultiThreds {
 					}
 		    		timeEnd = System.nanoTime();
 		    		timeDelta = timeEnd - timeBegin;
-		    		//System.out.println(timeDelta*Math.pow(10, -9));
 		    	}
 		    }
 		};

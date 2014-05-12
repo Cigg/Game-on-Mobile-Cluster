@@ -3,6 +3,7 @@ package src;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 
 // TODO: Make all computations based on new data types like vectors and
@@ -11,6 +12,16 @@ import java.util.concurrent.LinkedBlockingQueue;
 // This class handles the interaction between the server and the devices.
 public class DeviceManager {
 
+	private volatile static AtomicBoolean shouldUpdateScores = new AtomicBoolean(true);
+	
+	public static boolean shouldUpdateScores() {
+		return shouldUpdateScores.get();
+	}
+	
+	public static void setUpdateScores(final boolean upd) {
+		shouldUpdateScores.set(upd);
+	}
+	
 	// Data type for a device.
 	// Only the DeviceManager should be able to modify this class.
 	private class Device {
@@ -25,6 +36,7 @@ public class DeviceManager {
 		int resY;
 		boolean needsMapping;
 		short type;
+		int score;
 		
 		private LinkedBlockingQueue<byte[]> messagesToSend = new LinkedBlockingQueue <byte[]>();
 		
@@ -40,6 +52,7 @@ public class DeviceManager {
 			
 			this.type = type;
 			
+			int score = 0;
 			
 			if(type == 0) { // type == 0 is middle device
 				needsMapping = false;
@@ -59,8 +72,14 @@ public class DeviceManager {
 		public float getRotZ(){
 			return rotZ;
 		}
+		
+		public void incrementScore(){
+			setUpdateScores(true);
+			score++;
+			System.out.print(score);
+			System.out.println();
+		}
 	}
-	
 	
 	// Container with all added devices.
 	public ArrayList<Device> devices;
@@ -314,7 +333,11 @@ public class DeviceManager {
 	    		buffer.putShort((short) GLOBAL_STATE__.SET_STATE.ordinal());	// State: 		SET_STATE
 	    		buffer.putShort((short) GLOBAL_STATE__.MAP_DEVICE.ordinal());	// New state: 	MAP_DEVICE
 	    		
-	    		device.messagesToSend.add(buffer.array());
+	    		int position = buffer.position();
+	    		byte[] sendBytes = new byte[position];
+				System.arraycopy( buffer.array(), 0, sendBytes, 0, position);
+				
+	    		device.messagesToSend.add(sendBytes);
 		    }
 		}
 	}
@@ -329,7 +352,11 @@ public class DeviceManager {
 	    		buffer.putShort((short) GLOBAL_STATE__.SET_STATE.ordinal());	// State: 		SET_STATE
 	    		buffer.putShort((short) GLOBAL_STATE__.MAP_DEVICE.ordinal());	// New state: 	MAP_DEVICE
 	    		
-	    		device.messagesToSend.add(buffer.array());
+	    		int position = buffer.position();
+	    		byte[] sendBytes = new byte[position];
+				System.arraycopy( buffer.array(), 0, sendBytes, 0, position);
+				
+	    		device.messagesToSend.add(sendBytes);
 		}
 	}
 	
@@ -626,4 +653,17 @@ public class DeviceManager {
 		}		
 	}
 	
+	public void score(int id){
+		System.out.print("Score now is: ");
+		devices.get(id).incrementScore();
+	}
+	
+	public int getScore(String ip) {
+		for (Device device : this.devices) {
+		    if (device.ip.equals(ip)) {
+		    	return device.score;
+		    }
+		}
+		return 0;
+	}
 }

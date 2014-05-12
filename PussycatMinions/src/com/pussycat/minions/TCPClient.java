@@ -5,18 +5,20 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.InetAddress;
 import java.net.Socket;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import android.util.Log;
 
 public class TCPClient extends Thread {
 	
-	private final String SERVER_IP = "192.168.43.213";
+	private final String SERVER_IP = "192.168.43.122";
+
 
 
 	private final int SERVER_PORT = 4444;
-	private final int NUMBER_OF_INCOMING_MESSAGES = 8; 
+	private final int NUMBER_OF_INCOMING_MESSAGES = 32; 
 	
-	private volatile boolean isRunning = false;
+	private AtomicBoolean isRunning = new AtomicBoolean(false);
 	private OutputStream outputStream;
 	private InputStream inputStream;
 	private Socket socket;
@@ -26,6 +28,11 @@ public class TCPClient extends Thread {
 	
 	public TCPClient() {
 
+	}
+	
+	
+	public boolean isRunning() {
+		return isRunning.get();
 	}
 	
 	public synchronized void sendData(final byte[] buffer) {
@@ -56,11 +63,11 @@ public class TCPClient extends Thread {
 	
 	public void run() {
 		try {
-			setUpRunningThread();
 			socket = setUpAndGetSocket();
 			setUpStreams(socket);
+			setUpRunningThread();
 			
-			while( isRunning ) {
+			while( isRunning.get() ) {
 				Header header = new Header(inputStream);
 				if( header.isValid() ) {
 					DataPackage dataPackageToAdd = readDataPackage(header);
@@ -82,7 +89,13 @@ public class TCPClient extends Thread {
 	
 	
 	public void setIsRunning(final boolean isRunning) {
-		this.isRunning = isRunning;
+		this.isRunning.set(isRunning);
+		synchronized(this) {
+			if(isRunning) {
+				this.notifyAll();
+			}
+		}
+
 	}
 	
 	

@@ -9,7 +9,7 @@ import com.pussycat.framework.Graphics;
 import com.pussycat.minions.Animation.INTERPOLATION;
 import com.pussycat.minions.Animation.TYPE;
 
-public class PointsWidget {
+public class PointsWidget implements Widget {
 	
 	public class Player {
 		private final int id;
@@ -45,10 +45,6 @@ public class PointsWidget {
 
 	
 	public PointsWidget() {
-		
-		// TODO : DELTETE
-		SharedVariables.getInstance().initializePoints((short)4);
-		
 		nPlayers = SharedVariables.getInstance().getPoints().length;
 		players = new Player[nPlayers];
 		dist = screenWidth / nPlayers;
@@ -66,10 +62,14 @@ public class PointsWidget {
 	}
 	
 
-	public void updatePoints() {
+	public void update() {
 		if( SharedVariables.getInstance().pointsIsUpdated() ) {
 			AtomicInteger[] points = SharedVariables.getInstance().getPoints();
 			AtomicInteger totalPoints = SharedVariables.getInstance().getTotalPoints();
+			
+			if(totalPoints.get() == 0) {
+				return;
+			}
 			
 			for(int i=0; i<points.length; i++) {
 				players[i].width = (int) ((points[i].get() / (double)totalPoints.get()) * screenWidth);

@@ -43,6 +43,11 @@ public class SharedVariables {
 	private AtomicInteger[] points;	
 	private AtomicInteger totalPoints;	
 	private AtomicBoolean updatedPoints;
+	private AtomicBoolean isRunning;
+	private AtomicBoolean mapDone;
+	private AtomicBoolean isRemapping;
+	private AtomicBoolean startGame;
+	private AtomicInteger numberOfPlayers;
 	
 	
 	// Singleton design pattern
@@ -59,6 +64,10 @@ public class SharedVariables {
 	
 	
 	private SharedVariables() {
+		initialize();
+	}
+	
+	public void initialize() {
 		setInternalState(GLOBAL_STATE__.START);
 
 		setRecivieDelay(0.0f);
@@ -66,13 +75,24 @@ public class SharedVariables {
 		
 		nClocks = new AtomicInteger(0);
 		updatedPoints = new AtomicBoolean(false);
+		isRunning = new AtomicBoolean(false);
+		mapDone = new AtomicBoolean(false);
+		isRemapping = new AtomicBoolean(false);
+		startGame = new AtomicBoolean(false);
+		numberOfPlayers = new AtomicInteger(10);
+		initializePoints((short) numberOfPlayers.get());
 	}
-		
 	
 	public void initializePoints(final short nPlayers) {
+		this.numberOfPlayers.set(nPlayers);
 		points = new AtomicInteger[nPlayers];
 		totalPoints = new AtomicInteger();
 		
+		for(short i=0; i<nPlayers; i++) {
+			points[i] = new AtomicInteger();
+		}
+		
+		/*
 		// TODO: FIX
 		int totalPoints = 0;
 		for(short i=0; i<nPlayers; i++) {
@@ -110,6 +130,7 @@ public class SharedVariables {
 			
 		});
 		t.start();
+		*/
 		
 	}
 	
@@ -118,10 +139,33 @@ public class SharedVariables {
 	// Get methods
 	// =========================================
 	
+	public boolean isRunning() {
+		return isRunning.get();
+	}
+	
+	
+	public boolean shouldStartGame() {
+		return startGame.get();
+	}
+	
+	
+	public boolean isMapped() {
+		return mapDone.get();
+	}
+	
+	
+	public boolean isRemapping() {
+		return isRemapping.get();
+	}
+	
+	
+	public int getNumberOfPlayers() {
+		return numberOfPlayers.get();
+	}
+	
 	
 	public AtomicInteger[] getPoints() {
 		return points;
-		
 	}
 	
 	
@@ -205,6 +249,25 @@ public class SharedVariables {
 	// =========================================
 	// Set methods
 	// =========================================
+	
+	public void setMapDone(final boolean mapDone) {
+		this.mapDone.set(mapDone);
+	}
+	
+	
+	public void setIsRemapping(final boolean isRemapping) {
+		this.isRemapping.set(isRemapping);
+	}
+	
+	
+	public void setIsRunning(final boolean isRunning) {
+		this.isRunning.set(isRunning);
+	}
+	
+	
+	public void setStartGame(final boolean startGame) {
+		this.startGame.set(startGame);
+	}
 	
 	
 	public void setPoints(final int id, final int points) {

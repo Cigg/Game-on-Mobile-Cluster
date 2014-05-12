@@ -60,11 +60,23 @@ public class GameScreenPlayer extends Screen {
 	private PointsWidget pointsWidget;
 	private TimerWidget timerWidget;
 	private PointsNotificationWidget pointsNotificationsWidget;
+	private RemapWidget remapWidget;
+	private CountDownWidget countDownWidget;
+	
+	private ArrayList<Widget> widgets = new ArrayList<Widget>();
 
 	
     public GameScreenPlayer(Game game) {
         super(game);
 
+		comm = new TCPClient();
+		comm.start();
+
+		ballHandler = new BallHandler(PussycatMinions.getScreenWidth(), PussycatMinions.getScreenHeight());
+		ServerCommunication serverComm = new ServerCommunication(comm, ballHandler, null);
+		serverComm.start();
+		
+		
 		paint = new Paint();
 		paint.setTextSize(30);
 		paint.setTextAlign(Paint.Align.CENTER);
@@ -73,21 +85,34 @@ public class GameScreenPlayer extends Screen {
 
 		
 		previousTime = 0;		
-		SharedVariables.getInstance().setInternalState(GLOBAL_STATE__.SYNCHRONIZE_DEVICE);		
+		SharedVariables.getInstance().setInternalState(GLOBAL_STATE__.MAP_DEVICE);		
 
 		
-		comm = new TCPClient();
-		comm.start();
 
-		ballHandler = new BallHandler(PussycatMinions.getScreenWidth(), PussycatMinions.getScreenHeight());
-		ServerCommunication t4 = new ServerCommunication(comm, ballHandler, null);
-		t4.start();
+		if(!comm.isRunning()) {
+			try {
+				synchronized(comm) {
+					comm.wait();
+				}
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
 		
-		ballsWidget = new BallsWidget();
-		pointsWidget = new PointsWidget();
-		timerWidget = new TimerWidget();
-		pointsNotificationsWidget = new PointsNotificationWidget(game.getAudio());
+		if(!serverComm.isCommunicating()) {
+			try {
+				synchronized(serverComm) {
+					serverComm.wait();
+				}
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
 		
+		syncDevice();
+		addDevice();
     }
 
     @Override
@@ -112,17 +137,91 @@ public class GameScreenPlayer extends Screen {
         }
     }
     
+    private void syncDevice() {
+		ByteBuffer buffer;
+		buffer = ByteBuffer.allocate(1*2);
+		buffer.clear();
+		buffer.putShort((short) GLOBAL_STATE__.SYNCHRONIZE_DEVICE.ordinal()); 	
+		comm.sendData(buffer.array());
+    }
+    
+    private void addDevice() {
+    	ByteBuffer buffer;
+		buffer = ByteBuffer.allocate(2*2 + 4*4);
+		buffer.clear();
+		
+		buffer.putShort((short) GLOBAL_STATE__.ADD_DEVICE.ordinal());	// State: ADD_DEVICE
+		buffer.putShort((short) 1);										// type, 0 är hårdkodat till main-device - sätt 1 för alla andra devices
+		buffer.putInt(PussycatMinions.getXDPI());						// XDPI
+		buffer.putInt(PussycatMinions.getYDPI());						// YDPI
+		buffer.putInt(PussycatMinions.getScreenWidth());				// ResX
+		buffer.putInt(PussycatMinions.getScreenHeight());				// ResY
+		
+ 		comm.sendData(buffer.array());
+    }
+    
+    private void mapDevice(final float deltaTimeDragged, final float currentTime) {
+    	ByteBuffer buffer;
+		buffer = ByteBuffer.allocate(1*2 + 6*4);
+		buffer.clear();
+		    		
+		buffer.putShort((short) GLOBAL_STATE__.MAP_DEVICE.ordinal());	// State: MAP_DEVICE
+		buffer.putFloat(downX);											// x1
+		buffer.putFloat(downY); 										// y1
+		buffer.putFloat(currentX);										// x2
+		buffer.putFloat(currentY);										// y2
+		buffer.putFloat(deltaTimeDragged);    							// t
+		buffer.putFloat(currentTime + SharedVariables.getInstance().getSendDelay());	
+
+		comm.sendData(buffer.array());
+    }
+    
+    private void remapDevice() {
+		ByteBuffer buffer = ByteBuffer.allocate(2*2);
+		
+		buffer.putShort((short) GLOBAL_STATE__.SET_STATE.ordinal());	// State: SET_STATE
+		buffer.putShort((short) GLOBAL_STATE__.MAP_MAIN.ordinal());		// New state: MAP_MAIN
+		
+		comm.sendData(buffer.array());
+		
+		SharedVariables.getInstance().setIsRemapping(true);
+		SharedVariables.getInstance().setMapDone(false);
+		SharedVariables.getInstance().setInternalState(GLOBAL_STATE__.MAP_DEVICE);
+    }
     
     private void updateRunning(List<TouchEvent> touchEvents, float deltaTime) {   
     	
     	// Thread.currentThread().setPriority(Thread.MAX_PRIORITY);
     	
+    	if(SharedVariables.getInstance().shouldStartGame()) {
+    		SharedVariables.getInstance().setStartGame(false);
+    		SharedVariables.getInstance().setIsRunning(true);
+    		
+        	ballsWidget = new BallsWidget();
+    		pointsWidget = new PointsWidget();
+    		timerWidget = new TimerWidget();
+    		remapWidget = new RemapWidget();
+    		pointsNotificationsWidget = new PointsNotificationWidget(game.getAudio());
+    		countDownWidget = new CountDownWidget();
+
+    		widgets.add(ballsWidget);
+    		widgets.add(pointsWidget);
+    		widgets.add(timerWidget);
+    		widgets.add(pointsNotificationsWidget);	
+    		widgets.add(remapWidget);
+    		widgets.add(countDownWidget);
+			
+    		syncDevice();    
+			
+    		SharedVariables.getInstance().setInternalState(GLOBAL_STATE__.RUN_DEVICE);
+    	}
+
     	ballHandler.updateBalls(deltaTime);
     	ballHandler.removeBallsNotWanted();
-    	ballsWidget.updateBalls();
-    	pointsWidget.updatePoints();
-    	timerWidget.update();
-    	pointsNotificationsWidget.update();
+    	
+    	for(Widget widget : widgets) {
+    		widget.update();
+    	}
     	
     	if(animationHandler != null) {
     		animationHandler.updateAnimations(System.nanoTime());
@@ -139,19 +238,8 @@ public class GameScreenPlayer extends Screen {
     		
     	
     		  if(event.pointer >= 2) {
-     			Log.d("AppStates", "SEND SET_STATE");
-     			
-     			ByteBuffer buffer = ByteBuffer.allocate(2*2);
-     			
-     			buffer.putShort((short) GLOBAL_STATE__.SET_STATE.ordinal());	// State: SET_STATE
-     			buffer.putShort((short) 6);										// New state: MAP_MAIN
-     			
-     			comm.sendData(buffer.array());
-     			
-     			SharedVariables.getInstance().setInternalState(GLOBAL_STATE__.MAP_DEVICE);
-     			
-     		} 
-    		  else if(event.type == TouchEvent.TOUCH_DRAGGED) {
+     			remapDevice();
+    		  } else if(event.type == TouchEvent.TOUCH_DRAGGED) {
     			draggedX = currentX;
     			draggedY = currentY;  	
     		
@@ -172,63 +260,37 @@ public class GameScreenPlayer extends Screen {
     			
     			switch(SharedVariables.getInstance().getInternalState()) {
 
-    			
-	    			case SYNCHRONIZE_DEVICE:
-	    			{
-	    				Log.d("AppStates", "SYNCHRONZE_DEVICE");
-	    				
-	    				buffer = ByteBuffer.allocate(1*2);
-	    				buffer.clear();
-	    				
-	    				buffer.putShort((short) GLOBAL_STATE__.SYNCHRONIZE_DEVICE.ordinal()); 	// State: SYNCHRONZE_DEVICE
-	    				
-	    				comm.sendData(buffer.array());
-	    				SharedVariables.getInstance().setInternalState(GLOBAL_STATE__.ADD_DEVICE);
-	    			}
-	    			break;
-    			
-    				case ADD_DEVICE:
+    				case MAP_DEVICE:
     				{
-    					Log.d("AppStates", "ADD_DEVICE");
-    					
-    					buffer = ByteBuffer.allocate(2*2 + 4*4);
-    		    		buffer.clear();
-    		    		
-    		    		buffer.putShort((short) GLOBAL_STATE__.ADD_DEVICE.ordinal());	// State: ADD_DEVICE
-
-
-    		    		buffer.putShort((short) 1);										// type, 0 är hårdkodat till main-device - sätt 1 för alla andra devices
-    		    		buffer.putInt(PussycatMinions.getXDPI());						// XDPI
-    		    		buffer.putInt(PussycatMinions.getYDPI());						// YDPI
-    		    		buffer.putInt(PussycatMinions.getScreenWidth());				// ResX
-    		    		buffer.putInt(PussycatMinions.getScreenHeight());				// ResY
-    		    		
-    		     		comm.sendData(buffer.array());
-    		     		SharedVariables.getInstance().setInternalState(GLOBAL_STATE__.MAP_DEVICE);
- 
+    					mapDevice(deltaTimeDragged, currentTime);
+    					SharedVariables.getInstance().setIsRemapping(false);
+    					if(SharedVariables.getInstance().isRunning()) {
+							SharedVariables.getInstance().setInternalState(GLOBAL_STATE__.RUN_DEVICE);
+						} else {
+							SharedVariables.getInstance().setInternalState(GLOBAL_STATE__.IS_READY);
+						}
     				}
     				break;
     				
-    				case MAP_DEVICE:
+    				case IS_READY:
     				{
-    					Log.d("AppStates", "MAP_DEVICE");
+    					buffer = ByteBuffer.allocate(1*2 + 1*4);
+    					buffer.putShort((short) GLOBAL_STATE__.IS_READY.ordinal());	// State: IS_READY
+    					buffer.putInt(1);
+    					comm.sendData(buffer.array());
     					
-    					buffer = ByteBuffer.allocate(1*2 + 6*4);
-    		    		buffer.clear();
-    					    		
-    		    		buffer.putShort((short) GLOBAL_STATE__.MAP_DEVICE.ordinal());	// State: MAP_DEVICE
-    		    		
-    		    		buffer.putFloat(downX);											// x1
-    		    		buffer.putFloat(downY); 										// y1
-    		    		buffer.putFloat(currentX);										// x2
-    		    		buffer.putFloat(currentY);										// y2
-    		    		buffer.putFloat(deltaTimeDragged);    							// t
-    		    		buffer.putFloat(currentTime + SharedVariables.getInstance().getSendDelay());	
-
-    		    		comm.sendData(buffer.array());
-
-    		    		SharedVariables.getInstance().setInternalState(GLOBAL_STATE__.RUN_DEVICE);
+    					SharedVariables.getInstance().setInternalState(GLOBAL_STATE__.REG);
     				}
+    				break;
+
+					case REG: {
+    					
+    				}
+    				break;
+    				
+					case START_GAME: {
+					
+					}
     				break;
     				
     				case RUN_DEVICE:
@@ -657,10 +719,15 @@ public class GameScreenPlayer extends Screen {
        
         
         ballHandler.drawBalls(graphics);
-        ballsWidget.drawBalls(graphics);
-        pointsWidget.draw(graphics);
-        timerWidget.draw(graphics);
-        pointsNotificationsWidget.draw(graphics);
+        
+        for(Widget widget : widgets) {
+    		widget.draw(graphics);
+    	}
+        
+        //ballsWidget.draw(graphics);
+       // pointsWidget.draw(graphics);
+       // timerWidget.draw(graphics);
+       // pointsNotificationsWidget.draw(graphics);
    
         if (state == GameState.Running) {
             drawRunningUI();

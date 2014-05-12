@@ -5,6 +5,7 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
 
 import org.jbox2d.collision.shapes.CircleShape;
 import org.jbox2d.collision.shapes.PolygonShape;
@@ -28,7 +29,6 @@ import org.json.simple.parser.ParseException;
 
 public class PhysicsWorld {
 	//public volatile static Hashtable<Integer, Body> bodies = new Hashtable<Integer, Body>();		
-
 private class Vertex {
 	float x;
 	float y;
@@ -50,8 +50,8 @@ private class Vertex {
 	private float originY;
 	
 	public volatile static ArrayList<PhysicsBody> bodies = new ArrayList<PhysicsBody>();
-
-	private World world;
+	private static ArrayList<Body> toDestroy= new ArrayList<Body>();
+	private static World world;
 	
 
 	public void create(Vec2 gravity) {
@@ -105,6 +105,7 @@ private class Vertex {
 		calculateNormals();
 		
 		//---------- DEFENITION OF VERTECIES FROM FILE ---------
+		System.out.println("Polygon size is: " + polygons.size());
 		for(int i=0; i < polygons.size(); i++){
 			Polygon polygon = polygons.get(i);
 			polyDef.m_vertexCount = polygon.vertecies.size();
@@ -114,7 +115,7 @@ private class Vertex {
 				//polyDef.m_vertices[j].set((originX + 1.0f*vertex.x)*scale, (originY + 1.0f*vertex.y)*scale);
 				polyDef.m_normals[j].set(vertex.normalX,vertex.normalY);
 			}
-			body.createFixture(polyDef,1.0f).setUserData("Target");
+			while(body.createFixture(polyDef,1.0f) == null);
 		}
 		bodyDef.type = BodyType.STATIC;
 		bodyDef.position.set(xPos, yPos);
@@ -127,7 +128,7 @@ private class Vertex {
 		fixtureDef.isSensor = true;
 		
 		CircleShape pivot = new CircleShape();
-		pivot.m_radius = 0.25f;
+		pivot.m_radius = 0.30f;
 		
 		fixtureDef.shape = pivot;
 		
@@ -200,12 +201,11 @@ private class Vertex {
 			body = world.createBody(bodyDef);
 			System.out.println("NULLL BODYYY LOOP");
 		}
-
 		// body.setAngularVelocity(5); // la till
 
 		// bodies.put(id, body);
 
-		bodies.add(new PhysicsBody(id - 1, body));
+		
 
 		// Assign shape to Body
 		FixtureDef fixtureDef = new FixtureDef();
@@ -216,12 +216,13 @@ private class Vertex {
 
 		while (true) {
 			try {
-				body.createFixture(fixtureDef).setUserData("Ball: " + id);;
+				body.createFixture(fixtureDef).setUserData(id);
 				break;
 			} catch (Exception e) {
 				System.out.println("Erorror fixtureDef");
 			}
 		}
+		bodies.add(new PhysicsBody(id - 1, body));
 		// body.resetMassData();
 
 	}
@@ -229,7 +230,15 @@ private class Vertex {
 	public void update(float deltaTime) {
 		// Update Physics World
 		world.step(deltaTime, 8, 3); // vilka v�rden b�r de 2 sista
-											// parametrarna ha?
+									// parametrarna ha?
+		if (toDestroy.size()>0){
+			System.out.println("Before: " + world.getBodyCount());
+	         for (Body body:toDestroy){
+	              world.destroyBody(body);
+	          }
+	         System.out.println("After: " + world.getBodyCount());
+	         toDestroy.clear();
+	      }
 	}
 
 	public World getWorld() {
@@ -264,7 +273,7 @@ private class Vertex {
 	private void loadVertices(){
 		JSONParser parser = new JSONParser();
 		try{
-			Object obj = parser.parse(new FileReader("src/octopus.json"));
+			Object obj = parser.parse(new FileReader("src/octopus_detailed.json"));
 			JSONObject jsonObject = (JSONObject) obj;
 			JSONArray jsonArray = (JSONArray) jsonObject.get("rigidBodies");
 			jsonObject = (JSONObject) jsonArray.get(0);
@@ -284,11 +293,11 @@ private class Vertex {
 					JSONObject pair = (JSONObject) j.next();
 					Object x =  pair.get("x");
 					Object y =  pair.get("y");
-					System.out.println("x = " + x + ", y = " + y);
+					//System.out.println("x = " + x + ", y = " + y);
 					
 					polygon.vertecies.add(new Vertex(convertToFloat(x),convertToFloat(y)));
 				}
-				System.out.println();
+				//System.out.println();
 				polygons.add(polygon);
 			}
 		} catch (FileNotFoundException e) {
@@ -341,6 +350,12 @@ private class Vertex {
 	
 	public void drawDebug(){
 		world.drawDebugData();
+	}
+	
+	public static void removeBall(int id) {
+		System.out.println("Removing ball from world");
+		Body body = bodies.get(id-1).body;
+		toDestroy.add(body);
 	}
 	
 }
