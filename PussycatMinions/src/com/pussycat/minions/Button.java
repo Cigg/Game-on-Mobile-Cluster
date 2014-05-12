@@ -64,7 +64,7 @@ public class Button {
 		} else {
 			// 
 			
-			this.imageNormal = new Image()
+			//this.imageNormal = new Image()
 			
 		}
 		
