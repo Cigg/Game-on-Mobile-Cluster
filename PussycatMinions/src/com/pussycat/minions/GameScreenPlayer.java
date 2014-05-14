@@ -18,6 +18,7 @@ import com.pussycat.framework.Graphics;
 
 import com.pussycat.framework.Input.TouchEvent;
 import com.pussycat.framework.Screen;
+import com.pussycat.minions.GameScreenMiddle.GameState;
 
 
 public class GameScreenPlayer extends Screen {
@@ -30,7 +31,9 @@ public class GameScreenPlayer extends Screen {
 
     private Paint paint;
     Context context;
-
+    
+    Button readyButton;
+    
 	private float currentX, currentY;
 	private float downX, downY;
 
@@ -69,10 +72,17 @@ public class GameScreenPlayer extends Screen {
 	
     public GameScreenPlayer(Game game) {
         super(game);
+        
+        paint = new Paint();
+        paint.setTextSize(40);
+        paint.setTextAlign(Paint.Align.CENTER);
+        paint.setAntiAlias(true);
+        paint.setColor(Color.WHITE);
 
 		comm = new TCPClient();
 		comm.start();
-
+		readyButton = new Button(Assets.button, Assets.button_pressed, PussycatMinions.getScreenWidth(), PussycatMinions.getScreenHeight()/2-100, paint);
+        readyButton.setText("READY");
 		ballHandler = new BallHandler(PussycatMinions.getScreenWidth(), PussycatMinions.getScreenHeight());
 		ServerCommunication serverComm = new ServerCommunication(comm, ballHandler, null);
 		serverComm.start();
@@ -120,6 +130,9 @@ public class GameScreenPlayer extends Screen {
     public void update(float deltaTime) {
         List<TouchEvent> touchEvents = game.getInput().getTouchEvents();
     	
+        if(state == GameState.Ready) {
+        	updateReady(touchEvents);
+        }
     	if(SharedVariables.getInstance().shouldStartGame()) {
     		SharedVariables.getInstance().setInternalState(GLOBAL_STATE__.REG);
     		
@@ -769,7 +782,8 @@ public class GameScreenPlayer extends Screen {
     	} else if (state == GameState.Ready) {
     		Log.d("UI STATEZ", "Ready! Waiting...");
     		g.drawARGB(155, 0, 0, 0);
-    		g.drawString("Ready!", textX, textY, paint);
+    		readyButton.drawButton(g);
+    		//g.drawString("Ready!", textX, textY, paint);
     	} else if (state == GameState.Running) {
     		Log.d("UI STATEZ", "Running");
     	}
@@ -801,6 +815,38 @@ public class GameScreenPlayer extends Screen {
 //        g.drawString("GAME OVER.", 640, 300, paint);
 //    }
     
+
+    private void updateReady(List<TouchEvent> touchEvents) {
+   	 Graphics g = game.getGraphics();
+   	 
+   	 int len = touchEvents.size();
+        for (int i = 0; i < len; i++) {
+            TouchEvent event = touchEvents.get(i);
+            if(event.type == TouchEvent.TOUCH_DOWN){
+   				if(readyButton.inBounds(event.x, event.y)){
+   					readyButton.setPressed(true);
+   				}
+   			}
+   			
+   			if(event.type == TouchEvent.TOUCH_DRAGGED){
+   				if(!readyButton.inBounds(event.x, event.y)){
+   					readyButton.setPressed(false);
+   				}
+   			}
+   			
+   			if (event.type == TouchEvent.TOUCH_UP) {
+   				
+   				readyButton.setPressed(false);
+   			
+   			//TODO: Should go to SetupScreen instead
+   			if(readyButton.inBounds(event.x, event.y)){
+   				//game.setScreen(new GameScreenPlayer(game));
+   				state = GameState.Running;
+   			
+   			}
+   		}
+        }
+    }
     
     private void nullify() {
         // Set all variables to null. You will be recreating them in the constructor.
