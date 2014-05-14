@@ -288,7 +288,9 @@ public class ClientThread extends Thread {
 		isRunning = true;
 		int maxClientsCount = this.maxClientCount;
 		thread = this.threads;
-
+		
+		float delta1 = 0;
+		
 		try {
 			dout = clientSocket.getOutputStream();
 			clientSocket.setTcpNoDelay(true);
@@ -339,8 +341,9 @@ public class ClientThread extends Thread {
 								final short sendState = (short) GLOBAL_STATE__.SYNCHRONIZE_DEVICE.ordinal();
 								sendBuffer.putShort(sendState); // State: SYNCHRONZE_DEVICE
 
-								float delta1 = reciveTime - sendTime;
+								delta1 = reciveTime - sendTime;
 								System.out.println("delta1 = " + delta1);
+								System.out.println("delta1_2 = " + delta1 * (float)Math.pow(10, -9));
 								sendBuffer.putFloat(sendTime); // t1
 								sendBuffer.putFloat(reciveTime);
 								
@@ -390,6 +393,7 @@ public class ClientThread extends Thread {
 									System.out.println("MAPPING_STEP2");
 
 									float time2 = System.nanoTime();
+									//float time2 = sendTime + delta1;
 									float deltaTime = time2 - time1;
 
 									float x11 = buffer.getFloat();
@@ -452,6 +456,7 @@ public class ClientThread extends Thread {
 									System.out.println("MAPPING_STEP1");
 
 									time1 = System.nanoTime();
+									//time1 = sendTime + delta1;
 
 									float x1 = buffer.getFloat();
 									float y1 = buffer.getFloat();
