@@ -40,4 +40,6 @@ public interface Graphics {
     public Paint getPaint();
 
 	public Bitmap getFrameBuffer();
+
+	public Image newScaledImage(Image imageNormal, int pixelWidth);
 }

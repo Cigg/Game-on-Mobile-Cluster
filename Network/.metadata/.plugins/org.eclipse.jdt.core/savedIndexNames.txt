@@ -1,8 +1,0 @@
-INDEX VERSION 1.126+C:\Users\Sebastian\Desktop\Android\Game-on-Mobile-Cluster\Network\.metadata\.plugins\org.eclipse.jdt.core
-705793079.index
-2131532222.index
-3907060485.index
-4029686297.index
-955081981.index
-3338407113.index
-757160323.index
