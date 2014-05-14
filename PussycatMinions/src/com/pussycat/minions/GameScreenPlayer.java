@@ -115,11 +115,26 @@ public class GameScreenPlayer extends Screen {
 		syncDevice();
 		addDevice();
     }
+    
+    public void setIsReady() {
+		ByteBuffer buffer;
+		buffer = ByteBuffer.allocate(1*2 + 1*4);
+		buffer.putShort((short) GLOBAL_STATE__.IS_READY.ordinal());	// State: IS_READY
+		buffer.putInt(1);
+		comm.sendData(buffer.array());
+		
+		SharedVariables.getInstance().setInternalState(GLOBAL_STATE__.REG);
+		state = GameState.Ready;
+    }
 
     @Override
     public void update(float deltaTime) {
         List<TouchEvent> touchEvents = game.getInput().getTouchEvents();
     	
+        if(SharedVariables.getInstance().getInternalState() == GLOBAL_STATE__.IS_READY) {
+       	 	setIsReady();
+        }
+        
     	if(SharedVariables.getInstance().shouldStartGame()) {
     		SharedVariables.getInstance().setInternalState(GLOBAL_STATE__.REG);
     		
@@ -196,22 +211,14 @@ public class GameScreenPlayer extends Screen {
     					SharedVariables.getInstance().setIsRemapping(false);
     					if(SharedVariables.getInstance().isRunning()) {
 							SharedVariables.getInstance().setInternalState(GLOBAL_STATE__.RUN_DEVICE);
-						} else {
+						} /*else {
 							SharedVariables.getInstance().setInternalState(GLOBAL_STATE__.IS_READY);
-						}
+						}*/
     				}
     				break;
     				
     				case IS_READY:
     				{
-    					state = GameState.Ready;
-    					Log.d("STATEZ", "PLAYER IS_READY");
-    					buffer = ByteBuffer.allocate(1*2 + 1*4);
-    					buffer.putShort((short) GLOBAL_STATE__.IS_READY.ordinal());	// State: IS_READY
-    					buffer.putInt(1);
-    					comm.sendData(buffer.array());
-    					
-    					SharedVariables.getInstance().setInternalState(GLOBAL_STATE__.REG);
     				}
     				break;
 
