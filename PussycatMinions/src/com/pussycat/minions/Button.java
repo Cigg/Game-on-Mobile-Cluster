@@ -55,11 +55,11 @@ public class Button {
 	
 	/**
 	 * Scale button to input width
-	 * @param width Button width in meters
+	 * @param width Button width in pixels
 	 */
-	public void scaleButton(Graphics g, float width) {
-		imageNormal = g.newScaledImage(imageNormal, width);
-		imagePressed = g.newScaledImage(imagePressed, width);
+	public void scaleButton(Graphics g, int pixelWidth) {
+		imageNormal = g.newScaledImage(imageNormal, pixelWidth);
+		imagePressed = g.newScaledImage(imagePressed, pixelWidth);
 		
 		this.width = imageNormal.getWidth();
 		this.height = imageNormal.getHeight();
@@ -115,5 +115,10 @@ public class Button {
 	
 	public void setText(String string) {
 		this.string = string;
+	}
+	
+	public void setTextSize(float textSize) {
+		paint.setTextSize(textSize);
+		this.textHeight = paint.getTextSize()/2;
 	}
 }

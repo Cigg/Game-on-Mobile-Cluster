@@ -17,15 +17,16 @@ import com.pussycat.framework.Graphics;
 
 import com.pussycat.framework.Input.TouchEvent;
 import com.pussycat.framework.Screen;
+import com.pussycat.minions.GameScreenPlayer.GameState;
 
 
 
 public class GameScreenMiddle extends Screen {
     enum GameState {
-        Ready, Running, Paused, GameOver
+        Mapping, MappingDone, Ready, Running, Paused, GameOver
     }
 
-    private GameState state = GameState.Running; //used to be ready, but we want to start immediately
+    private GameState state = GameState.Mapping;
 
     private Paint paint;
     Context context;
@@ -72,16 +73,16 @@ public class GameScreenMiddle extends Screen {
         super(game);
 
 		paint = new Paint();
-		paint.setTextSize(30);
+		paint.setTextSize(40);
 		paint.setTextAlign(Paint.Align.CENTER);
 		paint.setAntiAlias(true);
-		paint.setColor(Color.BLACK);
+		paint.setColor(Color.WHITE);
 		
 		int width = PussycatMinions.getScreenWidth()/2 - Assets.button.getWidth()/2;
 		
 		menuButton = new Button(Assets.settings, Assets.settings_pressed, PussycatMinions.getScreenWidth() - Assets.settings.getWidth() - 30, PussycatMinions.getScreenHeight()-Assets.settings.getHeight() - 30, paint);
         //menuButton.setText("MENU");
-		menuButton.scaleButton(game.getGraphics(), 0.015f);
+		menuButton.scaleButton(game.getGraphics(), (int)(PussycatMinions.getScreenWidth()*0.02));
         resumeButton = new Button(Assets.button, Assets.button_pressed, width, PussycatMinions.getScreenHeight()/2-100, paint);
         resumeButton.setText("RESUME");
         restartButton = new Button(Assets.button, Assets.button_pressed, width, PussycatMinions.getScreenHeight()/2, paint);
@@ -139,76 +140,14 @@ public class GameScreenMiddle extends Screen {
     public void update(float deltaTime) {
         List<TouchEvent> touchEvents = game.getInput().getTouchEvents();
         
-        if (state == GameState.Running) {
-            updateRunning(touchEvents, deltaTime);
-        } else if (state == GameState.Ready) {
-            updateReady(touchEvents);
-    	} else if (state == GameState.Paused) {
-            updatePaused(touchEvents);
-		} else if (state == GameState.GameOver) {
-            updateGameOver(touchEvents);
-		}
-        
-    }
-    
-    private void updateReady(List<TouchEvent> touchEvents) {
-        
-        // This example starts with a "Ready" screen.
-        // When the user touches the screen, the game begins. 
-        // state now becomes GameState.Running.
-        // Now the updateRunning() method will be called!
-        
-        //if (touchEvents.size() > 0)
-            state = GameState.Running;
-    }
-    
-    private void syncDevice() {
-  		ByteBuffer buffer;
-  		buffer = ByteBuffer.allocate(1*2);
-  		buffer.clear();
-  		buffer.putShort((short) GLOBAL_STATE__.SYNCHRONIZE_DEVICE.ordinal()); 	
-  		comm.sendData(buffer.array());
-      }
-      
-      private void addDevice() {
-      	ByteBuffer buffer;
-  		buffer = ByteBuffer.allocate(2*2 + 4*4);
-  		buffer.clear();
-  		
-  		buffer.putShort((short) GLOBAL_STATE__.ADD_DEVICE.ordinal());	// State: ADD_DEVICE
-  		buffer.putShort((short) 0);										// type, 0 är hårdkodat till main-device - sätt 1 för alla andra devices
-  		buffer.putInt(PussycatMinions.getXDPI());						// XDPI
-  		buffer.putInt(PussycatMinions.getYDPI());						// YDPI
-  		buffer.putInt(PussycatMinions.getScreenWidth());				// ResX
-  		buffer.putInt(PussycatMinions.getScreenHeight());				// ResY
-  		
-   		comm.sendData(buffer.array());
-      }
-      
-      private void mapDevice(final float deltaTimeDragged, final float currentTime) {
-      	ByteBuffer buffer;
-  		buffer = ByteBuffer.allocate(1*2 + 6*4);
-  		buffer.clear();
-  		    		
-  		buffer.putShort((short) GLOBAL_STATE__.MAP_DEVICE.ordinal());	// State: MAP_DEVICE
-  		buffer.putFloat(downX);											// x1
-  		buffer.putFloat(downY); 										// y1
-  		buffer.putFloat(currentX);										// x2
-  		buffer.putFloat(currentY);										// y2
-  		buffer.putFloat(deltaTimeDragged);    							// t
-  		buffer.putFloat(currentTime + SharedVariables.getInstance().getSendDelay());	
-
-  		comm.sendData(buffer.array());
-      }
-
-    private void updateRunning(List<TouchEvent> touchEvents, float deltaTime) {   
-    	
-    	// Thread.currentThread().setPriority(Thread.MAX_PRIORITY);
+     // Thread.currentThread().setPriority(Thread.MAX_PRIORITY);
     	if(SharedVariables.getInstance().shouldStartGame()) {
     		SharedVariables.getInstance().setStartGame(false);
     		SharedVariables.getInstance().setIsRunning(true);
     		SharedVariables.getInstance().setInternalState(GLOBAL_STATE__.RUN_DEVICE);
     		musicWidget.play();
+    		
+    		state = GameState.Running;
     	}
     	
     	ballHandler.updateBalls(deltaTime);
@@ -247,6 +186,8 @@ public class GameScreenMiddle extends Screen {
     			
 	    			case MAP_DEVICE:
 					{
+						state = GameState.MappingDone;
+						Log.d("STATEZ", "MIDDLE MAP_DEVICE");
 						mapDevice(deltaTimeDragged, currentTime);
 						if(SharedVariables.getInstance().isRunning()) {
 							SharedVariables.getInstance().setInternalState(GLOBAL_STATE__.RUN_DEVICE);
@@ -258,6 +199,8 @@ public class GameScreenMiddle extends Screen {
 	    				
     				case IS_READY:
     				{
+    					state = GameState.Ready;
+    					Log.d("STATEZ", "MIDDLE IS_READY");
     					buffer = ByteBuffer.allocate(1*2 + 1*4);
     					buffer.putShort((short) GLOBAL_STATE__.IS_READY.ordinal());	// State: IS_READY
     					buffer.putInt(1);
@@ -268,7 +211,7 @@ public class GameScreenMiddle extends Screen {
     				break;
 
 					case REG: {
-    					
+						Log.d("STATEZ", "MIDDLE MAP_DEVICE");
     				}
     				break;
     				
@@ -337,9 +280,58 @@ public class GameScreenMiddle extends Screen {
     		}
     		
         }  
-                
+        
     }
+    
+//    private void updateReady(List<TouchEvent> touchEvents) {
+//        
+//        // This example starts with a "Ready" screen.
+//        // When the user touches the screen, the game begins. 
+//        // state now becomes GameState.Running.
+//        // Now the updateRunning() method will be called!
+//        
+//        //if (touchEvents.size() > 0)
+//            state = GameState.Running;
+//    }
+    
+    private void syncDevice() {
+  		ByteBuffer buffer;
+  		buffer = ByteBuffer.allocate(1*2);
+  		buffer.clear();
+  		buffer.putShort((short) GLOBAL_STATE__.SYNCHRONIZE_DEVICE.ordinal()); 	
+  		comm.sendData(buffer.array());
+      }
+      
+      private void addDevice() {
+      	ByteBuffer buffer;
+  		buffer = ByteBuffer.allocate(2*2 + 4*4);
+  		buffer.clear();
+  		
+  		buffer.putShort((short) GLOBAL_STATE__.ADD_DEVICE.ordinal());	// State: ADD_DEVICE
+  		buffer.putShort((short) 0);										// type, 0 är hårdkodat till main-device - sätt 1 för alla andra devices
+  		buffer.putInt(PussycatMinions.getXDPI());						// XDPI
+  		buffer.putInt(PussycatMinions.getYDPI());						// YDPI
+  		buffer.putInt(PussycatMinions.getScreenWidth());				// ResX
+  		buffer.putInt(PussycatMinions.getScreenHeight());				// ResY
+  		
+   		comm.sendData(buffer.array());
+      }
+      
+      private void mapDevice(final float deltaTimeDragged, final float currentTime) {
+      	ByteBuffer buffer;
+  		buffer = ByteBuffer.allocate(1*2 + 6*4);
+  		buffer.clear();
+  		    		
+  		buffer.putShort((short) GLOBAL_STATE__.MAP_DEVICE.ordinal());	// State: MAP_DEVICE
+  		buffer.putFloat(downX);											// x1
+  		buffer.putFloat(downY); 										// y1
+  		buffer.putFloat(currentX);										// x2
+  		buffer.putFloat(currentY);										// y2
+  		buffer.putFloat(deltaTimeDragged);    							// t
+  		buffer.putFloat(currentTime + SharedVariables.getInstance().getSendDelay());	
 
+  		comm.sendData(buffer.array());
+      }
     
     private void updatePaused(List<TouchEvent> touchEvents) {
         int len = touchEvents.size();
@@ -400,20 +392,20 @@ public class GameScreenMiddle extends Screen {
     }
 
     
-    private void updateGameOver(List<TouchEvent> touchEvents) {
-        int len = touchEvents.size();
-        for (int i = 0; i < len; i++) {
-            TouchEvent event = touchEvents.get(i);
-            if (event.type == TouchEvent.TOUCH_UP) {
-                if (event.x > 300 && event.x < 980 && event.y > 100 && event.y < 500) {
-                    nullify();
-                    game.setScreen(new MainMenuScreen(game));
-                    return;
-                }
-            }
-        }
-
-    }
+//    private void updateGameOver(List<TouchEvent> touchEvents) {
+//        int len = touchEvents.size();
+//        for (int i = 0; i < len; i++) {
+//            TouchEvent event = touchEvents.get(i);
+//            if (event.type == TouchEvent.TOUCH_UP) {
+//                if (event.x > 300 && event.x < 980 && event.y > 100 && event.y < 500) {
+//                    nullify();
+//                    game.setScreen(new MainMenuScreen(game));
+//                    return;
+//                }
+//            }
+//        }
+//
+//    }
 	
 	
  	Device device = new Device();
@@ -433,56 +425,75 @@ public class GameScreenMiddle extends Screen {
         
         remapWidget.draw(graphics);
    
-        if (state == GameState.Running) {
-            drawRunningUI();
+        drawUI();
+        
+    }
+  private void drawUI() {
+	  	Graphics g = game.getGraphics();
+	  	
+    	Log.d("UI STATEZ", "STATE: " + state);  	    	
+    	
+    	int textX = PussycatMinions.getScreenWidth()/2;
+    	int textY = PussycatMinions.getScreenHeight()/2;
+    	
+    	//Mapping, MappingDone, Ready, Running, 
+    	if (state == GameState.Mapping) {
+    		Log.d("UI STATEZ", "Mapping");
+    		g.drawARGB(155, 0, 0, 0);
+    		g.drawString("Mapping! Drag from this device...", textX, textY, paint);
+    	} else if (state == GameState.MappingDone) {
+    		Log.d("UI STATEZ", "MappingDone");
+    		g.drawARGB(155, 0, 0, 0);
+    		g.drawString("Tap when you are ready", textX, textY, paint);
     	} else if (state == GameState.Ready) {
-            drawReadyUI();
-        } else if (state == GameState.Paused) {
-            drawPausedUI();
-		} else if (state == GameState.GameOver) {
-			drawGameOverUI();
-		}
-        
+    		Log.d("UI STATEZ", "Ready! Waiting...");
+    		g.drawARGB(155, 0, 0, 0);
+    		g.drawString("Ready!", textX, textY, paint);
+    	} else if (state == GameState.Running) {
+    		Log.d("UI STATEZ", "Running");
+    	}
+    	
+    	
+    	
     }
-
-    private void drawReadyUI() {
-        Graphics g = game.getGraphics();
-       /* state = GameState.Running;
-        
-        
-        
-        g.drawARGB(155, 0, 0, 0);
-        g.drawString("Tap to create a ball", 640, 300, paint);
-        */
-    }
-
-    
-    private void drawRunningUI() {
-    	Graphics g = game.getGraphics();     
-    	//TODO: create button on init. use drawButton here
-        
-        menuButton.drawButton(g);
-    }
-
-    
-    private void drawPausedUI() {
-        Graphics g = game.getGraphics();
-        // Darken the entire screen so you can display the Paused screen.
-        g.drawARGB(155, 0, 0, 0);
-       
-        resumeButton.drawButton(g);
-        restartButton.drawButton(g);
-        remapButton.drawButton(g);
-        addButton.drawButton(g);
-        exitButton.drawButton(g);
-    }
-
-    
-    private void drawGameOverUI() {
-        Graphics g = game.getGraphics();
-        g.drawRect(0, 0, 1281, 801, Color.BLACK);
-        g.drawString("GAME OVER.", 640, 300, paint);
-    }
+//    private void drawReadyUI() {
+//        Graphics g = game.getGraphics();
+//       /* state = GameState.Running;
+//        
+//        
+//        
+//        g.drawARGB(155, 0, 0, 0);
+//        g.drawString("Tap to create a ball", 640, 300, paint);
+//        */
+//    }
+//
+//    
+//    private void drawRunningUI() {
+//    	Graphics g = game.getGraphics();     
+//    	//TODO: create button on init. use drawButton here
+//        
+//        menuButton.drawButton(g);
+//    }
+//
+//    
+//    private void drawPausedUI() {
+//        Graphics g = game.getGraphics();
+//        // Darken the entire screen so you can display the Paused screen.
+//        g.drawARGB(155, 0, 0, 0);
+//       
+//        resumeButton.drawButton(g);
+//        restartButton.drawButton(g);
+//        remapButton.drawButton(g);
+//        addButton.drawButton(g);
+//        exitButton.drawButton(g);
+//    }
+//
+//    
+//    private void drawGameOverUI() {
+//        Graphics g = game.getGraphics();
+//        g.drawRect(0, 0, 1281, 801, Color.BLACK);
+//        g.drawString("GAME OVER.", 640, 300, paint);
+//    }
     
     
     private void nullify() {

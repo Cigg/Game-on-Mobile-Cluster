@@ -1,5 +1,7 @@
 package com.pussycat.minions;
 
+import android.graphics.Typeface;
+
 import com.pussycat.framework.Image;
 import com.pussycat.framework.Sound;
 
@@ -15,5 +17,7 @@ public class Assets {
 	public static Image localBall;
 	public static Image settings;
 	public static Image settings_pressed;
+	
+	public static Typeface menu_font;
 	
 }
