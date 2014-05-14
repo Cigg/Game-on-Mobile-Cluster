@@ -93,6 +93,7 @@ public class MultiThreds {
 		    	
 		    	short nPlayers = 0;
 		    	boolean isStarted = false;
+		    	
 		    	while(!isStarted) {
 		    		nPlayers = 0;
 		    		for(ClientThread thread : threads) {
@@ -102,6 +103,7 @@ public class MultiThreds {
 								
 								if(deviceManager.isMiddle(thread.getIp())) {
 									isStarted = true;
+									System.out.println("STARTED!!!!!!!!!!!!!!!!!!!!!!!!!!!");
 									//nPlayers --;
 								}
 							}
@@ -121,6 +123,7 @@ public class MultiThreds {
 		    		}
 	    		}
 		    	
+		    
 		    	
 				for(ClientThread thread : threads) {
 					if (thread != null && thread.getIsReady() == 1) {

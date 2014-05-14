@@ -60,6 +60,7 @@ Button restartButton;
 Button remapButton;
 Button addButton;
 Button exitButton;
+Button startButton;
 
 private TCPClient comm;
 private BallHandler ballHandler;
@@ -96,7 +97,9 @@ menuButton.scaleButton(game.getGraphics(), (int)(PussycatMinions.getScreenWidth(
         addButton.setText("ADD");
         exitButton = new Button(Assets.button, Assets.button_pressed, width, PussycatMinions.getScreenHeight()/2+300, paint);
         exitButton.setText("EXIT");
-
+        startButton = new Button(Assets.button, Assets.button_pressed, width, PussycatMinions.getScreenHeight()/2 + 300, paint);
+        startButton.setText("START GAME");
+        
 middleTarget = new Target(PussycatMinions.getScreenWidth()/2, PussycatMinions.getScreenHeight()/2, 0.06f, game.getGraphics());
 
 previousTime = 0;	
@@ -154,9 +157,23 @@ addDevice();
     @Override
     public void update(float deltaTime) {
         List<TouchEvent> touchEvents = game.getInput().getTouchEvents();
+
        
      if(SharedVariables.getInstance().getInternalState() == GLOBAL_STATE__.IS_READY) {
     	 setIsReady();
+     }
+     
+   	     if (state != GameState.Running)
+   	    	 updateReady(touchEvents);
+   	    
+     // Thread.currentThread().setPriority(Thread.MAX_PRIORITY);
+     if(SharedVariables.getInstance().shouldStartGame()) {
+     SharedVariables.getInstance().setStartGame(false);
+     SharedVariables.getInstance().setIsRunning(true);
+     SharedVariables.getInstance().setInternalState(GLOBAL_STATE__.RUN_DEVICE);
+     musicWidget.play();
+     
+     state = GameState.Running;
      }
      
      for(Widget widget : widgets) {
@@ -221,9 +238,9 @@ case MAP_DEVICE:
 	if(SharedVariables.getInstance().isRunning()) {
 		state = GameState.Running;
 		SharedVariables.getInstance().setInternalState(GLOBAL_STATE__.RUN_DEVICE);
-	} else {
+	} /*else {
 		SharedVariables.getInstance().setInternalState(GLOBAL_STATE__.IS_READY);
-	}
+	}*/
 }
 break;
 
@@ -279,28 +296,28 @@ buffer.putFloat(currentTime - tms[index-8]);	// t
      break;
      }
     
-     dragged = false;
-     up = true;
-     drawTraceAfter = true;
+	    dragged = false;
+	    up = true;
+	    drawTraceAfter = true;
     
-     } else if(event.type == TouchEvent.TOUCH_DOWN) {
-     downTime = currentTime;
+	    } else if(event.type == TouchEvent.TOUCH_DOWN) {
+	    downTime = currentTime;
     
-     downX = currentX;
-     downY = currentY;
+	    downX = currentX;
+	    downY = currentY;
     
-     if(index < ptx.length) {
-     tms[index] = currentTime;
-     ptx[index] = currentX;
-     pty[index] = currentY;
-     index++;
-        }
+	    if(index < ptx.length) {
+		    tms[index] = currentTime;
+		    ptx[index] = currentX;
+		    pty[index] = currentY;
+		    index++;
+	    }
     
-     bitmap = null;
-lastAlpha = 255;
-index = 0;
-     beginIndex = 1;
-     drawTraceAfter = false;
+     	bitmap = null;
+		lastAlpha = 255;
+		index = 0;
+		beginIndex = 1;
+	    drawTraceAfter = false;
      }
     
         }
@@ -464,34 +481,58 @@ Graphics g = game.getGraphics();
     
      //Mapping, MappingDone, Ready, Running,
      if (state == GameState.Mapping) {
-     Log.d("UI STATEZ", "Mapping");
-     g.drawARGB(155, 0, 0, 0);
-     g.drawString("Mapping! Drag from this device...", textX, textY, paint);
+	     Log.d("UI STATEZ", "Mapping");
+	     g.drawARGB(155, 0, 0, 0);
+         startButton.drawButton(g);
+	     g.drawString("Mapping! Drag from this device...", textX, textY, paint);
      } else if (state == GameState.MappingDone) {
-     Log.d("UI STATEZ", "MappingDone");
-     g.drawARGB(155, 0, 0, 0);
-     g.drawString("Tap when you are ready", textX, textY, paint);
+	     Log.d("UI STATEZ", "MappingDone");
+	     g.drawARGB(155, 0, 0, 0);
+	     startButton.drawButton(g);
+	     g.drawString("Tap when you are ready", textX, textY, paint);
      } else if (state == GameState.Ready) {
-     Log.d("UI STATEZ", "Ready! Waiting...");
-     g.drawARGB(155, 0, 0, 0);
-     g.drawString("Ready!", textX, textY, paint);
+         Log.d("UI STATEZ", "Ready! Waiting...");
+         g.drawARGB(155, 0, 0, 0);
+         startButton.drawButton(g);
      } else if (state == GameState.Running) {
-     Log.d("UI STATEZ", "Running");
+    	 Log.d("UI STATEZ", "Running");
      }
     
     
     
     }
-// private void drawReadyUI() {
-// Graphics g = game.getGraphics();
-// /* state = GameState.Running;
-//
-//
-//
-// g.drawARGB(155, 0, 0, 0);
-// g.drawString("Tap to create a ball", 640, 300, paint);
-// */
-// }
+  
+ private void updateReady(List<TouchEvent> touchEvents) {
+	 Graphics g = game.getGraphics();
+	 
+	 int len = touchEvents.size();
+     for (int i = 0; i < len; i++) {
+         TouchEvent event = touchEvents.get(i);
+         if(event.type == TouchEvent.TOUCH_DOWN){
+				if(startButton.inBounds(event.x, event.y)){
+					startButton.setPressed(true);
+				}
+			}
+			
+			if(event.type == TouchEvent.TOUCH_DRAGGED){
+				if(!startButton.inBounds(event.x, event.y)){
+					startButton.setPressed(false);
+				}
+			}
+			
+			if (event.type == TouchEvent.TOUCH_UP) {
+				
+			startButton.setPressed(false);
+			
+			//TODO: Should go to SetupScreen instead
+			if(startButton.inBounds(event.x, event.y)){
+				//game.setScreen(new GameScreenPlayer(game));
+ 				SharedVariables.getInstance().setInternalState(GLOBAL_STATE__.IS_READY);
+			
+			}
+		}
+     }
+ }
 //
 //
 // private void drawRunningUI() {

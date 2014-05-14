@@ -1,0 +1,94 @@
+package com.pussycat.minions;
+
+import java.util.ArrayList;
+
+import android.graphics.PointF;
+import android.os.AsyncTask;
+import android.os.Looper;
+import android.util.Log;
+
+public class BackgroundHandler {
+	
+	int screenWidth;
+	int screenHeight;
+	float ppi;
+	float backgroundInPixels;
+	TCPClient tcpClient = null;
+	String data;
+	
+	public BackgroundHandler(){		
+		screenWidth = PussycatMinions.getScreenWidth();
+		screenHeight = PussycatMinions.getScreenHeight();
+		ppi = PussycatMinions.getPpi();
+		
+		//Looper.prepare();
+		new connectTask().execute("");
+		Log.d("Debug Pussycat", "ADDING CONNECTION");
+	}
+	
+	/**
+	 * Update function.
+	 */
+	public void update(){
+		getDataFromServer();
+	}
+	
+	public void getDataFromServer(){
+		if(tcpClient != null){
+			tcpClient.getData();
+			if(data != "" && data != null) {
+				System.out.println(data);
+				String[] lines = data.split(" n ");
+				for(int i=0; i<lines.length; i++) {
+					String[] parts = lines[i].split(" ");
+					if(parts.length>1) {
+						int id = Integer.parseInt(parts[0]);
+						float x = Float.parseFloat(parts[1]);
+						float y = Float.parseFloat(parts[2]);
+						this.addBackgroundTranslation(x,y);
+					}
+				}
+			}
+		}
+	}
+
+	public void addBackgroundTranslation(float x, float y, float ballDiameterInCentimeters){
+		float ballDiameterInPixels = ppi*(ballDiameterInCentimeters*0.3937f);
+		balls.add(new Ball(x, y, ballDiameterInPixels));
+	}
+
+	public void removeBall(int index){
+		balls.remove(index);
+		Log.d("Debug Pussycat", "ball removed");
+	}
+		
+	public class connectTask extends AsyncTask<String,String,TCPClient> {
+		@Override
+		protected TCPClient doInBackground(String... message) {
+			tcpClient = new TCPClient(new TCPClient.OnMessageReceived() {
+				@Override
+				public void messageReceived(String message) {
+					// TODO Auto-generated method stub
+					publishProgress(message);
+				}
+			});
+			tcpClient.run();
+			return null;
+		}
+		
+		@Override
+		protected void onProgressUpdate(String... values) {
+			super.onProgressUpdate(values);
+			data = values[0];
+			//System.out.println("Data is: " + data);
+		}
+	}
+	
+	public TCPClient getTCPClient() {
+		return tcpClient;
+	}
+	
+	public String getData() {
+		return data;
+	}
+}

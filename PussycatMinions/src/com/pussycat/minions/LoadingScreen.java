@@ -37,12 +37,14 @@ public class LoadingScreen extends Screen {
         //Assets.background = g.newBackground("colorspectrum.jpg", ImageFormat.RGB565);
         Assets.settings = g.newImage("settings.png",  ImageFormat.RGB565);
         Assets.settings_pressed = g.newImage("settings_pressed.png", ImageFormat.RGB565);
-        
+        Assets.mainMenuBackground = g.newImage("mainpage.png", ImageFormat.RGB565);
+        Assets.mainMenuBackground = g.newScaledImage(Assets.mainMenuBackground, (int) (PussycatMinions.getScreenWidth()));
+        Assets.splash = g.newImage("loadpage.png", ImageFormat.RGB565);
+        Assets.splash = g.newScaledImage(Assets.splash, PussycatMinions.getScreenWidth());
         Assets.countDownImage_1 = g.newImage("countDownImage_1.png", ImageFormat.RGB565);
         Assets.countDownImage_2 = g.newImage("countDownImage_2.png", ImageFormat.RGB565);
         Assets.countDownImage_3 = g.newImage("countDownImage_3.png", ImageFormat.RGB565);
         Assets.countDownImage_GO = g.newImage("countDownImage_GO.png", ImageFormat.RGB565);
-        
         AssetManager assets = AndroidGraphics.getAssets();
         Assets.menu_font = Typeface.createFromAsset(assets, "fonts" + File.separator + "angrybirds-regular.ttf");
 
@@ -66,6 +68,7 @@ public class LoadingScreen extends Screen {
     public void paint(float deltaTime) {
         Graphics graphics = game.getGraphics();
         Canvas canvas = graphics.getCanvas();
+        graphics.drawImage(Assets.splash, 0, 0);
         loadingbar.draw(graphics);
     }
 
