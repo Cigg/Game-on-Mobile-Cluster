@@ -194,15 +194,16 @@ public class GameScreenPlayer extends Screen {
     	// Thread.currentThread().setPriority(Thread.MAX_PRIORITY);
     	
     	if(SharedVariables.getInstance().shouldStartGame()) {
+    		SharedVariables.getInstance().setInternalState(GLOBAL_STATE__.REG);
+    		
     		SharedVariables.getInstance().setStartGame(false);
-    		SharedVariables.getInstance().setIsRunning(true);
     		
         	ballsWidget = new BallsWidget();
     		pointsWidget = new PointsWidget();
     		timerWidget = new TimerWidget();
     		remapWidget = new RemapWidget();
     		pointsNotificationsWidget = new PointsNotificationWidget(game.getAudio());
-    		countDownWidget = new CountDownWidget();
+    		countDownWidget = new CountDownWidget(timerWidget);
 
     		widgets.add(ballsWidget);
     		widgets.add(pointsWidget);
@@ -212,8 +213,6 @@ public class GameScreenPlayer extends Screen {
     		widgets.add(countDownWidget);
 			
     		syncDevice();    
-			
-    		SharedVariables.getInstance().setInternalState(GLOBAL_STATE__.RUN_DEVICE);
     	}
 
     	ballHandler.updateBalls(deltaTime);

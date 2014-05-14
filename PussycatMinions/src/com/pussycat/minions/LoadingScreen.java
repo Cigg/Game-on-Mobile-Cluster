@@ -33,6 +33,12 @@ public class LoadingScreen extends Screen {
         Assets.background = g.newBackground("colorspectrum.jpg", ImageFormat.RGB565);
         Assets.settings = g.newImage("settings.png",  ImageFormat.RGB565);
         Assets.settings_pressed = g.newImage("settings_pressed.png", ImageFormat.RGB565);
+        
+        Assets.countDownImage_1 = g.newImage("countDownImage_1.png", ImageFormat.RGB565);
+        Assets.countDownImage_2 = g.newImage("countDownImage_2.png", ImageFormat.RGB565);
+        Assets.countDownImage_3 = g.newImage("countDownImage_3.png", ImageFormat.RGB565);
+        Assets.countDownImage_GO = g.newImage("countDownImage_GO.png", ImageFormat.RGB565);
+        
 
         AnimationHandler.getInstance();
         loadingbar = new LoadingBar();

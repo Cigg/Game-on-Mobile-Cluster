@@ -211,8 +211,6 @@ public class ServerCommunication extends Thread {
 			
 			// TODO: FIX ALLL BALL TYPES
 			ballHandler.addBall(new BallRegular(id, parent, x, y, vx, vy));			
-			//SharedVariables.getInstance().setMiddleAngle(middleAngle);
-
 		}
 	}
 

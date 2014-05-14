@@ -2,6 +2,7 @@ package com.pussycat.minions;
 
 
 import java.nio.ByteBuffer;
+import java.util.ArrayList;
 import java.util.List;
 
 import android.content.Context;
@@ -66,7 +67,9 @@ public class GameScreenMiddle extends Screen {
 	private Target middleTarget;
 	private MusicWidget musicWidget;
 	private RemapWidget remapWidget;
-
+	private CountDownWidget countDownWidget;
+	private ArrayList<Widget> widgets = new ArrayList<Widget>();
+	
 	// Constructor
     public GameScreenMiddle(Game game) {
         super(game);
@@ -103,9 +106,6 @@ public class GameScreenMiddle extends Screen {
 		ballHandler = new BallHandler(PussycatMinions.getScreenWidth(), PussycatMinions.getScreenHeight());
 		ServerCommunication serverComm = new ServerCommunication(comm, ballHandler, middleTarget);
 		serverComm.start();
-		
-		musicWidget = new MusicWidget(game.getAudio());
-		remapWidget = new RemapWidget();
 		
 		if(!comm.isRunning()) {
 			try {
@@ -203,11 +203,23 @@ public class GameScreenMiddle extends Screen {
     private void updateRunning(List<TouchEvent> touchEvents, float deltaTime) {   
     	
     	// Thread.currentThread().setPriority(Thread.MAX_PRIORITY);
+    	
+    	for(Widget widget : widgets) {
+    		widget.update();
+    	}
+    	
     	if(SharedVariables.getInstance().shouldStartGame()) {
     		SharedVariables.getInstance().setStartGame(false);
     		SharedVariables.getInstance().setIsRunning(true);
-    		SharedVariables.getInstance().setInternalState(GLOBAL_STATE__.RUN_DEVICE);
-    		musicWidget.play();
+
+    		musicWidget = new MusicWidget(game.getAudio());
+    		remapWidget = new RemapWidget();
+    		countDownWidget = new CountDownWidget(musicWidget);
+    		
+    		widgets.add(remapWidget);
+    		widgets.add(countDownWidget);
+    		
+    		SharedVariables.getInstance().setInternalState(GLOBAL_STATE__.REG);
     	}
     	
     	ballHandler.updateBalls(deltaTime);
@@ -430,7 +442,9 @@ public class GameScreenMiddle extends Screen {
 
         ballHandler.drawBalls(graphics);
         
-        remapWidget.draw(graphics);
+        for(Widget widget : widgets) {
+        	widget.draw(graphics);
+        }
    
         if (state == GameState.Running) {
             drawRunningUI();
