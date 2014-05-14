@@ -37,6 +37,8 @@ public class LoadingScreen extends Screen {
         //Assets.background = g.newBackground("colorspectrum.jpg", ImageFormat.RGB565);
         Assets.settings = g.newImage("settings.png",  ImageFormat.RGB565);
         Assets.settings_pressed = g.newImage("settings_pressed.png", ImageFormat.RGB565);
+        Assets.mainMenuBackground = g.newImage("mainpage.png", ImageFormat.RGB565);
+        Assets.mainMenuBackground = g.newScaledImage(Assets.mainMenuBackground, (int) (PussycatMinions.getScreenWidth()));
         
         AssetManager assets = AndroidGraphics.getAssets();
         Assets.menu_font = Typeface.createFromAsset(assets, "fonts" + File.separator + "angrybirds-regular.ttf");

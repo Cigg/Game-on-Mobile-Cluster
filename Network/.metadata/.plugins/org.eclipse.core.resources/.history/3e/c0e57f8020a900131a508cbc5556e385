@@ -1,0 +1,244 @@
+package com.pussycat.framework.implementation;
+
+import java.io.IOException;
+import java.io.InputStream;
+
+import android.R;
+import android.content.res.AssetManager;
+import android.graphics.Bitmap;
+import android.graphics.Bitmap.Config;
+import android.graphics.BitmapFactory;
+import android.graphics.BitmapFactory.Options;
+import android.graphics.BitmapRegionDecoder;
+import android.graphics.Canvas;
+import android.graphics.Matrix;
+import android.graphics.Paint;
+import android.graphics.Paint.Style;
+import android.graphics.Rect;
+
+import com.pussycat.framework.Graphics;
+import com.pussycat.framework.Image;
+import com.pussycat.minions.PussycatMinions;
+
+public class AndroidGraphics implements Graphics {
+    AssetManager assets;
+    Bitmap frameBuffer;
+    Canvas canvas;
+    Paint paint;
+    Rect srcRect = new Rect();
+    Rect dstRect = new Rect();
+    Bitmap bitmap;
+
+    public AndroidGraphics(AssetManager assets, Bitmap frameBuffer) {
+        this.assets = assets;
+        this.frameBuffer = frameBuffer;
+        this.canvas = new Canvas(frameBuffer);
+        this.paint = new Paint();
+    }
+
+    @Override
+    public Image newImage(String fileName, ImageFormat format) {
+        Config config = null;
+        config = Config.ARGB_8888;
+        Options options = new Options();
+        options.inPreferredConfig = config;        
+        
+        InputStream in = null;
+        Bitmap bitmap = null;
+        try {
+            in = assets.open(fileName);
+            bitmap = BitmapFactory.decodeStream(in, null, options);
+            if (bitmap == null)
+                throw new RuntimeException("Couldn't load bitmap from asset '"
+                        + fileName + "'");
+        } catch (IOException e) {
+            throw new RuntimeException("Couldn't load bitmap from asset '"
+                    + fileName + "'");
+        } finally {
+            if (in != null) {
+                try {
+                    in.close();
+                } catch (IOException e) {
+                }
+            }
+        }
+
+        if (bitmap.getConfig() == Config.RGB_565)
+            format = ImageFormat.RGB565;
+        else if (bitmap.getConfig() == Config.ARGB_4444)
+            format = ImageFormat.ARGB4444;
+        else
+            format = ImageFormat.ARGB8888;
+
+        return new AndroidImage(bitmap, format);
+    }
+    
+    @Override
+    public Image newBackground(String fileName, ImageFormat format) {
+    	
+    	int imageHeight = 4000;
+    	int imageWidth = 5000;
+    	int screenHeight = PussycatMinions.getScreenHeight();
+    	int screenWidth  = PussycatMinions.getScreenWidth();
+    	
+    	int xStart = (int) ((imageHeight - screenHeight)/2);
+        int yStart = (int) ((imageWidth - screenWidth)/2);
+        
+    	Config config = null;
+        config = Config.ARGB_8888;
+        Options options = new Options();
+        options.inPreferredConfig = config;
+        
+    	//Bitmap yourBitmap = Bitmap.createBitmap(fileName, xStart, yStart, screenWidth, screenHeight);		
+       
+                
+        InputStream in = null;
+        Bitmap bitmap = null;
+       // Bitmap bitmapLarge = null;
+        
+        Rect rect = new Rect(yStart, xStart, yStart+screenWidth, xStart+screenHeight+50);
+        
+        int x1 = (int) (rect.left);
+        int y1 = (int) (rect.top);
+        int x2 = (int) (rect.left + rect.width());
+        int y2 = (int) (rect.top + rect.height());
+        
+        float pts[] = new float[4];
+        pts[0] = x1;
+        pts[1] = y1;
+        pts[2] = x2;
+        pts[3] = y2;
+        
+        Matrix M = null;
+       	M.setRotate(45);
+        M.mapPoints(pts);
+        
+        //Rect rectRotated = new Rect((int) pts[0], (int)pts[1],yStart+screenWidth, xStart+screenHeight+50);
+        
+        //Rect rotatedRect = rect*M;
+        try {
+            in = assets.open(fileName);
+            	// bitmap = BitmapFactory.decodeStream(in, null, options);
+				BitmapRegionDecoder decoder = BitmapRegionDecoder.newInstance(in, false);
+				bitmap = decoder.decodeRegion(rect, null);
+	            // bitmapLarge = BitmapFactory.decodeStream(in, null, options);
+				//Bitmap bitmap1 = BitmapFactory.decodeResource(null, );
+				//bitmap = Bitmap.createBitmap(bitmap1, xStart, yStart, screenWidth, screenHeight, M, false);
+            if (bitmap == null)
+                throw new RuntimeException("Couldn't load bitmap from asset '"
+                        + fileName + "'");
+        } catch (IOException e) {
+            throw new RuntimeException("Couldn't load bitmap from asset '"
+                    + fileName + "'");
+        } finally {
+            if (in != null) {
+                try {
+                    in.close();
+                } catch (IOException e) {
+                }
+            }
+        }
+
+        if (bitmap.getConfig() == Config.RGB_565)
+            format = ImageFormat.RGB565;
+        else if (bitmap.getConfig() == Config.ARGB_4444)
+            format = ImageFormat.ARGB4444;
+        else
+            format = ImageFormat.ARGB8888;
+
+        return new AndroidImage(bitmap, format);
+    }
+    
+    @Override
+    public void clearScreen(int color) {
+        canvas.drawRGB((color & 0xff0000) >> 16, (color & 0xff00) >> 8,
+                (color & 0xff));
+    }
+
+
+    @Override
+    public void drawLine(int x, int y, int x2, int y2, int color) {
+        paint.setColor(color);
+        canvas.drawLine(x, y, x2, y2, paint);
+    }
+
+    @Override
+    public void drawRect(int x, int y, int width, int height, int color) {
+        paint.setColor(color);
+        paint.setStyle(Style.FILL);
+        canvas.drawRect(x, y, x + width - 1, y + height - 1, paint);
+    }
+    
+    @Override
+    public void drawARGB(int a, int r, int g, int b) {
+        paint.setStyle(Style.FILL);
+       canvas.drawARGB(a, r, g, b);
+    }
+    
+    @Override
+    public void drawString(String text, int x, int y, Paint paint){
+    	canvas.drawText(text, x, y, paint);
+
+    	
+    }
+    
+
+    public void drawImage(Image Image, int x, int y, int srcX, int srcY,
+            int srcWidth, int srcHeight) {
+        srcRect.left = srcX;
+        srcRect.top = srcY;
+        srcRect.right = srcX + srcWidth;
+        srcRect.bottom = srcY + srcHeight;
+        
+        
+        dstRect.left = x;
+        dstRect.top = y;
+        dstRect.right = x + srcWidth;
+        dstRect.bottom = y + srcHeight;
+
+        canvas.drawBitmap(((AndroidImage) Image).bitmap, srcRect, dstRect,
+                null);
+    }
+    
+    @Override
+    public void drawImage(Image Image, int x, int y) {
+        canvas.drawBitmap(((AndroidImage)Image).bitmap, x, y, null);
+    }
+    
+    public void drawScaledImage(Image Image, int x, int y, int width, int height, int srcX, int srcY, int srcWidth, int srcHeight){
+    	
+   	 	srcRect.left = srcX;
+        srcRect.top = srcY;
+        srcRect.right = srcX + srcWidth;
+        srcRect.bottom = srcY + srcHeight;
+        
+        
+        dstRect.left = x;
+        dstRect.top = y;
+        dstRect.right = x + width;
+        dstRect.bottom = y + height;
+        
+        bitmap = ((AndroidImage) Image).bitmap;
+        
+        /**
+         * Improves resizing quality of bitmaps a lot, but possibly much heavier to calculate
+         */
+        Paint paint = new Paint();
+        paint.setAntiAlias(true);
+        paint.setFilterBitmap(true);
+        paint.setDither(true);
+        
+        canvas.drawBitmap(bitmap, srcRect, dstRect, paint);
+        
+    }
+   
+    @Override
+    public int getWidth() {
+        return frameBuffer.getWidth();
+    }
+
+    @Override
+    public int getHeight() {
+        return frameBuffer.getHeight();
+    }
+}

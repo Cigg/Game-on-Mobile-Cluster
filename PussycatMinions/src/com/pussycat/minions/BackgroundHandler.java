@@ -64,8 +64,8 @@ public class BackgroundHandler {
 				3232,											
 				150.0f,				
 				150.0f,
-				30,
-				30										);	
+				33,
+				33										);	
 	}
 	
 }
