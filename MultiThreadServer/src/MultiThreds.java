@@ -65,7 +65,7 @@ public class MultiThreds {
 	   
 		update = new Thread() {
 		    public void run() {
-		    	
+		    	/*
 		    	boolean allReady = false;
 		    	short nPlayers = 0;
 		    	while(!allReady) {
@@ -73,7 +73,7 @@ public class MultiThreds {
 		    		for(ClientThread thread : threads) {
 						if (thread != null) {
 							nPlayers ++;
-							if(thread.getIsReady() != 1) {
+							if(thread.getIsReady() != 1 && !deviceManager.isMiddle(thread.getIp())) {
 								allReady = false;
 							}
 						}
@@ -88,11 +88,38 @@ public class MultiThreds {
 							e.printStackTrace();
 						}
 		    		}
-
 		    	}
+		    	*/
+		    	
+		    	short nPlayers = 0;
+		    	boolean isStarted = false;
+		    	while(!isStarted) {
+		    		nPlayers = 0;
+		    		for(ClientThread thread : threads) {
+						if (thread != null) {
+							if(thread.getIsReady() == 1) {
+								nPlayers ++;
+								
+								if(deviceManager.isMiddle(thread.getIp())) {
+									isStarted = true;
+									//nPlayers --;
+								}
+							}
+						}
+		    		}
+		    		
+		    		if(!isStarted) {
+			    		try {
+							Thread.currentThread().sleep(100);
+						} catch (InterruptedException e) {
+							e.printStackTrace();
+						}
+		    		}
+	    		}
+		    	
 		    	
 				for(ClientThread thread : threads) {
-					if (thread != null) {
+					if (thread != null && thread.getIsReady() == 1) {
 						ByteBuffer dataBuffer = ByteBuffer.allocate(2*2 + 0*4);
 						dataBuffer.clear();
 	    				short sendState = (short) GLOBAL_STATE__.START_GAME.ordinal();

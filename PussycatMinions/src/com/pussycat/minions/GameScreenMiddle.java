@@ -142,12 +142,12 @@ addDevice();
         
      // Thread.currentThread().setPriority(Thread.MAX_PRIORITY);
      if(SharedVariables.getInstance().shouldStartGame()) {
-     SharedVariables.getInstance().setStartGame(false);
-     SharedVariables.getInstance().setIsRunning(true);
-     SharedVariables.getInstance().setInternalState(GLOBAL_STATE__.RUN_DEVICE);
-     musicWidget.play();
-    
-     state = GameState.Running;
+	     SharedVariables.getInstance().setStartGame(false);
+	     SharedVariables.getInstance().setIsRunning(true);
+	     SharedVariables.getInstance().setInternalState(GLOBAL_STATE__.RUN_DEVICE);
+	     musicWidget.play();
+	    
+	     state = GameState.Running;
      }
     
      ballHandler.updateBalls(deltaTime);
@@ -209,7 +209,7 @@ break;
      SharedVariables.getInstance().setInternalState(GLOBAL_STATE__.REG);
      }
      break;
-
+     
 case REG: {
 Log.d("STATEZ", "MIDDLE MAP_DEVICE");
      }
@@ -217,6 +217,7 @@ Log.d("STATEZ", "MIDDLE MAP_DEVICE");
     
     
 case START_GAME: {
+	
 }
     
 
