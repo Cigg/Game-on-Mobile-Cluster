@@ -133,6 +133,8 @@ public class GameScreenMiddle extends Screen {
 		
 		syncDevice();
 		addDevice();
+		
+		state = GameState.Running;
 
     }
 
@@ -140,6 +142,8 @@ public class GameScreenMiddle extends Screen {
     public void update(float deltaTime) {
         List<TouchEvent> touchEvents = game.getInput().getTouchEvents();
         
+		Log.d("MAPP", "JA");
+		
         if (state == GameState.Running) {
             updateRunning(touchEvents, deltaTime);
         } else if (state == GameState.Ready) {
@@ -198,12 +202,12 @@ public class GameScreenMiddle extends Screen {
   		buffer.putFloat(currentY);										// y2
   		buffer.putFloat(deltaTimeDragged);    							// t
   		buffer.putFloat(currentTime + SharedVariables.getInstance().getSendDelay());	
-
   		comm.sendData(buffer.array());
       }
 
     private void updateRunning(List<TouchEvent> touchEvents, float deltaTime) {   
     	
+
     	// Thread.currentThread().setPriority(Thread.MAX_PRIORITY);
     	
     	for(Widget widget : widgets) {
@@ -252,6 +256,8 @@ public class GameScreenMiddle extends Screen {
     			
     		} else if(event.type == TouchEvent.TOUCH_UP) {
     			
+ 
+      			
     			final float deltaTimeDragged = currentTime - downTime;
 
     			ByteBuffer buffer; 
@@ -259,7 +265,7 @@ public class GameScreenMiddle extends Screen {
     			switch(SharedVariables.getInstance().getInternalState()) {    		
     			
 	    			case MAP_DEVICE:
-					{
+					{  		
 						state = GameState.MappingDone;
 						Log.d("STATEZ", "MIDDLE MAP_DEVICE");
 						mapDevice(deltaTimeDragged, currentTime);
