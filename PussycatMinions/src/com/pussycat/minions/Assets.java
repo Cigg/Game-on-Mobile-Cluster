@@ -14,6 +14,7 @@ public class Assets {
     public static Image button_pressed;
     public static Image background;
     public static Image mainMenuBackground;
+    public static Image splash;
     public static Sound click;
 	public static Image localBall;
 	public static Image settings;
