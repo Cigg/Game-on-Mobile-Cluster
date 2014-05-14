@@ -18,6 +18,7 @@ import com.pussycat.framework.Graphics;
 
 import com.pussycat.framework.Input.TouchEvent;
 import com.pussycat.framework.Screen;
+import com.pussycat.minions.GameScreenMiddle.GameState;
 
 
 public class GameScreenPlayer extends Screen {
@@ -210,10 +211,11 @@ public class GameScreenPlayer extends Screen {
     					mapDevice(deltaTimeDragged, currentTime);
     					SharedVariables.getInstance().setIsRemapping(false);
     					if(SharedVariables.getInstance().isRunning()) {
+    						state = GameState.Running;
 							SharedVariables.getInstance().setInternalState(GLOBAL_STATE__.RUN_DEVICE);
-						} /*else {
+						} else {
 							SharedVariables.getInstance().setInternalState(GLOBAL_STATE__.IS_READY);
-						}*/
+						}
     				}
     				break;
     				

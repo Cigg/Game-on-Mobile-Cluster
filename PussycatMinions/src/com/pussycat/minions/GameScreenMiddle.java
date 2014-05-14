@@ -2,6 +2,7 @@ package com.pussycat.minions;
 
 
 import java.nio.ByteBuffer;
+import java.util.ArrayList;
 import java.util.List;
 
 import android.content.Context;
@@ -67,6 +68,8 @@ private BallHandler ballHandler;
 private Target middleTarget;
 private MusicWidget musicWidget;
 private RemapWidget remapWidget;
+private CountDownWidget countDownWidget;
+private ArrayList<Widget> widgets = new ArrayList<Widget>();
 
 // Constructor
     public GameScreenMiddle(Game game) {
@@ -156,14 +159,25 @@ addDevice();
     	 setIsReady();
      }
      
+     for(Widget widget : widgets) {
+ 		widget.update();
+ 	}
+
+     
      if(SharedVariables.getInstance().shouldStartGame()) {
-	     SharedVariables.getInstance().setStartGame(false);
-	     SharedVariables.getInstance().setIsRunning(true);
-	     SharedVariables.getInstance().setInternalState(GLOBAL_STATE__.RUN_DEVICE);
-	     musicWidget.play();
-	    
-	     state = GameState.Running;
-     }
+ 		SharedVariables.getInstance().setStartGame(false);
+ 		SharedVariables.getInstance().setIsRunning(true);
+
+ 		musicWidget = new MusicWidget(game.getAudio());
+ 		remapWidget = new RemapWidget();
+ 		countDownWidget = new CountDownWidget(musicWidget);
+ 		
+ 		widgets.add(remapWidget);
+ 		widgets.add(countDownWidget);
+ 		
+ 		SharedVariables.getInstance().setInternalState(GLOBAL_STATE__.REG);
+ 		state = GameState.Running;
+ 	}
     
      ballHandler.updateBalls(deltaTime);
      ballHandler.removeBallsNotWanted();
@@ -205,10 +219,11 @@ case MAP_DEVICE:
 	Log.d("STATEZ", "MIDDLE MAP_DEVICE");
 	mapDevice(deltaTimeDragged, currentTime);
 	if(SharedVariables.getInstance().isRunning()) {
+		state = GameState.Running;
 		SharedVariables.getInstance().setInternalState(GLOBAL_STATE__.RUN_DEVICE);
-	} /*else {
+	} else {
 		SharedVariables.getInstance().setInternalState(GLOBAL_STATE__.IS_READY);
-	}*/
+	}
 }
 break;
 
@@ -426,13 +441,15 @@ state = GameState.Running;
         Graphics graphics = game.getGraphics();
         Canvas canvas = graphics.getCanvas();
         
-     device.drawBackground(graphics);
+        device.drawBackground(graphics);
         
-     middleTarget.drawTarget(graphics);
+    	middleTarget.drawTarget(graphics);
 
         ballHandler.drawBalls(graphics);
         
-        remapWidget.draw(graphics);
+        for(Widget widget : widgets) {
+        	widget.draw(graphics);
+        }
    
         drawUI();
         

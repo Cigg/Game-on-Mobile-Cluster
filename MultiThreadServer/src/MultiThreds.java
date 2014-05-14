@@ -108,6 +108,10 @@ public class MultiThreds {
 						}
 		    		}
 		    		
+		    		if(nPlayers <= 1) {
+		    			isStarted = false;
+		    		}
+		    		
 		    		if(!isStarted) {
 			    		try {
 							Thread.currentThread().sleep(100);
