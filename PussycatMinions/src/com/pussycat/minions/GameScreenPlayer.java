@@ -140,6 +140,8 @@ public class GameScreenPlayer extends Screen {
     		widgets.add(countDownWidget);
 			
     		syncDevice();    
+    		
+    		state = GameState.Running;
     	}
 
     	ballHandler.updateBalls(deltaTime);

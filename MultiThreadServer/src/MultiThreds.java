@@ -66,8 +66,6 @@ public class MultiThreds {
 		update = new Thread() {
 		    public void run() {
 		    	
-		    	
-				
 		    	boolean allReady = false;
 		    	short nPlayers = 0;
 		    	while(!allReady) {
