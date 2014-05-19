@@ -30,6 +30,8 @@ public class GameScreenPlayer extends Screen {
     private GameState state = GameState.Mapping; //We don't need to start at GameState.Ready now. Changed to Running instead.
 
     private Paint paint;
+    private Paint paint2;
+    
     Context context;
     
     Button readyButton;
@@ -82,7 +84,9 @@ public class GameScreenPlayer extends Screen {
 		serverComm.start();
 		
 		
+		paint2 = new Paint();
 		paint = new Paint();
+		
 		paint.setTextSize(40);
 		paint.setTextAlign(Paint.Align.CENTER);
 		paint.setAntiAlias(true);
@@ -472,7 +476,7 @@ public class GameScreenPlayer extends Screen {
         boolean tail = true;
         if( dragged && tail) {
 
-  			paint.setColor(Color.YELLOW);
+  			paint2.setColor(Color.YELLOW);
                
         	int jump = 4;
         	for(int i = beginIndex ; i<index ; i += jump) {
@@ -517,9 +521,9 @@ public class GameScreenPlayer extends Screen {
 	            	    iv = Math.max(iv, 1);
 	            	    iv = Math.max(PussycatMinions.meters2Pixels( 0.05f / 100.0f ), PussycatMinions.meters2Pixels(25 / (iv*20000.0f)));
 	            	    
-	            	    paint.setStrokeWidth( iv ) ;
+	            	    paint2.setStrokeWidth( iv ) ;
 	      
-	            	    bitmapCanvas.drawPoint(ix, iy, paint);
+	            	    bitmapCanvas.drawPoint(ix, iy, paint2);
 	  	            	    
 	        		}
 	        		
@@ -562,7 +566,6 @@ public class GameScreenPlayer extends Screen {
     	
     	
     	if( drawTraceAfter ) {
-
     		//lastAlpha = Math.max(0, lastAlpha - (int)(0.5 * deltaTime * Math.pow(10, -6)));
         	//Log.d("NANO", "System.nanoTime() - tms[index] = " + (System.nanoTime() - tms[index]));
         	
@@ -574,12 +577,11 @@ public class GameScreenPlayer extends Screen {
         	
         	int alpha = Math.max(0, (int) cosineInterpolation(255, 0 , (float) (timeElapsed / seconds )));
         		        	
-        	paint.setAlpha( alpha );
+        	paint2.setAlpha( alpha );
         	
         	if( alpha == 0 ) {
         		drawTraceAfter = false;
         	}
-        	
     	}
     	
     	if (bitmap == null) {
@@ -588,7 +590,7 @@ public class GameScreenPlayer extends Screen {
 		}
     	
 	
-        canvas.drawBitmap(bitmap, 0, 0, paint);
+        canvas.drawBitmap(bitmap, 0, 0, paint2);
         
         int beginIndexBefore = beginIndex;
     	float x1b = x1;
@@ -612,7 +614,7 @@ public class GameScreenPlayer extends Screen {
         	
         	beginIndex = beginIndex - 2 ;
 
-        	paint.setColor(Color.YELLOW);
+        	paint2.setColor(Color.YELLOW);
                
         	int jump = 1;
         	for(int i = beginIndex ; i<index ; i += jump) {
@@ -657,12 +659,12 @@ public class GameScreenPlayer extends Screen {
 	            	   // iv = Math.max(3, 25 / iv);
 	            	    iv = Math.max(PussycatMinions.meters2Pixels( 0.05f / 100.0f ), PussycatMinions.meters2Pixels(25 / (iv*20000.0f)));
 	            	    
-	            	    paint.setStrokeWidth( iv ) ;
-	      
+	            	    paint2.setStrokeWidth( iv ) ;
+	            	    	
 	            	    if(up) {
-	            	    	bitmapCanvas.drawPoint(ix, iy, paint);
+	            	    	bitmapCanvas.drawPoint(ix, iy, paint2);
 	            	    } else {
-	            	    	canvas.drawPoint(ix, iy, paint);
+	            	    	canvas.drawPoint(ix, iy, paint2);
 	            	    }
 	        		}	
 	 
