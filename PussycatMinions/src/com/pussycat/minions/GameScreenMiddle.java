@@ -2,6 +2,7 @@ package com.pussycat.minions;
 
 
 import java.nio.ByteBuffer;
+import java.util.ArrayList;
 import java.util.List;
 
 import android.content.Context;
@@ -68,6 +69,8 @@ private BallHandler ballHandler;
 private Target middleTarget;
 private MusicWidget musicWidget;
 private RemapWidget remapWidget;
+private CountDownWidget countDownWidget;
+private ArrayList<Widget> widgets = new ArrayList<Widget>();
 
 // Constructor
     public GameScreenMiddle(Game game) {
@@ -139,10 +142,28 @@ addDevice();
 
     }
 
+    public void setIsReady() {
+    	 ByteBuffer buffer;
+ 	     buffer = ByteBuffer.allocate(1*2 + 1*4);
+ 	     buffer.putShort((short) GLOBAL_STATE__.IS_READY.ordinal());	// State: IS_READY
+ 	     buffer.putInt(1);
+ 	     comm.sendData(buffer.array());
+ 	    
+ 	     SharedVariables.getInstance().setInternalState(GLOBAL_STATE__.REG);
+    	 state = GameState.Ready;
+    }
+    
+    
     @Override
     public void update(float deltaTime) {
         List<TouchEvent> touchEvents = game.getInput().getTouchEvents();
-   	     if (state == GameState.Ready)
+
+       
+     if(SharedVariables.getInstance().getInternalState() == GLOBAL_STATE__.IS_READY) {
+    	 setIsReady();
+     }
+     
+   	     if (state != GameState.Running)
    	    	 updateReady(touchEvents);
    	    
      // Thread.currentThread().setPriority(Thread.MAX_PRIORITY);
@@ -154,6 +175,26 @@ addDevice();
      
      state = GameState.Running;
      }
+     
+     for(Widget widget : widgets) {
+ 		widget.update();
+ 	}
+
+     
+     if(SharedVariables.getInstance().shouldStartGame()) {
+ 		SharedVariables.getInstance().setStartGame(false);
+ 		SharedVariables.getInstance().setIsRunning(true);
+
+ 		musicWidget = new MusicWidget(game.getAudio());
+ 		remapWidget = new RemapWidget();
+ 		countDownWidget = new CountDownWidget(musicWidget);
+ 		
+ 		widgets.add(remapWidget);
+ 		widgets.add(countDownWidget);
+ 		
+ 		SharedVariables.getInstance().setInternalState(GLOBAL_STATE__.REG);
+ 		state = GameState.Running;
+ 	}
     
      ballHandler.updateBalls(deltaTime);
      ballHandler.removeBallsNotWanted();
@@ -195,26 +236,20 @@ case MAP_DEVICE:
 	Log.d("STATEZ", "MIDDLE MAP_DEVICE");
 	mapDevice(deltaTimeDragged, currentTime);
 	if(SharedVariables.getInstance().isRunning()) {
+		state = GameState.Running;
 		SharedVariables.getInstance().setInternalState(GLOBAL_STATE__.RUN_DEVICE);
-	} else {
+	} /*else {
 		SharedVariables.getInstance().setInternalState(GLOBAL_STATE__.IS_READY);
-	}
+	}*/
 }
 break;
 
      case IS_READY:
      {
-     state = GameState.Ready;
-     Log.d("STATEZ", "MIDDLE IS_READY");
-     buffer = ByteBuffer.allocate(1*2 + 1*4);
-     buffer.putShort((short) GLOBAL_STATE__.IS_READY.ordinal());	// State: IS_READY
-     buffer.putInt(1);
-     comm.sendData(buffer.array());
-    
-     SharedVariables.getInstance().setInternalState(GLOBAL_STATE__.REG);
+
      }
      break;
-
+     
 case REG: {
 Log.d("STATEZ", "MIDDLE MAP_DEVICE");
      }
@@ -222,6 +257,7 @@ Log.d("STATEZ", "MIDDLE MAP_DEVICE");
     
     
 case START_GAME: {
+	
 }
     
 
@@ -422,13 +458,15 @@ state = GameState.Running;
         Graphics graphics = game.getGraphics();
         Canvas canvas = graphics.getCanvas();
         
-     device.drawBackground(graphics);
+        device.drawBackground(graphics);
         
-     middleTarget.drawTarget(graphics);
+    	middleTarget.drawTarget(graphics);
 
         ballHandler.drawBalls(graphics);
         
-        remapWidget.draw(graphics);
+        for(Widget widget : widgets) {
+        	widget.draw(graphics);
+        }
    
         drawUI();
         
@@ -445,10 +483,12 @@ Graphics g = game.getGraphics();
      if (state == GameState.Mapping) {
 	     Log.d("UI STATEZ", "Mapping");
 	     g.drawARGB(155, 0, 0, 0);
+         startButton.drawButton(g);
 	     g.drawString("Mapping! Drag from this device...", textX, textY, paint);
      } else if (state == GameState.MappingDone) {
 	     Log.d("UI STATEZ", "MappingDone");
 	     g.drawARGB(155, 0, 0, 0);
+	     startButton.drawButton(g);
 	     g.drawString("Tap when you are ready", textX, textY, paint);
      } else if (state == GameState.Ready) {
          Log.d("UI STATEZ", "Ready! Waiting...");
@@ -487,7 +527,7 @@ Graphics g = game.getGraphics();
 			//TODO: Should go to SetupScreen instead
 			if(startButton.inBounds(event.x, event.y)){
 				//game.setScreen(new GameScreenPlayer(game));
-				//state = GameState.Running;
+ 				SharedVariables.getInstance().setInternalState(GLOBAL_STATE__.IS_READY);
 			
 			}
 		}

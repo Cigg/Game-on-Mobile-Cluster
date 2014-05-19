@@ -73,16 +73,10 @@ public class GameScreenPlayer extends Screen {
     public GameScreenPlayer(Game game) {
         super(game);
         
-        paint = new Paint();
-        paint.setTextSize(40);
-        paint.setTextAlign(Paint.Align.CENTER);
-        paint.setAntiAlias(true);
-        paint.setColor(Color.WHITE);
 
 		comm = new TCPClient();
 		comm.start();
-		readyButton = new Button(Assets.button, Assets.button_pressed, PussycatMinions.getScreenWidth(), PussycatMinions.getScreenHeight()/2-100, paint);
-        readyButton.setText("READY");
+
 		ballHandler = new BallHandler(PussycatMinions.getScreenWidth(), PussycatMinions.getScreenHeight());
 		ServerCommunication serverComm = new ServerCommunication(comm, ballHandler, null);
 		serverComm.start();
@@ -94,12 +88,13 @@ public class GameScreenPlayer extends Screen {
 		paint.setAntiAlias(true);
 		paint.setColor(Color.WHITE);
 
+		readyButton = new Button(Assets.button, Assets.button_pressed, PussycatMinions.getScreenWidth(), PussycatMinions.getScreenHeight()/2-100, paint);
+        readyButton.setText("READY");
 		
 		previousTime = 0;		
 		SharedVariables.getInstance().setInternalState(GLOBAL_STATE__.MAP_DEVICE);		
 
-		
-
+	
 		if(!comm.isRunning()) {
 			try {
 				synchronized(comm) {
@@ -125,14 +120,30 @@ public class GameScreenPlayer extends Screen {
 		syncDevice();
 		addDevice();
     }
+    
+    public void setIsReady() {
+		ByteBuffer buffer;
+		buffer = ByteBuffer.allocate(1*2 + 1*4);
+		buffer.putShort((short) GLOBAL_STATE__.IS_READY.ordinal());	// State: IS_READY
+		buffer.putInt(1);
+		comm.sendData(buffer.array());
+		
+		SharedVariables.getInstance().setInternalState(GLOBAL_STATE__.REG);
+		state = GameState.Ready;
+    }
 
     @Override
     public void update(float deltaTime) {
         List<TouchEvent> touchEvents = game.getInput().getTouchEvents();
     	
-        if(state == GameState.Ready) {
+        if(SharedVariables.getInstance().getInternalState() == GLOBAL_STATE__.IS_READY) {
+       	 	setIsReady();
+        }
+        
+        if(state != GameState.Running) {
         	updateReady(touchEvents);
         }
+
     	if(SharedVariables.getInstance().shouldStartGame()) {
     		SharedVariables.getInstance().setInternalState(GLOBAL_STATE__.REG);
     		
@@ -208,23 +219,16 @@ public class GameScreenPlayer extends Screen {
     					mapDevice(deltaTimeDragged, currentTime);
     					SharedVariables.getInstance().setIsRemapping(false);
     					if(SharedVariables.getInstance().isRunning()) {
+    						state = GameState.Running;
 							SharedVariables.getInstance().setInternalState(GLOBAL_STATE__.RUN_DEVICE);
 						} else {
-							SharedVariables.getInstance().setInternalState(GLOBAL_STATE__.IS_READY);
-						}
+    					SharedVariables.getInstance().setInternalState(GLOBAL_STATE__.IS_READY);
+    					}
     				}
     				break;
     				
     				case IS_READY:
     				{
-    					state = GameState.Ready;
-    					Log.d("STATEZ", "PLAYER IS_READY");
-    					buffer = ByteBuffer.allocate(1*2 + 1*4);
-    					buffer.putShort((short) GLOBAL_STATE__.IS_READY.ordinal());	// State: IS_READY
-    					buffer.putInt(1);
-    					comm.sendData(buffer.array());
-    					
-    					SharedVariables.getInstance().setInternalState(GLOBAL_STATE__.REG);
     				}
     				break;
 
@@ -769,15 +773,17 @@ public class GameScreenPlayer extends Screen {
 //    		g.drawImage(Assets.ball, imageX, imageY);
 //    		g.drawString("Klicka om du vill mappa om din enhet", textX, textY, paint);
 //    	}
-    	
+    	readyButton.drawButton(g); // TODO DEL
     	//Mapping, MappingDone, Ready, Running, 
     	if (state == GameState.Mapping) {
     		Log.d("UI STATEZ", "Mapping");
     		g.drawARGB(155, 0, 0, 0);
+    		readyButton.drawButton(g);
     		g.drawString("...to this device", textX, textY, paint);
     	} else if (state == GameState.MappingDone) {
     		Log.d("UI STATEZ", "MappingDone");
     		g.drawARGB(155, 0, 0, 0);
+    		readyButton.drawButton(g);
     		g.drawString("Tap when you are ready", textX, textY, paint);
     	} else if (state == GameState.Ready) {
     		Log.d("UI STATEZ", "Ready! Waiting...");
@@ -841,7 +847,7 @@ public class GameScreenPlayer extends Screen {
    			//TODO: Should go to SetupScreen instead
    			if(readyButton.inBounds(event.x, event.y)){
    				//game.setScreen(new GameScreenPlayer(game));
-   				state = GameState.Running;
+   				SharedVariables.getInstance().setInternalState(GLOBAL_STATE__.IS_READY);
    			
    			}
    		}
