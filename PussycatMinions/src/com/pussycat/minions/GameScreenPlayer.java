@@ -44,6 +44,9 @@ public class GameScreenPlayer extends Screen {
 	
 	private float downTime, previousTime;
 	
+	private float freezeStart;
+	private final float FREEZE_DURATION = (float) (0.1 * Math.pow(10, 9));
+	
 	float[] pts = new float[2048];
 	float[] tms = new float[1024];
 	float[] vel = new float[1024];
@@ -54,7 +57,6 @@ public class GameScreenPlayer extends Screen {
 	boolean up = false;
 	public Bitmap bitmap = null;
 	public Canvas bitmapCanvas = null;	  
-
 	public boolean drawTraceAfter = false;
 
 	
@@ -135,6 +137,10 @@ public class GameScreenPlayer extends Screen {
 		SharedVariables.getInstance().setInternalState(GLOBAL_STATE__.REG);
 		state = GameState.Ready;
     }
+    
+    public boolean isFrozen() {
+    	return (freezeStart + FREEZE_DURATION - System.nanoTime()) > 0; 
+    }
 
     @Override
     public void update(float deltaTime) {
@@ -192,9 +198,10 @@ public class GameScreenPlayer extends Screen {
     		currentY = event.y;
     		final float currentTime = event.time;
     		
-    	
+    		if( !isFrozen() ) {
     		  if(event.pointer >= 2) {
      			remapDevice();
+     			freezeStart = System.nanoTime();
     		  } else if(event.type == TouchEvent.TOUCH_DRAGGED) {
     			draggedX = currentX;
     			draggedY = currentY;  	
@@ -306,6 +313,8 @@ public class GameScreenPlayer extends Screen {
 				index = 0;
     			beginIndex = 1;
     			drawTraceAfter = false;
+    		}
+    		  
     		}
     		
         }  
