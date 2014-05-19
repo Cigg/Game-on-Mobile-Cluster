@@ -135,7 +135,7 @@ public class GameScreenPlayer extends Screen {
 		comm.sendData(buffer.array());
 		
 		SharedVariables.getInstance().setInternalState(GLOBAL_STATE__.REG);
-		state = GameState.Ready;
+		//state = GameState.Ready;
     }
     
     public boolean isFrozen() {
@@ -146,9 +146,11 @@ public class GameScreenPlayer extends Screen {
     public void update(float deltaTime) {
         List<TouchEvent> touchEvents = game.getInput().getTouchEvents();
     	
+        /*
         if(SharedVariables.getInstance().getInternalState() == GLOBAL_STATE__.IS_READY) {
        	 	setIsReady();
         }
+        */
         
         if(state != GameState.Running) {
         	updateReady(touchEvents);
@@ -156,16 +158,16 @@ public class GameScreenPlayer extends Screen {
 
     	if(SharedVariables.getInstance().shouldStartGame()) {
     		SharedVariables.getInstance().setInternalState(GLOBAL_STATE__.REG);
+    		SharedVariables.getInstance().setIsRemapping(false);
     		
     		SharedVariables.getInstance().setStartGame(false);
-    		
         	ballsWidget = new BallsWidget();
     		pointsWidget = new PointsWidget();
     		timerWidget = new TimerWidget();
     		remapWidget = new RemapWidget();
     		pointsNotificationsWidget = new PointsNotificationWidget(game.getAudio());
     		countDownWidget = new CountDownWidget(timerWidget);
-
+    		
     		widgets.add(ballsWidget);
     		widgets.add(pointsWidget);
     		widgets.add(timerWidget);
@@ -225,7 +227,7 @@ public class GameScreenPlayer extends Screen {
 
     				case MAP_DEVICE:
     				{
-    					state = GameState.MappingDone;
+    				//	state = GameState.MappingDone;
     					Log.d("STATEZ", "PLAYER MAP_DEVICE");
     					mapDevice(deltaTimeDragged, currentTime);
     					SharedVariables.getInstance().setIsRemapping(false);
@@ -233,8 +235,10 @@ public class GameScreenPlayer extends Screen {
     						state = GameState.Running;
 							SharedVariables.getInstance().setInternalState(GLOBAL_STATE__.RUN_DEVICE);
 						} else {
-    					SharedVariables.getInstance().setInternalState(GLOBAL_STATE__.IS_READY);
-    					}
+							setIsReady();
+							remapDevice();
+							//SharedVariables.getInstance().setInternalState(GLOBAL_STATE__.IS_READY);
+    					} 
     				}
     				break;
     				
