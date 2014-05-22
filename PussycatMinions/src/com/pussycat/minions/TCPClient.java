@@ -3,17 +3,38 @@ package com.pussycat.minions;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.net.DatagramPacket;
+import java.net.DatagramSocket;
 import java.net.InetAddress;
+import java.net.InetSocketAddress;
 import java.net.Socket;
+import java.net.SocketAddress;
+import java.net.SocketException;
+import java.nio.ByteBuffer;
+import java.util.ArrayList;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 import java.util.concurrent.atomic.AtomicBoolean;
 
+import com.pussycat.minions.Device.IndexPair;
+
+import android.graphics.Bitmap;
 import android.util.Log;
 
 public class TCPClient extends Thread {
 	
-	private final String SERVER_IP = "192.168.43.57";
-	private final int SERVER_PORT = 4444;
+
+	//private final String SERVER_IP = "192.168.43.122";
+	private String SERVER_IP;
+	
+	//private final static int SERVER_PORT = 4444;
+	private int SERVER_PORT;
+
 	private final int NUMBER_OF_INCOMING_MESSAGES = 32; 
+	final static int TIME_OUT = 200;
 	
 	private AtomicBoolean isRunning = new AtomicBoolean(false);
 	private OutputStream outputStream;
@@ -24,9 +45,45 @@ public class TCPClient extends Thread {
 	
 	
 	public TCPClient() {
-
+		Server server = SharedVariables.getInstance().getServer();
+		SERVER_IP = server.ip;
+		SERVER_PORT = server.port;
 	}
 	
+	
+	public static class Executor implements Runnable {
+
+		final int begin;
+		final int end;
+		
+		public Executor(final int begin, final int end) {
+			//Log.d("BROAD", "BEG = " + begin + ", END = " + end);
+			this.begin = begin;
+			this.end = end;
+		}
+		
+		public void run() {
+
+			for(int i=begin; i<end; i++) {
+				for(int j=0; j<256; j++) {
+					Log.d("BROAD", "loop: " + i + "." + j);
+					try{
+						String ip = "192.168".concat("." + i + "." + j);
+						Socket trySocket = new Socket();
+						trySocket.connect(new InetSocketAddress(ip, 4444), 10);
+						if (trySocket.isConnected()) {
+							Log.d("BROAD", "Found: " + ip);
+						//	SERVER_IP = ip;
+							return;	
+						}
+						trySocket.close();
+					} catch (Exception e) {
+					} 
+				}
+			}
+			
+		}
+	}
 	
 	public boolean isRunning() {
 		return isRunning.get();

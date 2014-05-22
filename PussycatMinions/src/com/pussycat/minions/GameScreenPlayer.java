@@ -75,9 +75,10 @@ public class GameScreenPlayer extends Screen {
 
 	
     public GameScreenPlayer(Game game) {
-        super(game);
+        super(game);        
         
-
+        Log.d("BROWSE", "AT GAMESCREEN");
+        
 		comm = new TCPClient();
 		comm.start();
 
@@ -349,6 +350,8 @@ public class GameScreenPlayer extends Screen {
     }
     
     private void mapDevice(final float deltaTimeDragged, final float currentTime) {
+    	ballHandler.removeAllBalls();
+    	
     	ByteBuffer buffer;
 		buffer = ByteBuffer.allocate(1*2 + 6*4);
 		buffer.clear();
@@ -364,7 +367,7 @@ public class GameScreenPlayer extends Screen {
 		comm.sendData(buffer.array());
     }
     
-    private void remapDevice() {
+    private void remapDevice() {    	
 		ByteBuffer buffer = ByteBuffer.allocate(2*2);
 		
 		buffer.putShort((short) GLOBAL_STATE__.SET_STATE.ordinal());	// State: SET_STATE

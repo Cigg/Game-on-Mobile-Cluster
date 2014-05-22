@@ -1,5 +1,6 @@
 package com.pussycat.minions;
 
+import java.util.ArrayList;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -49,6 +50,8 @@ public class SharedVariables {
 	private AtomicBoolean startGame;
 	private AtomicInteger numberOfPlayers;
 	
+	private ArrayList<Server> servers = new ArrayList<Server>();
+	private Server server = null;
 	
 	// Singleton design pattern
 	public static SharedVariables getInstance() {
@@ -132,6 +135,39 @@ public class SharedVariables {
 		t.start();
 		*/
 		
+	}
+	
+	
+	public void addServer(final Server server) {
+		synchronized(servers) {
+			Log.d("BROAD", "ADDED SERVER: " + server.name + ", " + server.ip + ", " + server.port);
+			servers.add(server);
+		}
+	}
+	
+	ArrayList<Server> getServers() {
+		synchronized(servers) {
+			return new ArrayList<Server>(servers);
+		}
+	}
+	
+	public void clearServers() {
+		synchronized(servers) {
+			servers.clear();
+		}
+	}
+	
+	public void setServer(final Server server) {
+		synchronized(server) {
+			Log.d("BROWSE", "Set server: " + server.name + ",  " + server.ip);
+			this.server = server;
+		}
+	}
+
+	public Server getServer() {
+		synchronized(server) {
+			return server;
+		}
 	}
 	
 	
