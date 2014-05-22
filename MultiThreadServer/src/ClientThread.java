@@ -6,6 +6,7 @@ import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.net.Socket;
 import java.nio.ByteBuffer;
+import java.util.ArrayList;
 import java.util.Hashtable;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -48,8 +49,9 @@ public class ClientThread extends Thread {
 	private static DeviceManager deviceManager;
 	private OutputStream dout;
 
-	static final int MAX_LIFETIME = 15;
+	static final int MAX_LIFETIME = 7;
 	static final float MAX_POSITION_X = (float) (100 / 2.5);
+	
 	static final float MAX_POSITION_Y = MAX_POSITION_X;
 
 	public class Ballz {
@@ -222,8 +224,10 @@ public class ClientThread extends Thread {
 	
 	public ClientThread(String ip, Socket clientSocket, ClientThread[] threads,
 			UpdateLoop updateLoop, DeviceManager deviceManager) {
+
 		this.deviceManager = deviceManager;
 		this.clientSocket = clientSocket;
+		
 		this.threads = threads;
 		this.updateLoop = updateLoop;
 		maxClientCount = threads.length;
@@ -235,6 +239,7 @@ public class ClientThread extends Thread {
 		clientInfo = new ClientInfo(ip);
 		clientInfo.createWindow();
 		
+	
 	}
 
 
@@ -288,19 +293,49 @@ public class ClientThread extends Thread {
 		isRunning = true;
 		int maxClientsCount = this.maxClientCount;
 		thread = this.threads;
-
+		
+		float delta1 = 0;
+		
 		try {
 			dout = clientSocket.getOutputStream();
 			clientSocket.setTcpNoDelay(true);
-
+			
+			/*
+			if(first) {
+	
+				
+				final short sendStatez = (short) GLOBAL_STATE__.HAND_SHAKE.ordinal();
+				String name = "Jockes Server";
+				//final char[] serverName =  name.toCharArray();
+				final char[] serverName = {'J', 'o', 'c', 'k', 'e'};
+				//ByteBuffer bufferz = ByteBuffer.allocate(2*2 + serverName.length*2);
+				ByteBuffer bufferz = ByteBuffer.allocate(24);
+				bufferz.putShort(sendStatez);
+				System.out.println(" serverName.length* = " +  serverName.length);
+				bufferz.putShort((short) serverName.length);
+				
+				for(int i=0; i< serverName.length; i++) {
+					bufferz.putChar(serverName[i]);
+				}
+				sendData(bufferz.array());
+			
+				clientInfo.addSentPackageItem(GLOBAL_STATE__.values()[sendStatez] + "   " + String.valueOf(serverName));
+			}*/
+			
+			
 			while( isRunning ) {
 
 					if (!clientSocket.isClosed()) {
 
 						byte[] headerBuffer = new byte[8];
 						
-						clientSocket.getInputStream().read(headerBuffer);
-
+						try{
+							clientSocket.getInputStream().read(headerBuffer);
+						} catch (Exception e){
+							clientSocket.close();
+							return;
+						}
+						
 						float reciveTime = System.nanoTime();
 
 						ByteBuffer header = ByteBuffer.wrap(headerBuffer);
@@ -339,8 +374,9 @@ public class ClientThread extends Thread {
 								final short sendState = (short) GLOBAL_STATE__.SYNCHRONIZE_DEVICE.ordinal();
 								sendBuffer.putShort(sendState); // State: SYNCHRONZE_DEVICE
 
-								float delta1 = reciveTime - sendTime;
+								delta1 = reciveTime - sendTime;
 								System.out.println("delta1 = " + delta1);
+								System.out.println("delta1_2 = " + delta1 * (float)Math.pow(10, -9));
 								sendBuffer.putFloat(sendTime); // t1
 								sendBuffer.putFloat(reciveTime);
 								
@@ -390,6 +426,7 @@ public class ClientThread extends Thread {
 									System.out.println("MAPPING_STEP2");
 
 									float time2 = System.nanoTime();
+									//float time2 = sendTime + delta1;
 									float deltaTime = time2 - time1;
 
 									float x11 = buffer.getFloat();
@@ -447,11 +484,14 @@ public class ClientThread extends Thread {
 									clientInfo.setPosY(posY * 2.5f);
 									clientInfo.setMidX(g_midX * 2.5f);
 									clientInfo.setMidY(g_midY * 2.5f);
+									
+									ownBallz.clear();
 
 								} else {
 									System.out.println("MAPPING_STEP1");
 
 									time1 = System.nanoTime();
+									//time1 = sendTime + delta1;
 
 									float x1 = buffer.getFloat();
 									float y1 = buffer.getFloat();

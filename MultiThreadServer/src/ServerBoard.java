@@ -8,6 +8,13 @@ import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
+import java.awt.GridLayout;
+import java.awt.CardLayout;
+import java.awt.FlowLayout;
+import java.awt.BorderLayout;
+import javax.swing.JLabel;
+import java.awt.Component;
+import javax.swing.SwingConstants;
 
 public class ServerBoard extends JFrame {
 	private MultiThreds server;
@@ -15,13 +22,20 @@ public class ServerBoard extends JFrame {
 	private JButton btnClearDevices;
 	private JButton btnClearBalls;
 	private JButton btnAddBalls;
-	private JTextField textBug;
-	
+	private JTextField serverName;
+	private JPanel panel_1;
+	private JLabel lblNewLabel;
+	private JLabel lblBug;
+	private JPanel panel_2;
+	private JLabel lblInfo;
+	private JPanel panel_3;
+	private JLabel lblNumberOfSlots;
+	private JTextField nSlots;
+
 	public ServerBoard() {
 		JPanel panel = new JPanel();
 		JPanel panel2 = new JPanel();
 		panel.setLayout(new BoxLayout(panel,BoxLayout.X_AXIS));
-		panel2.setLayout(new BoxLayout(panel2,BoxLayout.X_AXIS));
 		
 		this.setTitle("SERVER");
 		
@@ -30,8 +44,10 @@ public class ServerBoard extends JFrame {
             public void actionPerformed(ActionEvent e) {
             	System.out.println("Server started");
             	btnStart.setEnabled(false);
-               	server = new MultiThreds();
-               	
+            	
+               	server = new MultiThreds(serverName.getText(), nSlots.getText());
+               	serverName.setEditable(false);
+               	nSlots.setEditable(false);
                	
    				server.update.start();
    				server.deviceUpdate.start();
@@ -64,19 +80,49 @@ public class ServerBoard extends JFrame {
 			}
         });
         
-        textBug = new JTextField("Bug: 'Clear balls' före 'Clear devices'");
-        
         btnAddBalls.setEnabled(false);
         
         panel.add(btnStart);
         panel.add(btnClearDevices);
         panel.add(btnClearBalls);
         panel.add(btnAddBalls);
-        panel2.add(textBug);
+        panel2.setLayout(new GridLayout(0, 1, 0, 0));
+        
+        panel_1 = new JPanel();
+        panel2.add(panel_1);
+        panel_1.setLayout(new FlowLayout(FlowLayout.LEFT, 5, 5));
+        
+        lblNewLabel = new JLabel("Server name:");
+        panel_1.add(lblNewLabel);
+        
+        serverName = new JTextField();
+        panel_1.add(serverName);
+        serverName.setColumns(20);
         
         getContentPane().add(panel);
         getContentPane().setLayout(new BoxLayout(getContentPane(),BoxLayout.Y_AXIS));
         getContentPane().add(panel2);
+        
+        panel_3 = new JPanel();
+        panel2.add(panel_3);
+        panel_3.setLayout(new FlowLayout(FlowLayout.LEFT, 5, 5));
+        
+        lblNumberOfSlots = new JLabel("Number of slots:");
+        panel_3.add(lblNumberOfSlots);
+        
+        nSlots = new JTextField();
+        nSlots.setColumns(2);
+        panel_3.add(nSlots);
+        
+        panel_2 = new JPanel();
+        panel2.add(panel_2);
+        panel_2.setLayout(new GridLayout(2, 1, 0, 0));
+        
+        lblInfo = new JLabel(" Info: ");
+        panel_2.add(lblInfo);
+        
+        lblBug = new JLabel(" Bug: 'Clear balls' f\u00F6re 'Clear devices'");
+        panel_2.add(lblBug);
         setSize(400,170);
         setVisible(true);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);

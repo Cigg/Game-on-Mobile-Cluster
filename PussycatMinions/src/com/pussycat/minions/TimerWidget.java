@@ -26,7 +26,7 @@ public class TimerWidget implements Widget {
 	private long totalTime = SECONDS * 1000;
 	
 	private Paint paint;
-	private String text;
+	private String text = "60:00";
 	Rect bounds;
 	
 	public TimerWidget() {
@@ -38,10 +38,9 @@ public class TimerWidget implements Widget {
 		paint.setTypeface(typeface);
 		paint.setTextSize(SIZE);
 		bounds = new Rect();
-		String abc = "60.000";
+		String abc = "60:000";
 		paint.setColor(Color.BLUE);
 		paint.getTextBounds(abc, 0, 3 + DECIMALS, bounds);
-		start();
 	}
 	
 	

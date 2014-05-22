@@ -7,17 +7,22 @@ import com.pussycat.framework.Sound;
 
 public class Assets {
 
-    public static Image ball;
-    // public static Image frog;
-    public static Image octopus;
-    public static Image button;
-    public static Image button_pressed;
-    public static Image background;
-    public static Sound click;
-	public static Image localBall;
-	public static Image settings;
-	public static Image settings_pressed;
-	
-	public static Typeface menu_font;
+    public static volatile Image ball;
+    // public static volatile Image frog;
+    public static volatile Image octopus;
+    public static volatile Image button;
+    public static volatile Image button_pressed;
+    public static volatile Image background;
+    public static volatile Image mainMenuBackground;
+    public static volatile Image splash;
+    public static volatile Sound click;
+	public static volatile Image localBall;
+	public static volatile Image settings;
+	public static volatile Image settings_pressed;
+	public static volatile Image countDownImage_1;
+	public static volatile Image countDownImage_2;
+	public static volatile Image countDownImage_3;
+	public static volatile Image countDownImage_GO;
+	public static volatile Typeface menu_font;
 	
 }

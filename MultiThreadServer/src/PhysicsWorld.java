@@ -128,7 +128,7 @@ private class Vertex {
 		fixtureDef.isSensor = true;
 		
 		CircleShape pivot = new CircleShape();
-		pivot.m_radius = 0.30f;
+		pivot.m_radius = 0.50f;
 		
 		fixtureDef.shape = pivot;
 		
@@ -230,7 +230,7 @@ private class Vertex {
 	public void update(float deltaTime) {
 		// Update Physics World
 		world.step(deltaTime, 8, 3); // vilka v�rden b�r de 2 sista
-									// parametrarna ha?
+									// parametrarna ha? - nu 8 3
 		if (toDestroy.size()>0){
 			System.out.println("Before: " + world.getBodyCount());
 	         for (Body body:toDestroy){
@@ -273,7 +273,7 @@ private class Vertex {
 	private void loadVertices(){
 		JSONParser parser = new JSONParser();
 		try{
-			Object obj = parser.parse(new FileReader("src/octopus_detailed.json"));
+			Object obj = parser.parse(new FileReader("src/Spider.json"));
 			JSONObject jsonObject = (JSONObject) obj;
 			JSONArray jsonArray = (JSONArray) jsonObject.get("rigidBodies");
 			jsonObject = (JSONObject) jsonArray.get(0);

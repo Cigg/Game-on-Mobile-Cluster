@@ -33,19 +33,19 @@ public class MainMenuScreen extends Screen {
 		
 		Graphics g = game.getGraphics();
 		
-		playerButton = new Button(Assets.button, Assets.button_pressed, PussycatMinions.getScreenWidth()/2 - Assets.button.getWidth()/2, (int) (PussycatMinions.getScreenHeight()*0.5f), paint);
+		playerButton = new Button(Assets.button, Assets.button_pressed, PussycatMinions.getScreenWidth()/2 - Assets.button.getWidth()/2, (int) (PussycatMinions.getScreenHeight()*0.58f), paint);
 		playerButton.setText("PLAYER");
-		playerButton.scaleButton(g, (int)(PussycatMinions.getScreenWidth()/2));
+		playerButton.scaleButton(g, (int)(PussycatMinions.getScreenWidth()*0.45));
 		playerButton.setX(PussycatMinions.getScreenWidth()/2 - playerButton.getWidth()/2);
 		playerButton.setTextSize(playerButton.getHeight()/3);
-		middleButton = new Button(Assets.button, Assets.button_pressed, PussycatMinions.getScreenWidth()/2 - Assets.button.getWidth()/2, (int) (PussycatMinions.getScreenHeight()*0.65f), paint);
+		middleButton = new Button(Assets.button, Assets.button_pressed, PussycatMinions.getScreenWidth()/2 - Assets.button.getWidth()/2, (int) (PussycatMinions.getScreenHeight()*0.7f), paint);
 		middleButton.setText("MIDDLE");
-		middleButton.scaleButton(g, (int)(PussycatMinions.getScreenWidth()/2));
+		middleButton.scaleButton(g, (int)(PussycatMinions.getScreenWidth()*0.45));
 		middleButton.setX(PussycatMinions.getScreenWidth()/2 - playerButton.getWidth()/2);
 		middleButton.setTextSize(middleButton.getHeight()/3);
-        aboutButton = new Button(Assets.button, Assets.button_pressed, PussycatMinions.getScreenWidth()/2 - Assets.button.getWidth()/2,  (int) (PussycatMinions.getScreenHeight()*0.8f), paint);
+        aboutButton = new Button(Assets.button, Assets.button_pressed, PussycatMinions.getScreenWidth()/2 - Assets.button.getWidth()/2,  (int) (PussycatMinions.getScreenHeight()*0.82f), paint);
         aboutButton.setText("ABOUT");
-        aboutButton.scaleButton(g, (int)(PussycatMinions.getScreenWidth()/2));
+        aboutButton.scaleButton(g, (int)(PussycatMinions.getScreenWidth()*0.45));
         aboutButton.setX(PussycatMinions.getScreenWidth()/2 - playerButton.getWidth()/2);
         aboutButton.setTextSize(aboutButton.getHeight()/3);
     }
@@ -112,7 +112,8 @@ public class MainMenuScreen extends Screen {
     
     private void drawUI() {
         Graphics g = game.getGraphics();
-        
+        //g.drawScaledImage(Assets.mainMenuBackground, 0, 0, PussycatMinions.getScreenWidth(), PussycatMinions.getScreenHeight(), 0, 0, Assets.mainMenuBackground.getWidth(), Assets.mainMenuBackground.getHeight(), 0);
+        g.drawImage(Assets.mainMenuBackground, 0, 0);
         playerButton.drawButton(g);
         middleButton.drawButton(g);
         aboutButton.drawButton(g);

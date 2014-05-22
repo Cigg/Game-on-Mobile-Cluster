@@ -2,11 +2,19 @@ package src;
 
 import java.io.IOException;
 import java.io.PrintStream;
+import java.net.DatagramPacket;
+import java.net.DatagramSocket;
+import java.net.InetAddress;
+import java.net.MulticastSocket;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.net.SocketException;
+import java.net.UnknownHostException;
 import java.nio.ByteBuffer;
+import java.util.Arrays;
 
 import org.jbox2d.common.Vec2;
+
 
 
 /**
@@ -23,11 +31,13 @@ public class MultiThreds {
 	
 	static PhysicsWorld physicsWorld;
 	
+	private String SERVER_NAME;
+	private int maxClientCount;
+	private static int slotsTaken = 0;
 	
-	private static final int maxClientCount = 10;
-	private static final ClientThread[] threads = new ClientThread[maxClientCount];
-	private static final int[] scores = new int[maxClientCount];
-	private static final UpdateLoop updateLoop = new UpdateLoop(threads, maxClientCount);
+	private ClientThread[] threads;
+	private int[] scores;
+	private UpdateLoop updateLoop;
 	
 	volatile static DeviceManager deviceManager;
 	
@@ -42,8 +52,32 @@ public class MultiThreds {
 			return physicsWorld;
 	}
 	
+	public MultiThreds(final String serverName, final String maxClient) {
+		
+		try{
+			if(serverName.isEmpty()) {
+				SERVER_NAME = "Default Server";
+			} else {
+				SERVER_NAME = serverName;
+			}
+		} catch(Exception e) {
+			SERVER_NAME = "Default Server";
+		}
+		
+		try{
+			maxClientCount = Integer.parseInt(maxClient);
+			if(maxClientCount <= 0) {
+				maxClientCount = 10;
+			}
+		} catch(Exception e) {
+			maxClientCount = 10;
+		}
+
+		threads = new ClientThread[maxClientCount];
+		scores = new int[maxClientCount];
+		updateLoop = new UpdateLoop(threads, maxClientCount);
+		
 	
-	public MultiThreds() {
 		
 		int portNumber = 4444;
 		// Initiate Physics
@@ -65,9 +99,7 @@ public class MultiThreds {
 	   
 		update = new Thread() {
 		    public void run() {
-		    	
-		    	
-				
+		    	/*
 		    	boolean allReady = false;
 		    	short nPlayers = 0;
 		    	while(!allReady) {
@@ -75,7 +107,7 @@ public class MultiThreds {
 		    		for(ClientThread thread : threads) {
 						if (thread != null) {
 							nPlayers ++;
-							if(thread.getIsReady() != 1) {
+							if(thread.getIsReady() != 1 && !deviceManager.isMiddle(thread.getIp())) {
 								allReady = false;
 							}
 						}
@@ -90,11 +122,45 @@ public class MultiThreds {
 							e.printStackTrace();
 						}
 		    		}
-
 		    	}
+		    	*/
+		    	
+		    	short nPlayers = 0;
+		    	boolean isStarted = false;
+		    	
+		    	while(!isStarted) {
+		    		nPlayers = 0;
+		    		for(ClientThread thread : threads) {
+						if (thread != null) {
+							if(thread.getIsReady() == 1) {
+								nPlayers ++;
+								
+								if(deviceManager.isMiddle(thread.getIp())) {
+									isStarted = true;
+									System.out.println("STARTED!!!!!!!!!!!!!!!!!!!!!!!!!!!");
+									//nPlayers --;
+								}
+							}
+						}
+		    		}
+		    		
+		    		if(nPlayers <= 1) {
+		    			isStarted = false;
+		    		}
+		    		
+		    		if(!isStarted) {
+			    		try {
+							Thread.currentThread().sleep(100);
+						} catch (InterruptedException e) {
+							e.printStackTrace();
+						}
+		    		}
+	    		}
+		    	
+		    
 		    	
 				for(ClientThread thread : threads) {
-					if (thread != null) {
+					if (thread != null && thread.getIsReady() == 1) {
 						ByteBuffer dataBuffer = ByteBuffer.allocate(2*2 + 0*4);
 						dataBuffer.clear();
 	    				short sendState = (short) GLOBAL_STATE__.START_GAME.ordinal();
@@ -127,6 +193,7 @@ public class MultiThreds {
 		    				ball.update(timeDelta);
 		    				if(ball.shouldBeRemoved()) {
 		    					ClientThread.ballz.remove(ball);
+		    					physicsWorld.removeBall(ball.id);
 		    				} else if(ball.isDead()) {
 		    					ball.setShouldBeRemoved(true);
 		    				}
@@ -200,9 +267,7 @@ public class MultiThreds {
 			    				}
 	    					}	
 	    				}
-		    			
-		    			
-		    			
+
 		    			
 		    			
 			    		// Send ballz
@@ -359,7 +424,125 @@ public class MultiThreds {
 		};
 		
 		deviceUpdate = new Thread(){ 
+			
+			
 			 public void run() {
+				 
+				 Thread t2 = new Thread(new Runnable() {
+						public void run() {
+							System.out.println("START BROADCAST");
+							
+							final int port = 4444;
+							final String broadcastIp = "237.0.0.1";
+							
+							MulticastSocket socket = null;
+							 
+							try {
+								socket = new MulticastSocket(port);
+							} catch (IOException e) {
+								System.out.println("ERROR CREATING MULTICAST SOCKET");
+								e.printStackTrace();
+							}
+							
+							InetAddress group = null;
+							
+							try {
+								group = InetAddress.getByName(broadcastIp);
+							} catch (UnknownHostException e) {
+								System.out.println("ERROR GETTING IPGROUP");
+								e.printStackTrace();
+							}
+							
+							try {
+								socket.joinGroup(group);
+							} catch (IOException e) {
+								System.out.println("ERROR JOING IPGROUP");
+								e.printStackTrace();
+							}
+
+							
+							boolean isRunning = true;
+							while(isRunning) {
+								System.out.println("LOOP BROADCAST");
+					
+								DatagramPacket packet;
+								
+							    byte[] incomingData = new byte[10];
+							    packet = new DatagramPacket(incomingData, incomingData.length);
+							    
+							    try {
+							    	System.out.println("WAITING");
+									socket.receive(packet);
+									System.out.println("GOT");
+								} catch (IOException e) {
+									System.out.println("ERROR RECIVING PACKET");
+									e.printStackTrace();
+								}
+							    
+							    ByteBuffer buffer = ByteBuffer.wrap(packet.getData());
+							    
+							    final short state = buffer.getShort();
+								GLOBAL_STATE__ actualState;
+
+								try {
+									actualState = GLOBAL_STATE__.values()[state];
+								} catch (Exception e) { 
+									actualState = GLOBAL_STATE__.REG;
+								}
+								
+								boolean ok = false;
+								if(state == GLOBAL_STATE__.HAND_SHAKE.ordinal()) {
+									ok = true;
+									char[] key = {'Y', 'O', 'L', 'O'};
+									for(int i=0; i<key.length; i++) {
+										if(buffer.getChar() != key[i]) {
+											ok = false;
+											break;
+										}
+									}
+								}
+								
+								if(ok) {
+								    String received = new String(packet.getData());
+								    System.out.println("RECEIVED: " + received);
+									
+								    final short sendStatez = (short) GLOBAL_STATE__.HAND_SHAKE.ordinal();
+									final char[] serverName =  SERVER_NAME.toCharArray();
+									ByteBuffer bufferz = ByteBuffer.allocate(1024);
+									bufferz.putShort(sendStatez);
+									bufferz.putShort((short) serverName.length);
+									
+									for(int i=0; i< serverName.length; i++) {
+										bufferz.putChar(serverName[i]);
+									}
+									
+									bufferz.putInt(slotsTaken);
+									bufferz.putInt(maxClientCount);
+					
+									try {
+										socket.send(new DatagramPacket(bufferz.array(), bufferz.array().length, packet.getAddress(), packet.getPort()));
+									} catch (IOException e) {
+										System.out.println("ERROR SENDING DATAGRAM");
+										e.printStackTrace();
+									}				
+								} else {
+									System.out.println("NOT OK!");
+								}
+								
+							}
+							
+							try {
+								socket.leaveGroup(group);
+							} catch (IOException e) {
+								System.out.println("ERROR LEAVING IPGROUP");
+								e.printStackTrace();
+							}
+							socket.close();
+							
+						}
+				 });
+				 t2.start();
+				 
 				while(true) {
 					try {
 						clientSocket = serverSocket.accept();
@@ -371,6 +554,7 @@ public class MultiThreds {
 							int i = 0;
 							for(i=0; i<maxClientCount; i++) {
 								if(threads[i] == null) {
+									slotsTaken++;
 									(threads[i] = new ClientThread(clientSocket.getInetAddress().toString(), clientSocket,threads,updateLoop, deviceManager)).start();
 									break;
 								}
@@ -386,6 +570,8 @@ public class MultiThreds {
 						System.out.println(e);
 					}
 				}
+				
+				//t.join();
 			}
 		};
 	}//End of Main

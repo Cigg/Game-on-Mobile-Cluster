@@ -80,6 +80,10 @@ public class ServerCommunication extends Thread {
 							startGames( incomingData );
 						}
 						
+						case HAND_SHAKE: {
+							shakeHands( incomingData );
+						}
+						
 		    			default:
 		    			break;
 		    			
@@ -106,6 +110,28 @@ public class ServerCommunication extends Thread {
 				this.notifyAll();
 			}
 		}
+	}
+	
+	
+	private void shakeHands(DataPackage incomingData) {
+		ByteBuffer buffer = ByteBuffer.wrap(incomingData.getData());
+		final short state = buffer.getShort();
+		final short nChars = buffer.getShort();
+		char[] name = new char[20];
+		
+		try{
+			for(int c=0; c<nChars; c++) {
+				name[c] = buffer.getChar();
+			}
+		} catch (Exception e) {
+			Log.d("BROAD", "ERROR HANDLING UDP  -   READING CHAR");
+		}
+		
+		String nameStr = String.valueOf(name);
+		
+		Log.d("BROAD", "GOT SERVER: " + nameStr+ ", " + incomingData.getIp() + ", " + incomingData.getPort());
+		
+		//SharedVariables.getInstance().addServer(new Server(nameStr, incomingData.getIp(), incomingData.getPort()));
 	}
 		
 	
@@ -211,8 +237,6 @@ public class ServerCommunication extends Thread {
 			
 			// TODO: FIX ALLL BALL TYPES
 			ballHandler.addBall(new BallRegular(id, parent, x, y, vx, vy));			
-			//SharedVariables.getInstance().setMiddleAngle(middleAngle);
-
 		}
 	}
 
