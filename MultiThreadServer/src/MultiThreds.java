@@ -102,31 +102,6 @@ public class MultiThreds {
 	   
 		update = new Thread() {
 		    public void run() {
-		    	/*
-		    	boolean allReady = false;
-		    	short nPlayers = 0;
-		    	while(!allReady) {
-		    		allReady = true;
-		    		for(ClientThread thread : threads) {
-						if (thread != null) {
-							nPlayers ++;
-							if(thread.getIsReady() != 1 && !deviceManager.isMiddle(thread.getIp())) {
-								allReady = false;
-							}
-						}
-		    		}
-		    		if(nPlayers <= 1 || !allReady) {
-		    			allReady = false;
-		    			nPlayers = 0;
-		    			
-		    			try {
-							Thread.currentThread().sleep(100);
-						} catch (InterruptedException e) {
-							e.printStackTrace();
-						}
-		    		}
-		    	}
-		    	*/
 		    	
 		    	short nPlayers = 0;
 		    	boolean isStarted = false;
@@ -147,9 +122,9 @@ public class MultiThreds {
 						}
 		    		}
 		    		
-		    	/*	if(nPlayers <= 1) {
+		    		if(nPlayers <= 1) { // Ty main-device är fortfarande spelare.
 		    			isStarted = false;
-		    		}*/
+		    		}
 		    		
 		    		if(!isStarted) {
 			    		try {
