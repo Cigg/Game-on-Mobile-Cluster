@@ -26,11 +26,13 @@ import android.util.Log;
 
 public class TCPClient extends Thread {
 	
+
 	//private final String SERVER_IP = "192.168.43.122";
 	private String SERVER_IP;
 	
 	//private final static int SERVER_PORT = 4444;
 	private int SERVER_PORT;
+
 	private final int NUMBER_OF_INCOMING_MESSAGES = 32; 
 	final static int TIME_OUT = 200;
 	

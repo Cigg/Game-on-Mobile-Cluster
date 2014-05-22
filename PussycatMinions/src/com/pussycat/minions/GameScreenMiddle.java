@@ -84,9 +84,9 @@ paint.setColor(Color.WHITE);
 
 int width = PussycatMinions.getScreenWidth()/2 - Assets.button.getWidth()/2;
 
-menuButton = new Button(Assets.settings, Assets.settings_pressed, PussycatMinions.getScreenWidth() - Assets.settings.getWidth() - 30, PussycatMinions.getScreenHeight()-Assets.settings.getHeight() - 30, paint);
+menuButton = new Button(Assets.settings, Assets.settings_pressed, PussycatMinions.getScreenWidth() - Assets.settings.getWidth()/2, PussycatMinions.getScreenHeight()-Assets.settings.getHeight()/2, paint);
         //menuButton.setText("MENU");
-menuButton.scaleButton(game.getGraphics(), (int)(PussycatMinions.getScreenWidth()*0.02));
+menuButton.scaleButton(game.getGraphics(), (int)(PussycatMinions.getScreenWidth()*0.07));
         resumeButton = new Button(Assets.button, Assets.button_pressed, width, PussycatMinions.getScreenHeight()/2-100, paint);
         resumeButton.setText("RESUME");
         restartButton = new Button(Assets.button, Assets.button_pressed, width, PussycatMinions.getScreenHeight()/2, paint);
@@ -496,6 +496,7 @@ Graphics g = game.getGraphics();
          startButton.drawButton(g);
      } else if (state == GameState.Running) {
     	 Log.d("UI STATEZ", "Running");
+    	 menuButton.drawButton(g);
      }
     
     
@@ -535,12 +536,12 @@ Graphics g = game.getGraphics();
  }
 //
 //
-// private void drawRunningUI() {
-// Graphics g = game.getGraphics();
-// //TODO: create button on init. use drawButton here
-//
-// menuButton.drawButton(g);
-// }
+ private void drawRunningUI() {
+ Graphics g = game.getGraphics();
+ //TODO: create button on init. use drawButton here
+
+ menuButton.drawButton(g);
+ }
 //
 //
 // private void drawPausedUI() {
