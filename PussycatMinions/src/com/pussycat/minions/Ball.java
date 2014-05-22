@@ -1,5 +1,7 @@
 package com.pussycat.minions;
 
+import android.graphics.Color;
+
 import com.pussycat.framework.Graphics;
 import com.pussycat.framework.Image;
 
@@ -7,6 +9,7 @@ public abstract class Ball {
 
 	protected int id;
 	protected int parent;
+	protected int type;
 	
 	protected float x;
 	protected float y;
@@ -30,6 +33,9 @@ public abstract class Ball {
 	
 	
 	public void draw(Graphics graphics) {
+		
+		graphics.drawCircle((int)this.x, (int)this.y, (float)(this.radius*0.95), Color.RED);
+		
 	    graphics.drawScaledImage(	this.image, 
 			    				 	(int)this.x - this.radius, 
 			    				 	(int)this.y - this.radius, 

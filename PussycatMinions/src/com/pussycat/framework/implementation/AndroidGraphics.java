@@ -203,6 +203,13 @@ public class AndroidGraphics implements Graphics {
     }
     
     @Override
+    public void drawCircle(int x, int y, float r, int color){
+    	paint.setColor(color);
+    	paint.setStyle(Style.FILL);
+    	canvas.drawCircle(x, y, r, paint);
+    }
+    
+    @Override
     public void drawARGB(int a, int r, int g, int b) {
         paint.setStyle(Style.FILL);
        canvas.drawARGB(a, r, g, b);
