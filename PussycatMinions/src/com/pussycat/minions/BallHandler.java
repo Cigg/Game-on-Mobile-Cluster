@@ -84,6 +84,16 @@ public class BallHandler {
 	}
 	
 	
+	public void removeAllBalls() {
+		Enumeration<Integer> enumKey = balls.keys();
+		while( enumKey.hasMoreElements() ) {
+		    int key = enumKey.nextElement();
+		    Ball ball = balls.get(key);		 
+		    balls.remove(ball.id);
+		}	
+	}
+	
+	
 	public void drawBalls(Graphics graphics) {
 		Enumeration<Integer> enumKey = balls.keys();
 		while( enumKey.hasMoreElements() ) {

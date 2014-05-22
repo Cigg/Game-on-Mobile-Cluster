@@ -79,7 +79,7 @@ public class LoadingBar {
 		 	0.0f	);
 		 */
 		
-		 graphics.getCanvas().drawColor(Color.BLACK);
+		// graphics.getCanvas().drawColor(Color.BLACK);
 		 graphics.drawScaledImage(	
 			Assets.localBall, 
 			xImg + (int)animatedXImg.getValue() - (int)(PussycatMinions.meters2Pixels(0.0075f)) , 
