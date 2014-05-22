@@ -31,7 +31,7 @@ public class LoadingScreen extends Screen {
         Assets.click = game.getAudio().createSound("explosion.ogg");
         Assets.ball = g.newImage("baby.png", ImageFormat.RGB565);
         Assets.localBall = g.newImage("baby.png", ImageFormat.RGB565);
-        Assets.octopus = g.newImage("octopus.png", ImageFormat.RGB565);
+        Assets.octopus = g.newImage("Spider_target.png", ImageFormat.RGB565);
         Assets.button = g.newImage("button.png", ImageFormat.RGB565);
         Assets.button_pressed = g.newImage("button_pressed.png", ImageFormat.RGB565);
         //Assets.background = g.newBackground("colorspectrum.jpg", ImageFormat.RGB565);
