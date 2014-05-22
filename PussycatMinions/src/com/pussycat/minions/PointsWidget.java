@@ -1,5 +1,7 @@
 package com.pussycat.minions;
 
+import java.util.Enumeration;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import android.graphics.Color;
@@ -11,6 +13,19 @@ import com.pussycat.minions.Animation.TYPE;
 
 public class PointsWidget implements Widget {
 	
+	private final int COLORS[] = {
+			Color.rgb((int)(Math.random()*255),(int)(Math.random()*255), (int)(Math.random()*255)),
+			Color.rgb((int)(Math.random()*255),(int)(Math.random()*255), (int)(Math.random()*255)),
+			Color.rgb((int)(Math.random()*255),(int)(Math.random()*255), (int)(Math.random()*255)),
+			Color.rgb((int)(Math.random()*255),(int)(Math.random()*255), (int)(Math.random()*255)),
+			Color.rgb((int)(Math.random()*255),(int)(Math.random()*255), (int)(Math.random()*255)),
+			Color.rgb((int)(Math.random()*255),(int)(Math.random()*255), (int)(Math.random()*255)),
+			Color.rgb((int)(Math.random()*255),(int)(Math.random()*255), (int)(Math.random()*255)),
+			Color.rgb((int)(Math.random()*255),(int)(Math.random()*255), (int)(Math.random()*255)),
+			Color.rgb((int)(Math.random()*255),(int)(Math.random()*255), (int)(Math.random()*255)),
+			Color.rgb((int)(Math.random()*255),(int)(Math.random()*255), (int)(Math.random()*255))
+	};
+	
 	public class Player {
 		private final int id;
 		private int color;
@@ -19,11 +34,11 @@ public class PointsWidget implements Widget {
 		private AnimatedValue begin;
 		private AnimatedValue end;
 		
-		public Player(final int id, final int begin, final int end) {
+		public Player(final int id, final int begin, final int end, final short color) {
 			this.id = id;
 			this.begin = new AnimatedValue(begin);
 			this.end = new AnimatedValue(end);
-			color = Color.rgb((int)(Math.random()*255),(int)(Math.random()*255), (int)(Math.random()*255));
+			this.color = COLORS[color];
 		}
 	}
 	
@@ -55,10 +70,29 @@ public class PointsWidget implements Widget {
 	
 	
 	public void initializePlayers() {
+		
 		for(int i=0; i<nPlayers; i++) {
-			players[i] = new Player(i, i*dist, (i+1)*dist);
+			players[i] = new Player(i, i*dist, (i+1)*dist, (short)(Math.random()*5));
 		}
 		players[nPlayers-1].end.setValue(screenWidth + OFFSET_RIGHT);
+		
+		ConcurrentHashMap<Short, Short> idAndColors = SharedVariables.getInstance().getIdAndColors();
+		Log.d("SOON", "idAndColors.size(): " + idAndColors.size());
+		Log.d("nPlayers", "nPlayers: " + nPlayers);
+		
+		/*
+		Enumeration<Short> enumKey = idAndColors.keys();
+		int i = 0;
+		while( enumKey.hasMoreElements() ) {
+		    short key = enumKey.nextElement();
+		    Short color = idAndColors.get(key);		 
+		    players[i] = new Player(i, i*dist, (i+1)*dist, color);
+		    i++;
+		}
+		players[i].end.setValue(screenWidth + OFFSET_RIGHT);
+		
+		*/
+		
 	}
 	
 

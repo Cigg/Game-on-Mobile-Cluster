@@ -140,6 +140,10 @@ public class ServerCommunication extends Thread {
 		final short state = buffer.getShort();
 		final short nPlayers = buffer.getShort();
 		
+		for(short i=0; i<nPlayers; i++) {
+			SharedVariables.getInstance().setColor(buffer.getShort(), buffer.getShort());
+		}
+				
 		SharedVariables.getInstance().initializePoints(nPlayers);
 		SharedVariables.getInstance().setStartGame(true);
 	}

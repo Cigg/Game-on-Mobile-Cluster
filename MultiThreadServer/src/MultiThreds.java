@@ -48,6 +48,9 @@ public class MultiThreds {
 	public Thread update;
 	public Thread deviceUpdate;
 	
+
+	short[] colors = { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19 };
+
 	public static PhysicsWorld getPhysicsWorld() {
 			return physicsWorld;
 	}
@@ -144,9 +147,9 @@ public class MultiThreds {
 						}
 		    		}
 		    		
-		    		if(nPlayers <= 1) {
+		    	/*	if(nPlayers <= 1) {
 		    			isStarted = false;
-		    		}
+		    		}*/
 		    		
 		    		if(!isStarted) {
 			    		try {
@@ -159,20 +162,25 @@ public class MultiThreds {
 		    	
 		    
 		    	
-				for(ClientThread thread : threads) {
-					if (thread != null && thread.getIsReady() == 1) {
-						ByteBuffer dataBuffer = ByteBuffer.allocate(2*2 + 0*4);
+				for(int t=0; t<maxClientCount; t++) {
+					if (threads[t] != null && threads[t].getIsReady() == 1) {
+						ByteBuffer dataBuffer = ByteBuffer.allocate(2*2 + nPlayers*2 + 0*4 + 2 + 2*nPlayers);
 						dataBuffer.clear();
 	    				short sendState = (short) GLOBAL_STATE__.START_GAME.ordinal();
 						dataBuffer.putShort(sendState);
 						dataBuffer.putShort(nPlayers);	
 						
+						for(int i=0; i<nPlayers; i++) {
+							dataBuffer.putShort((short)threads[t].getId());
+							dataBuffer.putShort(colors[i]);
+						}
+						
 			    		int position = dataBuffer.position();
 			    		byte[] sendBytes = new byte[position];
 						System.arraycopy( dataBuffer.array(), 0, sendBytes, 0, position);
 						
-			    		thread.sendData(sendBytes);
-			    		thread.clientInfo.addSentPackageItem(GLOBAL_STATE__.values()[sendState] + "   " + nPlayers);
+						threads[t].sendData(sendBytes);
+			    		threads[t].clientInfo.addSentPackageItem(GLOBAL_STATE__.values()[sendState] + "   " + nPlayers);
 					}
 				}
 				System.out.println("DONE");
@@ -424,120 +432,136 @@ public class MultiThreds {
 		};
 		
 		deviceUpdate = new Thread(){ 
-			
-			
 			 public void run() {
 				 
 				 Thread t2 = new Thread(new Runnable() {
+					 
+					 class Sender implements Runnable {
+
+						 final DatagramPacket packet;
+						 MulticastSocket socket;
+						 
+						 Sender(MulticastSocket socket, final DatagramPacket packet) {
+							this.packet = packet; 
+							this.socket = socket;
+						 }
+								 
+						public void run() {
+							ByteBuffer buffer = ByteBuffer.wrap(packet.getData());
+						    
+						    final short state = buffer.getShort();
+							GLOBAL_STATE__ actualState;
+
+							try {
+								actualState = GLOBAL_STATE__.values()[state];
+							} catch (Exception e) { 
+								actualState = GLOBAL_STATE__.REG;
+							}
+							
+							boolean ok = false;
+							if(state == GLOBAL_STATE__.HAND_SHAKE.ordinal()) {
+								ok = true;
+								char[] key = {'Y', 'O', 'L', 'O'};
+								for(int i=0; i<key.length; i++) {
+									if(buffer.getChar() != key[i]) {
+										ok = false;
+										break;
+									}
+								}
+							}
+							
+							if(ok) {
+							   // String received = new String(packet.getData());
+							   // System.out.println("RECEIVED: " + received);
+								
+							    final short sendStatez = (short) GLOBAL_STATE__.HAND_SHAKE.ordinal();
+								final char[] serverName =  SERVER_NAME.toCharArray();
+								ByteBuffer bufferz = ByteBuffer.allocate(1024);
+								bufferz.putShort(sendStatez);
+								bufferz.putShort((short) serverName.length);
+								
+								for(int i=0; i< serverName.length; i++) {
+									bufferz.putChar(serverName[i]);
+								}
+								
+								bufferz.putInt(slotsTaken);
+								bufferz.putInt(maxClientCount);
+				
+								try {
+									System.out.println("SEND!");
+									socket.send(new DatagramPacket(bufferz.array(), bufferz.array().length, packet.getAddress(), packet.getPort()));
+								} catch (IOException e) {
+									System.out.println("ERROR SENDING DATAGRAM");
+									e.printStackTrace();
+								}				
+							} else {
+								System.out.println("NOT OK!");
+							}
+							 
+						}
+						 
+					 }
+					 
 						public void run() {
 							System.out.println("START BROADCAST");
 							
 							final int port = 4444;
 							final String broadcastIp = "237.0.0.1";
-							
-							MulticastSocket socket = null;
-							 
+						
 							try {
-								socket = new MulticastSocket(port);
+								MulticastSocket socket = new MulticastSocket(port);
+							
+								InetAddress group = null;
+								
+								try {
+									group = InetAddress.getByName(broadcastIp);
+								} catch (UnknownHostException e) {
+									System.out.println("ERROR GETTING IPGROUP");
+									e.printStackTrace();
+								}
+								
+								try {
+									socket.joinGroup(group);
+								} catch (IOException e) {
+									System.out.println("ERROR JOING IPGROUP");
+									e.printStackTrace();
+								}
+	
+								
+								boolean isRunning = true;
+								while(isRunning) {
+									System.out.println("LOOP BROADCAST");
+						
+									DatagramPacket packet;
+									
+								    byte[] incomingData = new byte[10];
+								    packet = new DatagramPacket(incomingData, incomingData.length);
+								    
+								    try {
+								    	System.out.println("WAITING");
+										socket.receive(packet);
+										System.out.println("GOT");
+									} catch (IOException e) {
+										System.out.println("ERROR RECIVING PACKET");
+										e.printStackTrace();
+									}
+								    Thread sender = new Thread(new Sender(socket, packet));
+								    sender.start();
+									
+								}
+								
+								try {
+									socket.leaveGroup(group);
+								} catch (IOException e) {
+									System.out.println("ERROR LEAVING IPGROUP");
+									e.printStackTrace();
+								}
+								socket.close();
+							
 							} catch (IOException e) {
 								System.out.println("ERROR CREATING MULTICAST SOCKET");
 								e.printStackTrace();
 							}
-							
-							InetAddress group = null;
-							
-							try {
-								group = InetAddress.getByName(broadcastIp);
-							} catch (UnknownHostException e) {
-								System.out.println("ERROR GETTING IPGROUP");
-								e.printStackTrace();
-							}
-							
-							try {
-								socket.joinGroup(group);
-							} catch (IOException e) {
-								System.out.println("ERROR JOING IPGROUP");
-								e.printStackTrace();
-							}
-
-							
-							boolean isRunning = true;
-							while(isRunning) {
-								System.out.println("LOOP BROADCAST");
-					
-								DatagramPacket packet;
-								
-							    byte[] incomingData = new byte[10];
-							    packet = new DatagramPacket(incomingData, incomingData.length);
-							    
-							    try {
-							    	System.out.println("WAITING");
-									socket.receive(packet);
-									System.out.println("GOT");
-								} catch (IOException e) {
-									System.out.println("ERROR RECIVING PACKET");
-									e.printStackTrace();
-								}
-							    
-							    ByteBuffer buffer = ByteBuffer.wrap(packet.getData());
-							    
-							    final short state = buffer.getShort();
-								GLOBAL_STATE__ actualState;
-
-								try {
-									actualState = GLOBAL_STATE__.values()[state];
-								} catch (Exception e) { 
-									actualState = GLOBAL_STATE__.REG;
-								}
-								
-								boolean ok = false;
-								if(state == GLOBAL_STATE__.HAND_SHAKE.ordinal()) {
-									ok = true;
-									char[] key = {'Y', 'O', 'L', 'O'};
-									for(int i=0; i<key.length; i++) {
-										if(buffer.getChar() != key[i]) {
-											ok = false;
-											break;
-										}
-									}
-								}
-								
-								if(ok) {
-								    String received = new String(packet.getData());
-								    System.out.println("RECEIVED: " + received);
-									
-								    final short sendStatez = (short) GLOBAL_STATE__.HAND_SHAKE.ordinal();
-									final char[] serverName =  SERVER_NAME.toCharArray();
-									ByteBuffer bufferz = ByteBuffer.allocate(1024);
-									bufferz.putShort(sendStatez);
-									bufferz.putShort((short) serverName.length);
-									
-									for(int i=0; i< serverName.length; i++) {
-										bufferz.putChar(serverName[i]);
-									}
-									
-									bufferz.putInt(slotsTaken);
-									bufferz.putInt(maxClientCount);
-					
-									try {
-										socket.send(new DatagramPacket(bufferz.array(), bufferz.array().length, packet.getAddress(), packet.getPort()));
-									} catch (IOException e) {
-										System.out.println("ERROR SENDING DATAGRAM");
-										e.printStackTrace();
-									}				
-								} else {
-									System.out.println("NOT OK!");
-								}
-								
-							}
-							
-							try {
-								socket.leaveGroup(group);
-							} catch (IOException e) {
-								System.out.println("ERROR LEAVING IPGROUP");
-								e.printStackTrace();
-							}
-							socket.close();
 							
 						}
 				 });

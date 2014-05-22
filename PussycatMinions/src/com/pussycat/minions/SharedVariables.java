@@ -1,6 +1,7 @@
 package com.pussycat.minions;
 
 import java.util.ArrayList;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -52,7 +53,11 @@ public class SharedVariables {
 	
 	private ArrayList<Server> servers = new ArrayList<Server>();
 	private Server server = null;
+
+	ConcurrentHashMap<Short, Short> idAndColors = new ConcurrentHashMap<Short, Short>();
+	//ConcurrentHashMap<Short, Integer> idAndPoints = new ConcurrentHashMap<Short, Integer>();
 	
+
 	// Singleton design pattern
 	public static SharedVariables getInstance() {
 		if( theOnlyInstance == null ) {
@@ -93,57 +98,33 @@ public class SharedVariables {
 		
 		for(short i=0; i<nPlayers; i++) {
 			points[i] = new AtomicInteger();
-		}
-		
-		/*
-		// TODO: FIX
-		int totalPoints = 0;
-		for(short i=0; i<nPlayers; i++) {
-			points[i] = new AtomicInteger();
-			int pointz = (int)(Math.random() * 100.0f);
-			Log.d("POINTS", "POINTS: " + pointz);
-			setPoints(i, pointz);
-			totalPoints += pointz;
-		}
-		setTotalPoints(totalPoints);
-		setPointsIsUpdated(true);
-		Log.d("POINTS", "totalPoints: " + totalPoints);
-		
-		Thread t = new Thread(new Runnable() {
-			public void run() {
-				while(true) {
-					AtomicInteger[] points = SharedVariables.getInstance().getPoints();
-					AtomicInteger totalPoints = SharedVariables.getInstance().getTotalPoints();
-					
-					int totalPointsInt = 0;
-					for(short i=0; i<SharedVariables.getInstance().getPoints().length; i++) {
-						int pointz = (int)(Math.random() * 100.0f);
-						SharedVariables.getInstance().setPoints(i, pointz);
-						totalPointsInt += pointz;
-					}
-					SharedVariables.getInstance().setTotalPoints(totalPointsInt);
-					SharedVariables.getInstance().setPointsIsUpdated(true);
-					try {
-						Thread.currentThread().sleep( (int)(Math.random() * 3000));
-					} catch (InterruptedException e) {
-						e.printStackTrace();
-					}
-				}
-			}
-			
-		});
-		t.start();
-		*/
-		
+		}		
+	}
+	
+	
+	public void setColor(final short index, final short color) {
+		idAndColors.put(index, color);
+	}
+	
+	
+	public ConcurrentHashMap<Short, Short> getIdAndColors() {
+		return idAndColors;
 	}
 	
 	
 	public void addServer(final Server server) {
 		synchronized(servers) {
+			for(Server serverInList : servers) {
+				if(serverInList.ip.equals(server.ip)) {
+					serverInList.slotsTaken = server.slotsTaken;
+					return;
+				}
+			}
 			Log.d("BROAD", "ADDED SERVER: " + server.name + ", " + server.ip + ", " + server.port);
 			servers.add(server);
 		}
 	}
+	
 	
 	ArrayList<Server> getServers() {
 		synchronized(servers) {
@@ -151,11 +132,13 @@ public class SharedVariables {
 		}
 	}
 	
+	
 	public void clearServers() {
 		synchronized(servers) {
 			servers.clear();
 		}
 	}
+	
 	
 	public void setServer(final Server server) {
 		synchronized(server) {
@@ -163,6 +146,7 @@ public class SharedVariables {
 			this.server = server;
 		}
 	}
+	
 
 	public Server getServer() {
 		synchronized(server) {
