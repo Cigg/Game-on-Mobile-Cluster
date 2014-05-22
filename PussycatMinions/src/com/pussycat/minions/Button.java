@@ -105,6 +105,10 @@ public class Button {
 		this.pressed = pressed;
 	}
 	
+	public boolean isPressed() {
+		return this.pressed;
+	}
+	
 	public void setVisible(boolean visible) {
 		this.visible = visible;
 	}

@@ -42,7 +42,6 @@ public class SharedVariables {
 	private float middleAngle;
 	private Object middleAngleMutex = new Object();
 	
-	private AtomicInteger[] points;	
 	private AtomicInteger totalPoints;	
 	private AtomicBoolean updatedPoints;
 	private AtomicBoolean isRunning;
@@ -53,9 +52,13 @@ public class SharedVariables {
 	
 	private ArrayList<Server> servers = new ArrayList<Server>();
 	private Server server = null;
+	
+	private AtomicInteger gameTimeInSeconds = new AtomicInteger(120);
 
-	ConcurrentHashMap<Short, Short> idAndColors = new ConcurrentHashMap<Short, Short>();
-	//ConcurrentHashMap<Short, Integer> idAndPoints = new ConcurrentHashMap<Short, Integer>();
+	ConcurrentHashMap<Integer, Integer> idAndColors = new ConcurrentHashMap<Integer, Integer>();
+	ConcurrentHashMap<Integer, Integer> idAndPoints = new ConcurrentHashMap<Integer, Integer>();
+	ArrayList<ShortPair> finalScores = new ArrayList<ShortPair>();
+	AtomicInteger deviceId = new AtomicInteger(-2);
 	
 
 	// Singleton design pattern
@@ -75,6 +78,7 @@ public class SharedVariables {
 		initialize();
 	}
 	
+	
 	public void initialize() {
 		setInternalState(GLOBAL_STATE__.START);
 
@@ -91,24 +95,60 @@ public class SharedVariables {
 		initializePoints((short) numberOfPlayers.get());
 	}
 	
+	
 	public void initializePoints(final short nPlayers) {
 		this.numberOfPlayers.set(nPlayers);
-		points = new AtomicInteger[nPlayers];
 		totalPoints = new AtomicInteger();
+	}
+	
+	
+	public void setColor(final int id, final int color) {
+		synchronized(idAndColors) {
+			Log.d("SOON", "ADDED NEW COLOR: " + id +".  " + color);
+			idAndColors.put(id, color);
+		}
 		
-		for(short i=0; i<nPlayers; i++) {
-			points[i] = new AtomicInteger();
-		}		
 	}
 	
 	
-	public void setColor(final short index, final short color) {
-		idAndColors.put(index, color);
+	public void addScore(final ShortPair score) {
+		synchronized(finalScores) {
+			Log.d("SOON", "ADDED SCORE: " + score.id + ", " + score.second);
+			finalScores.add(score);
+		}
 	}
 	
 	
-	public ConcurrentHashMap<Short, Short> getIdAndColors() {
-		return idAndColors;
+	public int getScore(final short id) {
+		synchronized(finalScores) {
+			for(ShortPair score : finalScores) {
+				if(score.id == id) {
+					return score.second;
+				}
+			}
+		}
+		return -1;
+	}
+	
+	
+	public void clearScores() {
+		synchronized( finalScores ){
+			finalScores.clear();
+		}
+	}
+	
+	
+	public ConcurrentHashMap<Integer, Integer> getIdAndColors() {
+		synchronized(idAndColors) {
+			return new ConcurrentHashMap<Integer, Integer>(idAndColors);
+		}
+	}
+	
+	
+	public int getColor(final int id) {
+		synchronized(idAndColors) {
+			return idAndColors.get(id);
+		}
 	}
 	
 	
@@ -184,8 +224,8 @@ public class SharedVariables {
 	}
 	
 	
-	public AtomicInteger[] getPoints() {
-		return points;
+	public ConcurrentHashMap<Integer, Integer> getPoints() {
+		return idAndPoints;
 	}
 	
 	
@@ -266,6 +306,21 @@ public class SharedVariables {
 	}
 	
 	
+	public int getGameTimeInSeconds() {
+		return gameTimeInSeconds.get();
+	}
+	
+	
+	public int getDeviceId() {
+		return deviceId.get();
+	}
+	
+	
+	public int getMyPoints() {
+		return idAndPoints.get(deviceId.get());
+	}
+	
+	
 	// =========================================
 	// Set methods
 	// =========================================
@@ -291,7 +346,7 @@ public class SharedVariables {
 	
 	
 	public void setPoints(final int id, final int points) {
-		this.points[id].set(points);
+		idAndPoints.put(id, points);
 	}
 
 
@@ -377,6 +432,15 @@ public class SharedVariables {
 		}
 	}
 
+
+	public void setGameTimeInSeconds(final short gameTimeInSeconds) {
+		this.gameTimeInSeconds.set(gameTimeInSeconds);
+	}
+
+
+	public void setDeviceId(final short deviceId) {
+		this.deviceId.set(deviceId);
+	}
 
 
 }

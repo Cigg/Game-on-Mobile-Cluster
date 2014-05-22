@@ -83,21 +83,18 @@ public class MainMenuScreen extends Screen {
             }
             
             if (event.type == TouchEvent.TOUCH_UP) {
-            	playerButton.setPressed(false);
-            	middleButton.setPressed(false);
-            	aboutButton.setPressed(false);
-
-            	
             	// TODO: Should go to SetupScreen instead
-            	if(playerButton.inBounds(event.x, event.y)){
+            	if(playerButton.isPressed() && playerButton.inBounds(event.x, event.y)){
             		game.setScreen(new GameScreenPlayer(game));
-            	}
-            	if(middleButton.inBounds(event.x, event.y)){
+            		playerButton.setPressed(false);
+            	} else if(middleButton.isPressed() && middleButton.inBounds(event.x, event.y)){
             		game.setScreen(new GameScreenMiddle(game));
-            	}
-            	if(aboutButton.inBounds(event.x, event.y)){
+            		middleButton.setPressed(false);
+            	} else if(aboutButton.isPressed() && aboutButton.inBounds(event.x, event.y)){
             		game.setScreen(new GameScreenMiddle(game));
-            	}            	
+            		aboutButton.setPressed(false);
+            	} 
+
             }
         }
     }

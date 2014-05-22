@@ -106,15 +106,16 @@ public class ServerBrowser extends Screen {
         		}
    			} else if(event.type == TouchEvent.TOUCH_UP) {
    				for(int j=0; j<buttons.length; j++) {
-            		if(buttons[j].inBounds(event.x, event.y)){
+            		if(buttons[j].isPressed() && buttons[j].inBounds(event.x, event.y)){
             			ArrayList<Server> servers = SharedVariables.getInstance().getServers();
             			SharedVariables.getInstance().setServer(servers.get(j));
             			game.setScreen(new MainMenuScreen(game));
+            			buttons[j].setPressed(false);
        				}
-            		buttons[j].setPressed(false);
+            		
             	}
    				
-   				if(refreshButton.inBounds(event.x, event.y)){
+   				if(refreshButton.isPressed() && refreshButton.inBounds(event.x, event.y)){
    					refreshButton.setPressed(false);
    					refresh();
         		}

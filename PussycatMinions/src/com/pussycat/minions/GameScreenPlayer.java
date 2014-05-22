@@ -45,7 +45,7 @@ public class GameScreenPlayer extends Screen {
 	private float downTime, previousTime;
 	
 	private float freezeStart;
-	private final float FREEZE_DURATION = (float) (0.1 * Math.pow(10, 9));
+	private final float FREEZE_DURATION = (float) (0.2 * Math.pow(10, 9));
 	
 	float[] pts = new float[2048];
 	float[] tms = new float[1024];
@@ -163,10 +163,10 @@ public class GameScreenPlayer extends Screen {
     		
     		SharedVariables.getInstance().setStartGame(false);
         	ballsWidget = new BallsWidget();
-    		pointsWidget = new PointsWidget();
+        	pointsNotificationsWidget = new PointsNotificationWidget(game.getAudio());
+    		pointsWidget = new PointsWidget(pointsNotificationsWidget);
     		timerWidget = new TimerWidget();
     		remapWidget = new RemapWidget();
-    		pointsNotificationsWidget = new PointsNotificationWidget(game.getAudio());
     		countDownWidget = new CountDownWidget(timerWidget);
     		
     		widgets.add(ballsWidget);
@@ -286,7 +286,6 @@ public class GameScreenPlayer extends Screen {
 	    		    		comm.sendData(buffer.array());
 	    		    		
 	    		    		Log.d("CLOCK", "RUNDEVICE ==== " + (System.nanoTime() + SharedVariables.getInstance().getSendDelay()) * Math.pow(10, -9));
-	    		    		pointsNotificationsWidget.addNotification((int) (Math.random() * 1000));
     					}
     				}
     				break;

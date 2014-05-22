@@ -24,6 +24,7 @@ import org.jbox2d.dynamics.joints.RevoluteJoint;
  */
 
 public class ClientThread extends Thread {
+	private int id;
 	private PrintWriter out;
 	private BufferedReader in;
 	private Socket clientSocket = null;
@@ -223,8 +224,10 @@ public class ClientThread extends Thread {
 	ClientInfo clientInfo;
 	
 	public ClientThread(String ip, Socket clientSocket, ClientThread[] threads,
-			UpdateLoop updateLoop, DeviceManager deviceManager) {
+			UpdateLoop updateLoop, DeviceManager deviceManager, final int id) {
 
+		this.id = id;
+		
 		this.deviceManager = deviceManager;
 		this.clientSocket = clientSocket;
 		
@@ -243,6 +246,10 @@ public class ClientThread extends Thread {
 	}
 
 
+	public int getIdentification() {
+		return this.id;
+	}
+	
 	/**
 	 * @deprecated replaced by sendData {@link #sendData(byte[])}
 	 */
@@ -418,6 +425,19 @@ public class ClientThread extends Thread {
 								if(type == 0) {
 									targetJoint = MultiThreds.getPhysicsWorld().addTarget(g_midX, g_midY, 0);
 								}
+								
+								
+								
+								// Send response 
+								ByteBuffer sendBuffer = ByteBuffer.allocate(2*2);
+								sendBuffer.clear();
+
+								final short sendState = (short) GLOBAL_STATE__.ADD_DEVICE.ordinal();
+								sendBuffer.putShort(sendState); 
+								sendBuffer.putShort((short) id);
+
+								sendData(buffer.array());
+								clientInfo.addSentPackageItem(GLOBAL_STATE__.values()[sendState] + "   Id: " + id);
 							}
 								break;
 
