@@ -48,7 +48,7 @@ public class ClientThread extends Thread {
 	private static DeviceManager deviceManager;
 	private OutputStream dout;
 
-	static final int MAX_LIFETIME = 15;
+	static final int MAX_LIFETIME = 7;
 	static final float MAX_POSITION_X = (float) (100 / 2.5);
 	static final float MAX_POSITION_Y = MAX_POSITION_X;
 

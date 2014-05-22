@@ -44,6 +44,9 @@ public class GameScreenPlayer extends Screen {
 	
 	private float downTime, previousTime;
 	
+	private float freezeStart;
+	private final float FREEZE_DURATION = (float) (0.1 * Math.pow(10, 9));
+	
 	float[] pts = new float[2048];
 	float[] tms = new float[1024];
 	float[] vel = new float[1024];
@@ -54,7 +57,6 @@ public class GameScreenPlayer extends Screen {
 	boolean up = false;
 	public Bitmap bitmap = null;
 	public Canvas bitmapCanvas = null;	  
-
 	public boolean drawTraceAfter = false;
 
 	
@@ -133,16 +135,22 @@ public class GameScreenPlayer extends Screen {
 		comm.sendData(buffer.array());
 		
 		SharedVariables.getInstance().setInternalState(GLOBAL_STATE__.REG);
-		state = GameState.Ready;
+		//state = GameState.Ready;
+    }
+    
+    public boolean isFrozen() {
+    	return (freezeStart + FREEZE_DURATION - System.nanoTime()) > 0; 
     }
 
     @Override
     public void update(float deltaTime) {
         List<TouchEvent> touchEvents = game.getInput().getTouchEvents();
     	
+        /*
         if(SharedVariables.getInstance().getInternalState() == GLOBAL_STATE__.IS_READY) {
        	 	setIsReady();
         }
+        */
         
         if(state != GameState.Running) {
         	updateReady(touchEvents);
@@ -150,16 +158,16 @@ public class GameScreenPlayer extends Screen {
 
     	if(SharedVariables.getInstance().shouldStartGame()) {
     		SharedVariables.getInstance().setInternalState(GLOBAL_STATE__.REG);
+    		SharedVariables.getInstance().setIsRemapping(false);
     		
     		SharedVariables.getInstance().setStartGame(false);
-    		
         	ballsWidget = new BallsWidget();
     		pointsWidget = new PointsWidget();
     		timerWidget = new TimerWidget();
     		remapWidget = new RemapWidget();
     		pointsNotificationsWidget = new PointsNotificationWidget(game.getAudio());
     		countDownWidget = new CountDownWidget(timerWidget);
-
+    		
     		widgets.add(ballsWidget);
     		widgets.add(pointsWidget);
     		widgets.add(timerWidget);
@@ -192,9 +200,10 @@ public class GameScreenPlayer extends Screen {
     		currentY = event.y;
     		final float currentTime = event.time;
     		
-    	
+    		if( !isFrozen() ) {
     		  if(event.pointer >= 2) {
      			remapDevice();
+     			freezeStart = System.nanoTime();
     		  } else if(event.type == TouchEvent.TOUCH_DRAGGED) {
     			draggedX = currentX;
     			draggedY = currentY;  	
@@ -218,7 +227,7 @@ public class GameScreenPlayer extends Screen {
 
     				case MAP_DEVICE:
     				{
-    					state = GameState.MappingDone;
+    				//	state = GameState.MappingDone;
     					Log.d("STATEZ", "PLAYER MAP_DEVICE");
     					mapDevice(deltaTimeDragged, currentTime);
     					SharedVariables.getInstance().setIsRemapping(false);
@@ -226,8 +235,10 @@ public class GameScreenPlayer extends Screen {
     						state = GameState.Running;
 							SharedVariables.getInstance().setInternalState(GLOBAL_STATE__.RUN_DEVICE);
 						} else {
-    					SharedVariables.getInstance().setInternalState(GLOBAL_STATE__.IS_READY);
-    					}
+							setIsReady();
+							remapDevice();
+							//SharedVariables.getInstance().setInternalState(GLOBAL_STATE__.IS_READY);
+    					} 
     				}
     				break;
     				
@@ -306,6 +317,8 @@ public class GameScreenPlayer extends Screen {
 				index = 0;
     			beginIndex = 1;
     			drawTraceAfter = false;
+    		}
+    		  
     		}
     		
         }  
