@@ -10,7 +10,8 @@ public class BackgroundHandler {
 		COLORSPECTRUM,
 		COORDINATES_SPLIT,
 		SAND, 
-		PAPER
+		PAPER,
+		WEB
 	}
 	
 	public BackgroundHandler()  {
@@ -66,6 +67,14 @@ public class BackgroundHandler {
 				150.0f,
 				33,
 				33										);	
+		
+		backgrounds [BACKGROUNDS.WEB.ordinal()] = new Background(		"spiderweb_split",  "Coordinates_", ".png",							
+				4200, 											
+				4200,											
+				150.0f,				
+				150.0f,
+				32,
+				32										);	
 	}
 	
 }

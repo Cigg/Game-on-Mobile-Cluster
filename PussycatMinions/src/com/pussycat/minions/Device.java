@@ -73,7 +73,7 @@ public class Device {
 		this.ydpi = PussycatMinions.getYDPI();
 		
 		BackgroundHandler bgh = new BackgroundHandler();
-		this.bg = bgh.backgrounds[BACKGROUNDS.PAPER.ordinal()];
+		this.bg = bgh.backgrounds[BACKGROUNDS.WEB.ordinal()];
 		
 		nRader = bg.nRows;
 		nKolumner = bg.nCols;
