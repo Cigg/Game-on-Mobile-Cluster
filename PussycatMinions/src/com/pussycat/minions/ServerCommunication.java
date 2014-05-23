@@ -280,7 +280,7 @@ public class ServerCommunication extends Thread {
 			Log.d("BALLINFO", "ADD: " + id + "  " + x + "  " + y + "  " + vx + "  " + vy + " " + type);
 			
 			// TODO: FIX ALLL BALL TYPES
-			ballHandler.addBall(new BallRegular(id, parent, x, y, vx, vy, type));			
+			ballHandler.addBall(new BallRegular(id, parent, x, y, vx, vy, type, PussycatMinions.meters2Pixels(0.0075f)));			
 		}
 	}
 

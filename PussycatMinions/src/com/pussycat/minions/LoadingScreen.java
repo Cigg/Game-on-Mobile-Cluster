@@ -71,6 +71,9 @@ public class LoadingScreen extends Screen {
     	        Assets.countDownImage_3 = g.newImage("countDownImage_3.png", ImageFormat.RGB565);
     	        Assets.countDownImage_GO = g.newImage("countDownImage_GO.png", ImageFormat.RGB565);
     	        
+    	        Assets.horizontal_line = g.newImage("horizontalline.png" , ImageFormat.RGB565);
+    	        Assets.vertical_line = g.newImage("verticalline.png" , ImageFormat.RGB565);
+    	        
     	        Assets.ball = g.newImage("baby.png", ImageFormat.RGB565);
     	        
     	        AssetManager assets = AndroidGraphics.getAssets();

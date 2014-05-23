@@ -27,5 +27,6 @@ public class Assets {
 	public static volatile Image countDownImage_3;
 	public static volatile Image countDownImage_GO;
 	public static volatile Typeface menu_font;
-	
+	public static volatile Image horizontal_line;
+	public static volatile Image vertical_line;
 }
