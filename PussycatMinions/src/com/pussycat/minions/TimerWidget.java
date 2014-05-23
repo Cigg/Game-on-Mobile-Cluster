@@ -13,7 +13,7 @@ import com.pussycat.framework.implementation.AndroidGraphics;
 
 public class TimerWidget implements Widget {
 	
-	private final String FONT = "DS-DIGIB.TTF";
+	private final String FONT = "angrybirds-regular.ttf";
 	private final int DECIMALS = 2;
 	private final String SEPERATOR = ":";
 	private final int SIZE = PussycatMinions.meters2Pixels( 1.0f / 100.0f);
@@ -37,9 +37,9 @@ public class TimerWidget implements Widget {
 		paint.setTypeface(typeface);
 		paint.setTextSize(SIZE);
 		bounds = new Rect();
-		String abc = "02:20:000";
-		paint.setColor(Color.BLUE);
-		paint.getTextBounds(abc, 0, 6 + DECIMALS, bounds);
+		String abc = "8888888";
+		paint.setColor(Color.WHITE);
+		paint.getTextBounds(abc, 0, 3, bounds);
 		
 		seconds = SharedVariables.getInstance().getGameTimeInSeconds(); 
 		totalTime = seconds * 1000;
@@ -60,7 +60,8 @@ public class TimerWidget implements Widget {
 			if(timeLeft > 0) {
 				setTime(timeLeft);
 			} else {
-				text = "00" + SEPERATOR + "00" + SEPERATOR + "00";
+				//text = "00" + SEPERATOR + "00" + SEPERATOR + "00";
+				text = "0";
 			}
 		}
 	}
@@ -69,6 +70,7 @@ public class TimerWidget implements Widget {
 	public void setTime(float timeLeft) {
 		text = "";
 		
+		/*
 		int min = (int) Math.floor(timeLeft / (60*1000.0f));
 		timeLeft -= min * 60*1000;	
 		
@@ -82,21 +84,24 @@ public class TimerWidget implements Widget {
 			text = text.concat("00");
 			text = text.concat(SEPERATOR);
 		}
+		*/
 		
 		int sec = (int) (timeLeft / 1000);
-		timeLeft -= sec * 1000;
+		//timeLeft -= sec * 1000;
+		
 		
 		if(sec > 0) {
-			if(sec < 10) {
-				text = text.concat("0");
-			}
+//			if(sec < 10) {
+//				text = text.concat("0");
+//			}
 			text = text.concat(String.valueOf(sec));
-			text = text.concat(SEPERATOR);
+			//text = text.concat(SEPERATOR);
 		} else {
-			text = text.concat("00");
-			text = text.concat(SEPERATOR);
+			text = text.concat("0");
+			//text = text.concat(SEPERATOR);
 		}
 		
+		/*
 		int mil = (int) Math.floor(timeLeft / 10.0f);
 		
 		if(mil > 0) {
@@ -107,6 +112,9 @@ public class TimerWidget implements Widget {
 		} else {
 			text = text.concat("00");
 		}
+		*/
+		
+		
 	}
 
 	
