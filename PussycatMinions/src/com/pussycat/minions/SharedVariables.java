@@ -196,7 +196,7 @@ public class SharedVariables {
 	
 	public int getMyColor() {
 		synchronized(idAndColors) {
-			return idAndColors.get(deviceId);	
+			return idAndColors.get(deviceId);
 		}
 	}
 	

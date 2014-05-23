@@ -749,7 +749,10 @@ public class GameScreenPlayer extends Screen {
         		currentBall = Assets.ball;
         	}
         	
-        	graphics.drawCircle((int)(draggedX), (int)(draggedY), (float)(PussycatMinions.meters2Pixels(0.0075f)*0.95),Color.RED);
+        	if(state == GameState.Running) {
+        		int deviceId = SharedVariables.getInstance().getDeviceId();
+        		graphics.drawCircle((int)(draggedX), (int)(draggedY), (float)(PussycatMinions.meters2Pixels(0.0075f)*0.87),SharedVariables.getInstance().getColor(deviceId));
+        	}
         	graphics.drawScaledImage(	currentBall, 
 				 	(int)(draggedX - PussycatMinions.meters2Pixels(0.0075f)), 
 				 	(int)(draggedY - PussycatMinions.meters2Pixels(0.0075f)), 
