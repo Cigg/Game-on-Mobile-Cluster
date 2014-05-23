@@ -45,6 +45,7 @@ public class BallsWidget implements Widget {
 			Log.d("SOON", "SharedVariables.getInstance().getDeviceId() = " + SharedVariables.getInstance().getDeviceId());
 			animatedYs[i] = new AnimatedValue(balls[i].getY());
 		}
+		
 	}
 	
 	
@@ -100,7 +101,9 @@ public class BallsWidget implements Widget {
 			Log.d("WID", "ADD BALL");
 			adder.setValue(0.0f);
 			int type = rand.nextInt(3)+1;
+
 			addBall(new BallRegular(0, SharedVariables.getInstance().getDeviceId(), x, OFFSET + maxY - (maxNBalls-1) * dist, 0, 0,type, PussycatMinions.meters2Pixels(RADIUS)));
+			
 			if(activeBalls < maxNBalls) {
 				adderAnimation.start();
 			}

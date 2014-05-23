@@ -438,7 +438,7 @@ public class ClientThread extends Thread {
 
 								final short sendState = (short) GLOBAL_STATE__.ADD_DEVICE.ordinal();
 								sendBuffer.putShort(sendState); 
-								sendBuffer.putShort((short) id);
+								sendBuffer.putShort((short) getIdentification());
 
 								sendData(buffer.array());
 								clientInfo.addSentPackageItem(GLOBAL_STATE__.values()[sendState] + "   Id: " + id);
