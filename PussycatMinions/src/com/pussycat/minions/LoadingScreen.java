@@ -42,7 +42,7 @@ public class LoadingScreen extends Screen {
 
         // Preload the Assets which are used by LoadingScreen
         Assets.splash = g.newImage("mainpage.png", ImageFormat.RGB565);
-        Assets.splash = g.newScaledImage(Assets.splash, PussycatMinions.getScreenWidth());
+        Assets.splash = g.newScaledImage(Assets.splash, PussycatMinions.getScreenWidth(), PussycatMinions.getScreenHeight());
         Assets.localBall = g.newImage("baby.png", ImageFormat.RGB565);
         Assets.ball1 = g.newImage("Bug_1.png", ImageFormat.RGB565);
         Assets.ball2 = g.newImage("Bug_2.png", ImageFormat.RGB565);
@@ -55,7 +55,7 @@ public class LoadingScreen extends Screen {
         		// Load the Assets with largest size first - otherwise out of memory error will occur
         	    //Assets.background = g.newBackground("colorspectrum.jpg", ImageFormat.RGB565);
         		Assets.mainMenuBackground = g.newImage("mainpage.png", ImageFormat.RGB565);
-     	        Assets.mainMenuBackground = g.newScaledImage(Assets.mainMenuBackground, (int) (PussycatMinions.getScreenWidth()));
+     	        Assets.mainMenuBackground = g.newScaledImage(Assets.mainMenuBackground, PussycatMinions.getScreenWidth(), PussycatMinions.getScreenHeight());
      	        Assets.octopus = g.newImage("Spider_target.png", ImageFormat.RGB565);
      	       
      	        //Assets.click = game.getAudio().createSound("explosion.ogg");
