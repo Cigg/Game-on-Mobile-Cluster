@@ -2,6 +2,7 @@ package com.pussycat.minions;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.Enumeration;
+import java.util.Random;
 import java.util.concurrent.ConcurrentHashMap;
 
 import com.pussycat.framework.Graphics;
@@ -21,7 +22,16 @@ public class BallHandler {
 	
 	
 	public void addBall(Ball ball) {
+		int type;
+		if(balls.get(ball.id) != null) {
+			type = balls.get(ball.id).type;
+		}
+		else {
+			Random generator = new Random(); 
+			type = generator.nextInt(2) + 1;
+		}
 		balls.put(ball.id, ball);
+		balls.get(ball.id).type = type;
 	}
 
 
