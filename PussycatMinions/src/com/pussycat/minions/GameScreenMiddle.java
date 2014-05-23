@@ -70,7 +70,10 @@ private Target middleTarget;
 private MusicWidget musicWidget;
 private RemapWidget remapWidget;
 private CountDownWidget countDownWidget;
+private BlinkWidget blinkWidget;
 private ArrayList<Widget> widgets = new ArrayList<Widget>();
+
+private AnimationHandler animationHandler = AnimationHandler.getInstance();	
 
 // Constructor
     public GameScreenMiddle(Game game) {
@@ -179,6 +182,10 @@ addDevice();
      for(Widget widget : widgets) {
  		widget.update();
  	}
+     
+  	if(animationHandler != null) {
+		animationHandler.updateAnimations(System.nanoTime());
+	}
 
      
      if(SharedVariables.getInstance().shouldStartGame()) {
@@ -188,7 +195,9 @@ addDevice();
  		musicWidget = new MusicWidget(game.getAudio());
  		remapWidget = new RemapWidget();
  		countDownWidget = new CountDownWidget(musicWidget);
+ 		blinkWidget = new BlinkWidget();
  		
+ 		widgets.add(blinkWidget);
  		widgets.add(remapWidget);
  		widgets.add(countDownWidget);
  		

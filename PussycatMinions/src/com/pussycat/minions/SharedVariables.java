@@ -186,7 +186,7 @@ public class SharedVariables {
 	}
 	
 	public int getColor(final int id) {
-		Log.d("DEVICEID", "GET COLOR: " + id);
+		//Log.d("DEVICEID", "GET COLOR: " + id);
 		synchronized(idAndColors) {
 			int color = idAndColors.get(id);
 			if(colorOk(color)) {
