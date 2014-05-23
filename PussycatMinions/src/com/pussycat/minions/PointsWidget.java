@@ -12,20 +12,7 @@ import com.pussycat.minions.Animation.INTERPOLATION;
 import com.pussycat.minions.Animation.TYPE;
 
 public class PointsWidget implements Widget {
-	
-	private final int COLORS[] = {
-			Color.rgb(255, 0, 0),
-			Color.rgb(0, 255, 0),
-			Color.rgb(0, 255, 0),
-			Color.rgb((int)(Math.random()*255),(int)(Math.random()*255), (int)(Math.random()*255)),
-			Color.rgb((int)(Math.random()*255),(int)(Math.random()*255), (int)(Math.random()*255)),
-			Color.rgb((int)(Math.random()*255),(int)(Math.random()*255), (int)(Math.random()*255)),
-			Color.rgb((int)(Math.random()*255),(int)(Math.random()*255), (int)(Math.random()*255)),
-			Color.rgb((int)(Math.random()*255),(int)(Math.random()*255), (int)(Math.random()*255)),
-			Color.rgb((int)(Math.random()*255),(int)(Math.random()*255), (int)(Math.random()*255)),
-			Color.rgb((int)(Math.random()*255),(int)(Math.random()*255), (int)(Math.random()*255))
-	};
-	
+		
 	public class Player {
 		private final int id;
 		private int color;
@@ -38,7 +25,7 @@ public class PointsWidget implements Widget {
 			this.id = id;
 			this.begin = new AnimatedValue(begin);
 			this.end = new AnimatedValue(end);
-			this.color = COLORS[color];
+			this.color = color;
 		}
 	}
 	
@@ -83,19 +70,11 @@ public class PointsWidget implements Widget {
 		players[nPlayers-1].end.setValue(screenWidth + OFFSET_RIGHT);
 		
 		*/
-		ConcurrentHashMap<Integer, Integer> idAndColors = SharedVariables.getInstance().getIdAndColors();
-		Log.d("SOON", "idAndColors.size(): " + idAndColors.size());
-		Log.d("SOON", "nPlayers: " + nPlayers);
-		
-		
-		Enumeration<Integer> enumKey = idAndColors.keys();
+		final int[] colors = SharedVariables.getInstance().getColors();
+
 		int i = 0;
-		while( enumKey.hasMoreElements() ) {
-		    int key = enumKey.nextElement();
-		    Integer color = idAndColors.get(key);		 
-		    Log.d("SOON", "HAS ELEMENT: " + i + ",  " + color);
-		    players[i] = new Player(i, i*dist, (i+1)*dist, color);
-		    i++;
+		for(; i<colors.length; i++) {
+		    players[i] = new Player(i, i*dist, (i+1)*dist, colors[i]);
 		}
 		players[i-1].end.setValue(screenWidth + OFFSET_RIGHT);		
 	}

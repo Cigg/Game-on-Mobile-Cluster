@@ -1,10 +1,14 @@
 package com.pussycat.minions;
 
 import java.util.ArrayList;
+import java.util.Enumeration;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import com.pussycat.minions.PointsWidget.Player;
+
+import android.graphics.Color;
 import android.util.Log;
 
 public class SharedVariables {
@@ -59,6 +63,20 @@ public class SharedVariables {
 	ConcurrentHashMap<Integer, Integer> idAndPoints = new ConcurrentHashMap<Integer, Integer>();
 	ArrayList<ShortPair> finalScores = new ArrayList<ShortPair>();
 	AtomicInteger deviceId = new AtomicInteger(-2);
+	
+	
+	private final int COLORS[] = {
+			Color.rgb(255, 0, 0),
+			Color.rgb(0, 255, 0),
+			Color.rgb(0, 0, 255),
+			Color.rgb((int)(Math.random()*255),(int)(Math.random()*255), (int)(Math.random()*255)),
+			Color.rgb((int)(Math.random()*255),(int)(Math.random()*255), (int)(Math.random()*255)),
+			Color.rgb((int)(Math.random()*255),(int)(Math.random()*255), (int)(Math.random()*255)),
+			Color.rgb((int)(Math.random()*255),(int)(Math.random()*255), (int)(Math.random()*255)),
+			Color.rgb((int)(Math.random()*255),(int)(Math.random()*255), (int)(Math.random()*255)),
+			Color.rgb((int)(Math.random()*255),(int)(Math.random()*255), (int)(Math.random()*255)),
+			Color.rgb((int)(Math.random()*255),(int)(Math.random()*255), (int)(Math.random()*255))
+	};
 	
 
 	// Singleton design pattern
@@ -138,17 +156,42 @@ public class SharedVariables {
 	}
 	
 	
-	public ConcurrentHashMap<Integer, Integer> getIdAndColors() {
+	public int[] getColors() {
+		int[] rtr;
 		synchronized(idAndColors) {
-			return new ConcurrentHashMap<Integer, Integer>(idAndColors);
+			rtr = new int[idAndColors.size()];
+			Enumeration<Integer> enumKey = idAndColors.keys();
+			int i = 0;
+			while( enumKey.hasMoreElements() ) {
+			    int key = enumKey.nextElement();
+			    int color = idAndColors.get(key);
+			    if(colorOk(color)) {
+			    	rtr[i] = COLORS[color];
+			    } else {
+			    	rtr[i] = 0;
+			    }
+			    i++;
+			}
 		}
+		return rtr;
 	}
 	
 	
+	public boolean colorOk(final int color) {
+		if(color >= 0 && color < COLORS.length) {
+			return true;
+		} 
+		return false;
+	}
+	
 	public int getColor(final int id) {
 		synchronized(idAndColors) {
-			return idAndColors.get(id);
+			int color = idAndColors.get(id);
+			if(colorOk(color)) {
+				return COLORS[color];
+			}
 		}
+		return 0;
 	}
 	
 	public int getMyColor() {
@@ -444,6 +487,7 @@ public class SharedVariables {
 
 
 	public void setDeviceId(final short deviceId) {
+		Log.d("SOON", "My device id: " + deviceId);
 		this.deviceId.set(deviceId);
 	}
 

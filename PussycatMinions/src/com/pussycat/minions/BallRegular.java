@@ -10,19 +10,7 @@ import android.util.Log;
 
 
 public class BallRegular extends Ball {
-	
-	private final int COLORS[] = {
-			Color.rgb(255, 0, 0),
-			Color.rgb(0, 255, 0),
-			Color.rgb(0, 255, 0),
-			Color.rgb((int)(Math.random()*255),(int)(Math.random()*255), (int)(Math.random()*255)),
-			Color.rgb((int)(Math.random()*255),(int)(Math.random()*255), (int)(Math.random()*255)),
-			Color.rgb((int)(Math.random()*255),(int)(Math.random()*255), (int)(Math.random()*255)),
-			Color.rgb((int)(Math.random()*255),(int)(Math.random()*255), (int)(Math.random()*255)),
-			Color.rgb((int)(Math.random()*255),(int)(Math.random()*255), (int)(Math.random()*255)),
-			Color.rgb((int)(Math.random()*255),(int)(Math.random()*255), (int)(Math.random()*255)),
-			Color.rgb((int)(Math.random()*255),(int)(Math.random()*255), (int)(Math.random()*255))
-	};
+
 	
 	public BallRegular (final int id, final int parent, final float x, final float y, final float vx, final float vy, final int type) {
 		this.id = id;
@@ -54,12 +42,9 @@ public class BallRegular extends Ball {
 		if(parent == -1){
 			return;
 		}
-		int color = SharedVariables.getInstance().getColor(parent);
-		if(color >= 0 && color < COLORS.length) {
-			graphics.drawCircle((int)this.x, (int)this.y, (float)(this.radius*0.95), COLORS[color]);
-		} else {
-			graphics.drawCircle((int)this.x, (int)this.y, (float)(this.radius*0.95), COLORS[0]);
-		}
+		
+		graphics.drawCircle((int)this.x, (int)this.y, (float)(this.radius*0.95),  SharedVariables.getInstance().getColor(parent));
+
 		
 	    graphics.drawScaledImage(	this.image, 
 			    				 	(int)this.x - this.radius, 

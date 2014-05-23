@@ -22,16 +22,13 @@ public class BallHandler {
 	
 	
 	public void addBall(Ball ball) {
-		int type;
-		if(balls.get(ball.id) != null) {
-			type = balls.get(ball.id).type;
-		}
-		else {
-			Random generator = new Random(); 
-			type = generator.nextInt(2) + 1;
-		}
-		balls.put(ball.id, ball);
-		balls.get(ball.id).type = type;
+		if(balls.containsKey(ball.id)) {
+			int type = balls.get(ball.id).type;
+			balls.put(ball.id, ball);
+			balls.get(ball.id).type = type;
+		} else {
+			balls.put(ball.id, ball);
+		}	
 	}
 
 
