@@ -41,7 +41,7 @@ public class LoadingScreen extends Screen {
         Graphics g = game.getGraphics();
 
         // Preload the Assets which are used by LoadingScreen
-        Assets.splash = g.newImage("loadpage.png", ImageFormat.RGB565);
+        Assets.splash = g.newImage("mainpage.png", ImageFormat.RGB565);
         Assets.splash = g.newScaledImage(Assets.splash, PussycatMinions.getScreenWidth());
         Assets.localBall = g.newImage("baby.png", ImageFormat.RGB565);
         Assets.ball1 = g.newImage("Bug_1.png", ImageFormat.RGB565);
