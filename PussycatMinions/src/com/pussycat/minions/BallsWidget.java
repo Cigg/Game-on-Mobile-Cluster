@@ -43,6 +43,7 @@ public class BallsWidget implements Widget {
 			int type = rand.nextInt(3)+1;
 			Log.d("Queue", "New type1: " + type);
 			balls[i] = new BallRegular(i, SharedVariables.getInstance().getDeviceId(), x, OFFSET + maxY - i*dist, 0, 0, type);
+			Log.d("SOON", "SharedVariables.getInstance().getDeviceId() = " + SharedVariables.getInstance().getDeviceId());
 			animatedYs[i] = new AnimatedValue(balls[i].getY());
 		}
 	}
