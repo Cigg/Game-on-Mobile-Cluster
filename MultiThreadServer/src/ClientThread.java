@@ -251,7 +251,7 @@ public class ClientThread extends Thread {
 
 
 	public int getIdentification() {
-		return this.id;
+		return deviceManager.getDeviceThread(ip);
 	}
 	
 	/**

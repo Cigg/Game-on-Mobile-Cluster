@@ -10,9 +10,8 @@ import android.util.Log;
 
 
 public class BallRegular extends Ball {
-
 	
-	public BallRegular (final int id, final int parent, final float x, final float y, final float vx, final float vy, final int type) {
+	public BallRegular (final int id, final int parent, final float x, final float y, final float vx, final float vy, final int type, final int radius) {
 		this.id = id;
 		this.parent = parent;
 		
@@ -25,7 +24,7 @@ public class BallRegular extends Ball {
 		this.type = type;
 		
 		Log.d("RADIUS_2", "PussycatMinions.meters2Pixels(0.0075f); = " + PussycatMinions.meters2Pixels(0.0075f));
-		this.radius = PussycatMinions.meters2Pixels(0.0075f);
+		this.radius = radius; //PussycatMinions.meters2Pixels(0.0075f);
 		
 		if(this.type == 1){
 			this.image = Assets.ball1;
