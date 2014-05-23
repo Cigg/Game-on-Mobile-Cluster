@@ -19,12 +19,12 @@
        android:targetSdkVersion="19" />
 
     <application
-       android:label="Octoshooter" >
+       android:label="Ladykiller" >
         <activity
-           android:icon="@drawable/octopus_icon_fat"
+           android:icon="@drawable/icon"
            android:name="com.pussycat.minions.PussycatMinions"
            android:configChanges="keyboard|keyboardHidden|orientation"
-           android:label="Octoshooter"
+           android:label="Ladykiller"
            android:screenOrientation="portrait" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

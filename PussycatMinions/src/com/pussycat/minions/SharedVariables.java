@@ -151,6 +151,11 @@ public class SharedVariables {
 		}
 	}
 	
+	public int getMyColor() {
+		synchronized(idAndColors) {
+			return idAndColors.get(deviceId);	
+		}
+	}
 	
 	public void addServer(final Server server) {
 		synchronized(servers) {
