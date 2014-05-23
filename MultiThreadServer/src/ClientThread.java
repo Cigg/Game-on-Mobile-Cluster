@@ -583,7 +583,7 @@ public class ClientThread extends Thread {
 									Random r = new Random();
 									//int type = r.nextInt(3) + 1;
 									System.out.println("Type of ball is: " + type);
-									ballz.add(new Ballz(deviceManager.getDeviceThread(ip), ballCount, xG, yG, xVel, yVel,type));
+									ballz.add(new Ballz(getIdentification(), ballCount, xG, yG, xVel, yVel,type));
 									for (int j = 0; j < maxClientsCount; j++) {
 										if (threads[j] != null) {
 											threads[j].ballCount = ballCount;

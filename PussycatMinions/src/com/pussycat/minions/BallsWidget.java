@@ -42,6 +42,7 @@ public class BallsWidget implements Widget {
 			int type = rand.nextInt(3)+1;
 			Log.d("Queue", "New type1: " + type);
 			balls[i] = new BallRegular(i, SharedVariables.getInstance().getDeviceId(), x, OFFSET + maxY - i*dist, 0, 0,type, PussycatMinions.meters2Pixels(0.0025f));
+			Log.d("SOON", "SharedVariables.getInstance().getDeviceId() = " + SharedVariables.getInstance().getDeviceId());
 			animatedYs[i] = new AnimatedValue(balls[i].getY());
 		}
 	}
@@ -49,7 +50,7 @@ public class BallsWidget implements Widget {
 	
 	public int pop() {
 		if(!isEmpty()) {
-			int type = balls[0].type;
+			Ball tempBall = balls[0];
 			for(int i=0; i<maxNBalls-1; i++) {
 				balls[i] = balls[i+1];
 				animatedYs[i] = animatedYs[i+1];
@@ -58,7 +59,7 @@ public class BallsWidget implements Widget {
 			animateBalls();
 			adderAnimation.start();
 			
-			return type;
+			return tempBall.type;
 		}
 		return 0;
 	}

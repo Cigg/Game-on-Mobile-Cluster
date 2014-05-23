@@ -270,6 +270,7 @@ public class GameScreenPlayer extends Screen {
 	    		    		buffer.clear();
 	    		    		
 	    		    		Log.d("Queue", "Got type: " + currentBallType);
+
 	    		    		buffer.putShort((short) GLOBAL_STATE__.RUN_DEVICE.ordinal());	// State: RUN_DEVICE
 	    		    			
 	    		    		if(index < 8) {
