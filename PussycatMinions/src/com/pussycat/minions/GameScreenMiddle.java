@@ -497,7 +497,7 @@ Graphics g = game.getGraphics();
          startButton.drawButton(g);
      } else if (state == GameState.Running) {
     	 Log.d("UI STATEZ", "Running");
-    	 menuButton.drawButton(g);
+    	 //menuButton.drawButton(g);
      }
     
     

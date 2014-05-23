@@ -66,16 +66,17 @@ public class SharedVariables {
 	
 	
 	private final int COLORS[] = {
-			Color.rgb(255, 0, 0),
-			Color.rgb(0, 255, 0),
-			Color.rgb(0, 0, 255),
-			Color.rgb((int)(Math.random()*255),(int)(Math.random()*255), (int)(Math.random()*255)),
-			Color.rgb((int)(Math.random()*255),(int)(Math.random()*255), (int)(Math.random()*255)),
-			Color.rgb((int)(Math.random()*255),(int)(Math.random()*255), (int)(Math.random()*255)),
-			Color.rgb((int)(Math.random()*255),(int)(Math.random()*255), (int)(Math.random()*255)),
-			Color.rgb((int)(Math.random()*255),(int)(Math.random()*255), (int)(Math.random()*255)),
-			Color.rgb((int)(Math.random()*255),(int)(Math.random()*255), (int)(Math.random()*255)),
-			Color.rgb((int)(Math.random()*255),(int)(Math.random()*255), (int)(Math.random()*255))
+			Color.rgb(233, 137, 21), // Orange
+			Color.rgb(135, 0, 255), // Lila
+			Color.rgb(197, 0, 98), // Ceris
+			Color.rgb(1, 232, 89), // Grön
+			Color.rgb(255, 237, 0), // Gul
+			Color.rgb(0, 254, 255), // Turkos
+			Color.rgb(255, 60, 43), // Röd
+			Color.rgb(19, 109, 236), // Blå
+			Color.rgb(178, 68, 28), // Brun
+			Color.rgb(1, 232, 89) // Ljusgrön
+		
 	};
 	
 
