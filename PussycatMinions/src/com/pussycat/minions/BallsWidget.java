@@ -99,7 +99,6 @@ public class BallsWidget implements Widget {
 			Log.d("WID", "ADD BALL");
 			adder.setValue(0.0f);
 			int type = rand.nextInt(3)+1;
-			Log.d("Queue", "New type2: " + type);
 			addBall(new BallRegular(0, SharedVariables.getInstance().getDeviceId(), x, OFFSET + maxY - (maxNBalls-1) * dist, 0, 0,type, PussycatMinions.meters2Pixels(0.0025f)));
 			if(activeBalls < maxNBalls) {
 				adderAnimation.start();
@@ -111,6 +110,14 @@ public class BallsWidget implements Widget {
 	public void draw(Graphics graphics) {
 		for(int i=0; i<activeBalls; i++) {
 			balls[i].draw(graphics);
+		}
+	}
+	
+	public int getTypeOfFirstBall(){
+		if(balls[0] != null) {
+			return balls[0].type;
+		} else {
+			return 0;
 		}
 	}
 	

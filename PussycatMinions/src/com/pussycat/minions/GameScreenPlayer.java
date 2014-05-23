@@ -264,7 +264,6 @@ public class GameScreenPlayer extends Screen {
     				case RUN_DEVICE:
     				{
     					Log.d("STATEZ", "PLAYER RUN_DEVICE");
-    					currentBallType = ballsWidget.pop();
     					if( currentBallType > 0) {
 	    					Log.d("AppStates", "RUN_DEVICE");
 	    					buffer = ByteBuffer.allocate(2*2 + 5*4);
@@ -310,6 +309,8 @@ public class GameScreenPlayer extends Screen {
     			
     			downX = currentX;
     			downY = currentY;
+    			
+    			currentBallType = ballsWidget.pop();
     			
     			if(index < ptx.length) {
     				tms[index] = currentTime;
@@ -734,6 +735,12 @@ public class GameScreenPlayer extends Screen {
         vz = vzb;
     	
         if( dragged ) {
+        	if(ballsWidget != null) {
+        		currentBallType = ballsWidget.getTypeOfFirstBall();
+        	} else {
+        		currentBallType = 0;
+        	}
+        	
         	com.pussycat.framework.Image currentBall;
         	if(currentBallType == 1){
         		currentBall = Assets.ball1; 
