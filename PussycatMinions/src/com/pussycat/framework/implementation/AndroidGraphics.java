@@ -181,6 +181,23 @@ public class AndroidGraphics implements Graphics {
 		return new AndroidImage(resizedBitmap, format);
     }
     
+    public Image newScaledImage(Image image, int pixelWidth, int pixelHeight) {
+		ImageFormat format;
+        if (((AndroidImage)image).bitmap.getConfig() == Config.RGB_565)
+            format = ImageFormat.RGB565;
+        else if (((AndroidImage)image).bitmap.getConfig() == Config.ARGB_4444)
+        	format = ImageFormat.ARGB4444;
+        else
+            format = ImageFormat.ARGB8888;
+        
+        int newWidth = pixelWidth;
+        int newHeight = pixelHeight;
+        
+        Bitmap resizedBitmap = Bitmap.createScaledBitmap(((AndroidImage)image).bitmap, newWidth, newHeight, false);
+		
+		return new AndroidImage(resizedBitmap, format);
+    }
+    
     
     @Override
     public void clearScreen(int color) {
