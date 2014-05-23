@@ -144,13 +144,14 @@ public class ServerBrowser extends Screen {
 		//graphics.drawImage(Assets.splash, 0, 0);
 		// TODO: Fix ServerBrowser Screen
 		graphics.clearScreen(Color.WHITE);
+		graphics.drawImage(Assets.mainMenuBackground, 0, 0);
 		
 		if(buttons != null && buttons.length != 0) {
 			for(int i=0; i<buttons.length; i++) {
 				buttons[i].drawButton(graphics);
 			}
 		} else {
-			paint.setColor(Color.BLACK);
+			paint.setColor(Color.WHITE);
 			graphics.drawString("No servers available.", TEXT_X, TEXT_Y, paint);
 			paint.setColor(Color.WHITE);
 		}

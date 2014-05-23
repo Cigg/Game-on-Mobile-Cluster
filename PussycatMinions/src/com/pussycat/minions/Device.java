@@ -483,11 +483,6 @@ public class Device {
 	
 			canvas.restore();
 			
-			// Mark out screen center
-			Paint redPaint = new Paint();
-			redPaint.setColor(Color.RED);
-			canvas.drawCircle(screenWidth/2, screenHeight/2, PussycatMinions.meters2Pixels(0.08f / 100.0f), redPaint); // Draw to the current frame buffer
-			
 			// Get and store the rotated background from the current frame buffer
 			backgroundFinal.recycle();
 			backgroundFinal = Bitmap.createBitmap( graphics.getFrameBuffer() );

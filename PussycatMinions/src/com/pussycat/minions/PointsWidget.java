@@ -163,8 +163,24 @@ public class PointsWidget implements Widget {
 	
 	
 	public void draw(Graphics graphics) {
+		
 		for(int i=0; i<nPlayers; i++) {
 			graphics.drawRect((int)players[i].begin.getValue(), OFFSET_DOWN + screenHeight - widgetHeight, (int)(players[i].end.getValue() - players[i].begin.getValue()) + OFFSET_RIGHT, widgetHeight, players[i].color);
-		}		
+		}
+		
+		int targetHeight = widgetHeight;
+		int targetWidth = (int)(((float)targetHeight/(float)Assets.vertical_line.getHeight())*(float)Assets.vertical_line.getWidth());
+		
+		graphics.drawScaledImage(Assets.vertical_line, (int)(players[0].begin.getValue() - targetWidth/2), screenHeight - widgetHeight, targetWidth, targetHeight, 0, 0, Assets.vertical_line.getWidth(), Assets.vertical_line.getHeight(), 0);
+		// Draw sketchy lines
+		for(int i = 0; i < nPlayers; i++) {
+			graphics.drawScaledImage(Assets.vertical_line, (int)(players[i].end.getValue() - targetWidth/2), screenHeight - widgetHeight, targetWidth, targetHeight, 0, 0, Assets.vertical_line.getWidth(), Assets.vertical_line.getHeight(), 0);
+		}
+		
+		targetWidth = screenWidth;
+		targetHeight = (int)(((float)targetWidth/(float)Assets.horizontal_line.getWidth())*(float)Assets.horizontal_line.getHeight());
+		
+		graphics.drawScaledImage(Assets.horizontal_line, 0, screenHeight - widgetHeight - (int)(targetHeight*0.6), targetWidth, targetHeight, 0, 0, Assets.horizontal_line.getWidth(), Assets.horizontal_line.getHeight(), 0);
+		
 	}
 }

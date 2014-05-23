@@ -56,9 +56,9 @@ public class BallRegular extends Ball {
 		}
 		int color = SharedVariables.getInstance().getColor(parent);
 		if(color >= 0 && color < COLORS.length) {
-			graphics.drawCircle((int)this.x, (int)this.y, (float)(this.radius*0.95), COLORS[color]);
+			graphics.drawCircle((int)this.x, (int)this.y, (float)(this.radius*0.87), COLORS[color]);
 		} else {
-			graphics.drawCircle((int)this.x, (int)this.y, (float)(this.radius*0.95), COLORS[0]);
+			graphics.drawCircle((int)this.x, (int)this.y, (float)(this.radius*0.87), COLORS[0]);
 		}
 		
 	    graphics.drawScaledImage(	this.image, 
