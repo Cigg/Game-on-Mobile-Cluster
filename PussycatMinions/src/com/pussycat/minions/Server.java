@@ -2,7 +2,7 @@ package com.pussycat.minions;
 
 public class Server {
 	public final String name;
-	public final int slotsTaken;
+	public int slotsTaken;
 	public final int numberOfSlots;
 	public final String ip;
 	public final int port;

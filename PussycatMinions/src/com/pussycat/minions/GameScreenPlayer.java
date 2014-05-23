@@ -45,7 +45,7 @@ public class GameScreenPlayer extends Screen {
 	private float downTime, previousTime;
 	
 	private float freezeStart;
-	private final float FREEZE_DURATION = (float) (0.1 * Math.pow(10, 9));
+	private final float FREEZE_DURATION = (float) (0.2 * Math.pow(10, 9));
 	
 	float[] pts = new float[2048];
 	float[] tms = new float[1024];
@@ -163,10 +163,10 @@ public class GameScreenPlayer extends Screen {
     		
     		SharedVariables.getInstance().setStartGame(false);
         	ballsWidget = new BallsWidget();
-    		pointsWidget = new PointsWidget();
+        	pointsNotificationsWidget = new PointsNotificationWidget(game.getAudio());
+    		pointsWidget = new PointsWidget(pointsNotificationsWidget);
     		timerWidget = new TimerWidget();
     		remapWidget = new RemapWidget();
-    		pointsNotificationsWidget = new PointsNotificationWidget(game.getAudio());
     		countDownWidget = new CountDownWidget(timerWidget);
     		
     		widgets.add(ballsWidget);
@@ -261,12 +261,13 @@ public class GameScreenPlayer extends Screen {
     				case RUN_DEVICE:
     				{
     					Log.d("STATEZ", "PLAYER RUN_DEVICE");
-    					if( ballsWidget.pop() ) {
+    					int type = ballsWidget.pop();
+    					if( type > 0) {
 	    					Log.d("AppStates", "RUN_DEVICE");
-	    					
-	    					buffer = ByteBuffer.allocate(1*2 + 5*4);
+	    					buffer = ByteBuffer.allocate(2*2 + 5*4);
 	    		    		buffer.clear();
 	    		    		
+	    		    		Log.d("Queue", "Got type: " + type);
 	    		    		buffer.putShort((short) GLOBAL_STATE__.RUN_DEVICE.ordinal());	// State: RUN_DEVICE
 	    		    			
 	    		    		if(index < 8) {
@@ -275,18 +276,19 @@ public class GameScreenPlayer extends Screen {
 		    		    		buffer.putFloat(currentX);										// x2
 		    		    		buffer.putFloat(currentY);										// y2
 		    		    		buffer.putFloat(deltaTimeDragged);								// t	
+		    		    		buffer.putShort((short) type);											//type of ball
 	    		    		} else {
 	    		    			buffer.putFloat(ptx[index-8]);									// x1
 		    		    		buffer.putFloat(pty[index-8]); 									// y1
 		    		    		buffer.putFloat(currentX);										// x2
 		    		    		buffer.putFloat(currentY);										// y2
 		    		    		buffer.putFloat(currentTime - tms[index-8]);					// t	
+		    		    		buffer.putShort((short) type);											//type of ball
 	    		    		}
 	    		    		
 	    		    		comm.sendData(buffer.array());
 	    		    		
 	    		    		Log.d("CLOCK", "RUNDEVICE ==== " + (System.nanoTime() + SharedVariables.getInstance().getSendDelay()) * Math.pow(10, -9));
-	    		    		pointsNotificationsWidget.addNotification((int) (Math.random() * 1000));
     					}
     				}
     				break;

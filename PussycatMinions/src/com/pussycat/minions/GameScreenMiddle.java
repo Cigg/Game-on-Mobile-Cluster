@@ -523,14 +523,13 @@ Graphics g = game.getGraphics();
 			
 			if (event.type == TouchEvent.TOUCH_UP) {
 				
-			startButton.setPressed(false);
-			
-			//TODO: Should go to SetupScreen instead
-			if(startButton.inBounds(event.x, event.y)){
-				//game.setScreen(new GameScreenPlayer(game));
- 				SharedVariables.getInstance().setInternalState(GLOBAL_STATE__.IS_READY);
-			
-			}
+				//TODO: Should go to SetupScreen instead
+				if(startButton.isPressed() && startButton.inBounds(event.x, event.y)){
+					//game.setScreen(new GameScreenPlayer(game));
+					SharedVariables.getInstance().setInternalState(GLOBAL_STATE__.IS_READY);
+					startButton.setPressed(false);
+				
+				}
 		}
      }
  }

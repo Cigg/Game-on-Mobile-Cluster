@@ -1,10 +1,12 @@
 package com.pussycat.minions;
 
+import java.util.LinkedList;
+import java.util.Queue;
+import java.util.Random;
+
 import android.util.Log;
 
 import com.pussycat.framework.Graphics;
-import com.pussycat.minions.Animation.INTERPOLATION;
-import com.pussycat.minions.Animation.TYPE;
 
 public class BallsWidget implements Widget {
 	
@@ -30,20 +32,25 @@ public class BallsWidget implements Widget {
 	private AnimatedValue adder = new AnimatedValue(0.0f);
 	private Animation adderAnimation;
 	
+	private Random rand = new Random();
+	
 	public BallsWidget() {
 		
 		adderAnimation = new Animation(adder, 0.0f, 1.0f, System.nanoTime(), COOL_TIME, Animation.INTERPOLATION.FLIP, Animation.TYPE.ENDLESS);
 		AnimationHandler.getInstance().addAnimation(adderAnimation);		
 		
 		for(int i=0; i<activeBalls; i++) {
-			balls[i] = new BallRegular(i, -1, x, OFFSET + maxY - i*dist, 0, 0,1);
+			int type = rand.nextInt(3)+1;
+			Log.d("Queue", "New type1: " + type);
+			balls[i] = new BallRegular(i, SharedVariables.getInstance().getDeviceId(), x, OFFSET + maxY - i*dist, 0, 0,type);
 			animatedYs[i] = new AnimatedValue(balls[i].getY());
 		}
 	}
 	
 	
-	public boolean pop() {
+	public int pop() {
 		if(!isEmpty()) {
+			int type = balls[0].type;
 			for(int i=0; i<maxNBalls-1; i++) {
 				balls[i] = balls[i+1];
 				animatedYs[i] = animatedYs[i+1];
@@ -51,9 +58,10 @@ public class BallsWidget implements Widget {
 			activeBalls--;
 			animateBalls();
 			adderAnimation.start();
-			return true;
+			
+			return type;
 		}
-		return false;
+		return 0;
 	}
 	
 	
@@ -91,7 +99,9 @@ public class BallsWidget implements Widget {
 		if(adder.getValue() == 1.0f) {
 			Log.d("WID", "ADD BALL");
 			adder.setValue(0.0f);
-			addBall(new BallRegular(0, -1, x, OFFSET + maxY - (maxNBalls-1) * dist, 0, 0,1));
+			int type = rand.nextInt(3)+1;
+			Log.d("Queue", "New type2: " + type);
+			addBall(new BallRegular(0, SharedVariables.getInstance().getDeviceId(), x, OFFSET + maxY - (maxNBalls-1) * dist, 0, 0,type));
 			if(activeBalls < maxNBalls) {
 				adderAnimation.start();
 			}

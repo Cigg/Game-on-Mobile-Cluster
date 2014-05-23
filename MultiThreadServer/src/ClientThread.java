@@ -26,6 +26,7 @@ import org.jbox2d.dynamics.joints.RevoluteJoint;
  */
 
 public class ClientThread extends Thread {
+	private int id;
 	private PrintWriter out;
 	private BufferedReader in;
 	private Socket clientSocket = null;
@@ -83,6 +84,7 @@ public class ClientThread extends Thread {
 			this.isMoved = false;
 			this.shouldBeRemoved = false;
 			this.removed = false;
+			this.type = type;
 			
 			lx = xPos;
 			ly = yPos;
@@ -226,8 +228,10 @@ public class ClientThread extends Thread {
 	ClientInfo clientInfo;
 	
 	public ClientThread(String ip, Socket clientSocket, ClientThread[] threads,
-			UpdateLoop updateLoop, DeviceManager deviceManager) {
+			UpdateLoop updateLoop, DeviceManager deviceManager, final int id) {
 
+		this.id = id;
+		
 		this.deviceManager = deviceManager;
 		this.clientSocket = clientSocket;
 		
@@ -246,6 +250,10 @@ public class ClientThread extends Thread {
 	}
 
 
+	public int getIdentification() {
+		return this.id;
+	}
+	
 	/**
 	 * @deprecated replaced by sendData {@link #sendData(byte[])}
 	 */
@@ -421,6 +429,19 @@ public class ClientThread extends Thread {
 								if(type == 0) {
 									targetJoint = MultiThreds.getPhysicsWorld().addTarget(g_midX, g_midY, 0);
 								}
+								
+								
+								
+								// Send response 
+								ByteBuffer sendBuffer = ByteBuffer.allocate(2*2);
+								sendBuffer.clear();
+
+								final short sendState = (short) GLOBAL_STATE__.ADD_DEVICE.ordinal();
+								sendBuffer.putShort(sendState); 
+								sendBuffer.putShort((short) id);
+
+								sendData(buffer.array());
+								clientInfo.addSentPackageItem(GLOBAL_STATE__.values()[sendState] + "   Id: " + id);
 							}
 								break;
 
@@ -538,6 +559,7 @@ public class ClientThread extends Thread {
 								float x2 = buffer.getFloat();
 								float y2 = buffer.getFloat();
 								float t = buffer.getFloat();
+								short type = buffer.getShort();
 
 								clientInfo.addIncomingPackageItem(actualState.name() + "   " + x1 + "   " + y1 + "   " + x2 + "   " + y2 + "   " + t);
 								
@@ -559,7 +581,8 @@ public class ClientThread extends Thread {
 									// Ballz(MultiThreds.sharedVariables.getInstance().getBallCounter(),xG,
 									// yG, xVel, yVel));
 									Random r = new Random();
-									int type = r.nextInt(2) + 1;
+									//int type = r.nextInt(3) + 1;
+									System.out.println("Type of ball is: " + type);
 									ballz.add(new Ballz(deviceManager.getDeviceThread(ip), ballCount, xG, yG, xVel, yVel,type));
 									for (int j = 0; j < maxClientsCount; j++) {
 										if (threads[j] != null) {

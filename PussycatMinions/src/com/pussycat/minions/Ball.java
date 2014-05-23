@@ -1,5 +1,7 @@
 package com.pussycat.minions;
 
+import android.graphics.Color;
+
 import com.pussycat.framework.Graphics;
 import com.pussycat.framework.Image;
 
@@ -7,6 +9,7 @@ public abstract class Ball {
 
 	protected int id;
 	protected int parent;
+	protected int type;
 	
 	protected float x;
 	protected float y;
@@ -16,8 +19,6 @@ public abstract class Ball {
 	
 	protected Image image;
 	protected int radius;
-	
-	protected int type;
 	
 	
 	public void update(final float timeStep) {
@@ -32,6 +33,7 @@ public abstract class Ball {
 	
 	
 	public void draw(Graphics graphics) {
+		
 	    graphics.drawScaledImage(	this.image, 
 			    				 	(int)this.x - this.radius, 
 			    				 	(int)this.y - this.radius, 

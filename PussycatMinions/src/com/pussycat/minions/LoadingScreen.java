@@ -28,19 +28,18 @@ import com.pussycat.minions.Device.IndexPair;
 public class LoadingScreen extends Screen {
 	
 	private float startTime;
-	private float durationTime = (float) (2 * Math.pow(10, 9));
+	private float durationTime = (float) (1 * Math.pow(10, 9));
 	private LoadingBar loadingbar;
 	
 	private AtomicBoolean doneLoading = new AtomicBoolean(false);
 	private AtomicBoolean doneScanning = new AtomicBoolean(false);
 	
 	
-		
     public LoadingScreen(final Game game) {
         super(game);
         
         Graphics g = game.getGraphics();
-        
+
         // Preload the Assets which are used by LoadingScreen
         Assets.splash = g.newImage("loadpage.png", ImageFormat.RGB565);
         Assets.splash = g.newScaledImage(Assets.splash, PussycatMinions.getScreenWidth());
@@ -48,7 +47,6 @@ public class LoadingScreen extends Screen {
         Assets.ball1 = g.newImage("Bug_1.png", ImageFormat.RGB565);
         Assets.ball2 = g.newImage("Bug_2.png", ImageFormat.RGB565);
         Assets.ball3 = g.newImage("Bug_3.png", ImageFormat.RGB565);
-    
          
         Thread loadingThread = new Thread(new Runnable() {
         	public void run() {
@@ -82,8 +80,6 @@ public class LoadingScreen extends Screen {
         	}
         });
        
-       
-        
         
         Thread scanningThread = new Thread(new Runnable() {
         	public void run() {
@@ -108,6 +104,7 @@ public class LoadingScreen extends Screen {
         if(doneScanning.get() && doneLoading.get() && (startTime + durationTime - System.nanoTime() <= 0.0f)) {
         	loadingbar.setFinished(true);
         	//game.setScreen(new MainMenuScreen(game));
+        	Assets.splash.dispose();
         	game.setScreen(new ServerBrowser(game));
         }
         AnimationHandler.getInstance().updateAnimations(System.nanoTime());

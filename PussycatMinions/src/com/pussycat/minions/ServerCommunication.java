@@ -77,11 +77,19 @@ public class ServerCommunication extends Thread {
 						} break;
 						
 						case START_GAME: {
-							startGames( incomingData );
+							startGame( incomingData );
 						}
 						
 						case HAND_SHAKE: {
 							shakeHands( incomingData );
+						} break;
+						
+						case GAME_OVER: {
+							gameOver( incomingData );
+						} break;
+						
+						case ADD_DEVICE: {
+							addDevice( incomingData );
 						}
 						
 		    			default:
@@ -113,6 +121,31 @@ public class ServerCommunication extends Thread {
 	}
 	
 	
+	public void addDevice(DataPackage incomingData) {
+		ByteBuffer buffer = ByteBuffer.wrap(incomingData.getData());
+		final short state = buffer.getShort();
+		final short deviceId = buffer.getShort();
+		
+		SharedVariables.getInstance().setDeviceId(deviceId);
+	}
+	
+	
+	private void gameOver(DataPackage incomingData) {
+		ByteBuffer buffer = ByteBuffer.wrap(incomingData.getData());
+		final short state = buffer.getShort();
+		final short nPlayers = buffer.getShort();
+		
+		SharedVariables.getInstance().clearScores();
+		
+		for(short i=0; i<nPlayers; i++) {
+			final short id = buffer.getShort();
+			final int points = buffer.getInt();
+			SharedVariables.getInstance().addScore(new ShortPair(id, points));
+		}
+		
+		SharedVariables.getInstance().setIsRunning(false);
+	}
+	
 	private void shakeHands(DataPackage incomingData) {
 		ByteBuffer buffer = ByteBuffer.wrap(incomingData.getData());
 		final short state = buffer.getShort();
@@ -120,7 +153,7 @@ public class ServerCommunication extends Thread {
 		char[] name = new char[20];
 		
 		try{
-			for(int c=0; c<nChars; c++) {
+			for(short c=0; c<nChars; c++) {
 				name[c] = buffer.getChar();
 			}
 		} catch (Exception e) {
@@ -135,11 +168,21 @@ public class ServerCommunication extends Thread {
 	}
 		
 	
-	private void startGames(DataPackage incomingData) {
+	private void startGame(DataPackage incomingData) {
 		ByteBuffer buffer = ByteBuffer.wrap(incomingData.getData());
 		final short state = buffer.getShort();
+		final short gameTimeInSeconds = buffer.getShort();
+		SharedVariables.getInstance().setGameTimeInSeconds(gameTimeInSeconds);
+		
 		final short nPlayers = buffer.getShort();
 		
+		for(short i=0; i<nPlayers; i++) {
+			final short id = buffer.getShort();
+			final short color = buffer.getShort();
+			Log.d("SOON", "START GOT: id = " + id + " ,,  " + color);
+			SharedVariables.getInstance().setColor(id, color);
+		}
+				
 		SharedVariables.getInstance().initializePoints(nPlayers);
 		SharedVariables.getInstance().setStartGame(true);
 	}
@@ -148,13 +191,13 @@ public class ServerCommunication extends Thread {
 	private void setPoints(DataPackage incomingData) {
 		ByteBuffer buffer = ByteBuffer.wrap(incomingData.getData());
 		final short state = buffer.getShort();
-		
 		final short nPlayers = buffer.getShort();
 		
 		int totalPoints = 0;
 		for(short i=0; i<nPlayers; i++) {
+			final short id = buffer.getShort();
 			final int points = buffer.getInt();
-			SharedVariables.getInstance().setPoints(i, points);
+			SharedVariables.getInstance().setPoints(id, points);
 			totalPoints += points;
 		}
 		SharedVariables.getInstance().setTotalPoints(totalPoints);
