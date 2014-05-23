@@ -17,7 +17,7 @@ public class BallsWidget implements Widget {
 	
 	private final float COOL_TIME = 1.0f; // seconds
 	private final float SHIFT_TIME = 1.0f; // seconds
-	private final float RADIUS = 0.0075f; // meters
+	private final float RADIUS = 0.0050f; // meters
 	private final float X_MARIGN = 0.05f; // cm
 	private final float Y_MARIGN = 0.05f; // cm
 	private final float BALL_MARGIN = 0.1f; // cm
@@ -41,7 +41,7 @@ public class BallsWidget implements Widget {
 		for(int i=0; i<activeBalls; i++) {
 			int type = rand.nextInt(3)+1;
 			Log.d("Queue", "New type1: " + type);
-			balls[i] = new BallRegular(i, SharedVariables.getInstance().getDeviceId(), x, OFFSET + maxY - i*dist, 0, 0,type, PussycatMinions.meters2Pixels(0.0025f));
+			balls[i] = new BallRegular(i, SharedVariables.getInstance().getDeviceId(), x, OFFSET + maxY - i*dist, 0, 0,type, PussycatMinions.meters2Pixels(RADIUS));
 			Log.d("SOON", "SharedVariables.getInstance().getDeviceId() = " + SharedVariables.getInstance().getDeviceId());
 			animatedYs[i] = new AnimatedValue(balls[i].getY());
 		}
@@ -100,7 +100,7 @@ public class BallsWidget implements Widget {
 			Log.d("WID", "ADD BALL");
 			adder.setValue(0.0f);
 			int type = rand.nextInt(3)+1;
-			addBall(new BallRegular(0, SharedVariables.getInstance().getDeviceId(), x, OFFSET + maxY - (maxNBalls-1) * dist, 0, 0,type, PussycatMinions.meters2Pixels(0.0025f)));
+			addBall(new BallRegular(0, SharedVariables.getInstance().getDeviceId(), x, OFFSET + maxY - (maxNBalls-1) * dist, 0, 0,type, PussycatMinions.meters2Pixels(RADIUS)));
 			if(activeBalls < maxNBalls) {
 				adderAnimation.start();
 			}

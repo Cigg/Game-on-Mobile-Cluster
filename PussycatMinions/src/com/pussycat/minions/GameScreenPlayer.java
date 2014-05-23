@@ -311,7 +311,9 @@ public class GameScreenPlayer extends Screen {
     			downX = currentX;
     			downY = currentY;
     			
-    			currentBallType = ballsWidget.pop();
+    			if(ballsWidget != null) {
+    				currentBallType = ballsWidget.pop();
+    			}
     			
     			if(index < ptx.length) {
     				tms[index] = currentTime;
@@ -735,13 +737,7 @@ public class GameScreenPlayer extends Screen {
         vk = vkb;
         vz = vzb;
     	
-        if( dragged ) {
-        	if(ballsWidget != null) {
-        		currentBallType = ballsWidget.getTypeOfFirstBall();
-        	} else {
-        		currentBallType = 0;
-        	}
-        	
+        if( dragged ) {        	
         	com.pussycat.framework.Image currentBall;
         	if(currentBallType == 1){
         		currentBall = Assets.ball1; 
@@ -753,7 +749,7 @@ public class GameScreenPlayer extends Screen {
         		currentBall = Assets.ball;
         	}
         	
-        	graphics.drawCircle((int)(draggedX), (int)(draggedY), (float)(PussycatMinions.meters2Pixels(0.0075f)*0.95), Color.RED);
+        	graphics.drawCircle((int)(draggedX), (int)(draggedY), (float)(PussycatMinions.meters2Pixels(0.0075f)*0.95),Color.RED);
         	graphics.drawScaledImage(	currentBall, 
 				 	(int)(draggedX - PussycatMinions.meters2Pixels(0.0075f)), 
 				 	(int)(draggedY - PussycatMinions.meters2Pixels(0.0075f)), 
