@@ -311,7 +311,7 @@ public class MultiThreds {
 			    				
 			    				for(ClientThread.Ballz ball : thread.ballz) {
 			    			
-			    					if(buffer.limit() - buffer.position() >= 6*4) {
+			    					if(buffer.limit() - buffer.position() >= 7*4) {
 			    						
 				    					float xG = ball.getXPos();
 					    				float yG = ball.getYPos();
@@ -363,7 +363,9 @@ public class MultiThreds {
 								    				
 								    				buffer.putFloat(xVelL2);
 								    				buffer.putFloat(yVelL2);
-				
+								    				
+								    				buffer.putInt(ball.type);
+								    				
 								    				nBalls ++;
 								    				//System.out.println("OOOOOOOOOOOOOOOOOOO___BALL_UPDATE___OOOOOOOOOOOOOOOOOOO");
 					    						}
@@ -384,7 +386,9 @@ public class MultiThreds {
 							    				
 							    				buffer.putFloat(xVelL);
 							    				buffer.putFloat(yVelL);
-			
+							    				
+							    				buffer.putInt(ball.type);
+							    				
 							    				nBalls ++;
 					    					}				
 						    				

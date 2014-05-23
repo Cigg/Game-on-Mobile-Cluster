@@ -8,8 +8,10 @@ import java.net.Socket;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.Hashtable;
+import java.util.Random;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.atomic.AtomicInteger;
+
 
 
 
@@ -61,6 +63,7 @@ public class ClientThread extends Thread {
 		float xVel, yVel;
 		float mass, radius, lifeTime;
 		int id;
+		int type;
 		boolean isMoved;
 		boolean shouldBeRemoved;
 		boolean removed;
@@ -68,7 +71,7 @@ public class ClientThread extends Thread {
 		float lx, ly;
 		int parent;
 
-		public Ballz(int parent, int id, float xPos, float yPos, float xVel, float yVel) {
+		public Ballz(int parent, int id, float xPos, float yPos, float xVel, float yVel, int type) {
 
 			this.id = id;
 			this.parent = parent;
@@ -81,6 +84,7 @@ public class ClientThread extends Thread {
 			this.isMoved = false;
 			this.shouldBeRemoved = false;
 			this.removed = false;
+			this.type = type;
 			
 			lx = xPos;
 			ly = yPos;
@@ -555,6 +559,7 @@ public class ClientThread extends Thread {
 								float x2 = buffer.getFloat();
 								float y2 = buffer.getFloat();
 								float t = buffer.getFloat();
+								short type = buffer.getShort();
 
 								clientInfo.addIncomingPackageItem(actualState.name() + "   " + x1 + "   " + y1 + "   " + x2 + "   " + y2 + "   " + t);
 								
@@ -575,7 +580,10 @@ public class ClientThread extends Thread {
 									// ballz.add(new
 									// Ballz(MultiThreds.sharedVariables.getInstance().getBallCounter(),xG,
 									// yG, xVel, yVel));
-									ballz.add(new Ballz(deviceManager.getDeviceThread(ip), ballCount, xG, yG, xVel, yVel));
+									Random r = new Random();
+									//int type = r.nextInt(3) + 1;
+									System.out.println("Type of ball is: " + type);
+									ballz.add(new Ballz(deviceManager.getDeviceThread(ip), ballCount, xG, yG, xVel, yVel,type));
 									for (int j = 0; j < maxClientsCount; j++) {
 										if (threads[j] != null) {
 											threads[j].ballCount = ballCount;
@@ -653,7 +661,7 @@ public class ClientThread extends Thread {
 		
 			for(int i = 0; i < 100; i++) {
 				ballCount++;
-				ballz.add(new Ballz(-2, ballCount, 0, 0,0, 0));
+				ballz.add(new Ballz(-2, ballCount, 0, 0,0, 0,1));
 			}
 			synchronized (this) {
 			for (int j = 0; j < 10; j++) {

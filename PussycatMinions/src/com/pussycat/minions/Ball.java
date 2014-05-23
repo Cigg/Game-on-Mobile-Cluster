@@ -34,8 +34,6 @@ public abstract class Ball {
 	
 	public void draw(Graphics graphics) {
 		
-		graphics.drawCircle((int)this.x, (int)this.y, (float)(this.radius*0.87), Color.RED);
-		
 	    graphics.drawScaledImage(	this.image, 
 			    				 	(int)this.x - this.radius, 
 			    				 	(int)this.y - this.radius, 
