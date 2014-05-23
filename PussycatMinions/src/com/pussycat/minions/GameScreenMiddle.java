@@ -261,6 +261,7 @@ case START_GAME: {
 }
     
 
+/*
      case RUN_DEVICE:
      {
      Log.d("AppStates", "RUN_DEVICE");
@@ -290,7 +291,7 @@ buffer.putFloat(currentTime - tms[index-8]);	// t
     
      }
      break;
-    
+    */
     
      default:
      break;

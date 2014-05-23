@@ -42,15 +42,16 @@ public class BallsWidget implements Widget {
 		for(int i=0; i<activeBalls; i++) {
 			int type = rand.nextInt(3)+1;
 			Log.d("Queue", "New type1: " + type);
-			balls[i] = new BallRegular(i, SharedVariables.getInstance().getDeviceId(), x, OFFSET + maxY - i*dist, 0, 0,type);
+			balls[i] = new BallRegular(i, SharedVariables.getInstance().getDeviceId(), x, OFFSET + maxY - i*dist, 0, 0, type);
+			Log.d("SOON", "SharedVariables.getInstance().getDeviceId() = " + SharedVariables.getInstance().getDeviceId());
 			animatedYs[i] = new AnimatedValue(balls[i].getY());
 		}
 	}
 	
 	
-	public int pop() {
+	public Ball pop() {
 		if(!isEmpty()) {
-			int type = balls[0].type;
+			Ball tempBall = balls[0];
 			for(int i=0; i<maxNBalls-1; i++) {
 				balls[i] = balls[i+1];
 				animatedYs[i] = animatedYs[i+1];
@@ -59,9 +60,9 @@ public class BallsWidget implements Widget {
 			animateBalls();
 			adderAnimation.start();
 			
-			return type;
+			return tempBall;
 		}
-		return 0;
+		return null;
 	}
 	
 	

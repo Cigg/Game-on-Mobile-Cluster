@@ -261,13 +261,12 @@ public class GameScreenPlayer extends Screen {
     				case RUN_DEVICE:
     				{
     					Log.d("STATEZ", "PLAYER RUN_DEVICE");
-    					int type = ballsWidget.pop();
-    					if( type > 0) {
+    					Ball addBall = ballsWidget.pop();
+    					if(addBall != null) {
 	    					Log.d("AppStates", "RUN_DEVICE");
 	    					buffer = ByteBuffer.allocate(2*2 + 5*4);
 	    		    		buffer.clear();
-	    		    		
-	    		    		Log.d("Queue", "Got type: " + type);
+	    		    	
 	    		    		buffer.putShort((short) GLOBAL_STATE__.RUN_DEVICE.ordinal());	// State: RUN_DEVICE
 	    		    			
 	    		    		if(index < 8) {
@@ -276,14 +275,14 @@ public class GameScreenPlayer extends Screen {
 		    		    		buffer.putFloat(currentX);										// x2
 		    		    		buffer.putFloat(currentY);										// y2
 		    		    		buffer.putFloat(deltaTimeDragged);								// t	
-		    		    		buffer.putShort((short) type);											//type of ball
+		    		    		buffer.putShort((short) addBall.type);											//type of ball
 	    		    		} else {
 	    		    			buffer.putFloat(ptx[index-8]);									// x1
 		    		    		buffer.putFloat(pty[index-8]); 									// y1
 		    		    		buffer.putFloat(currentX);										// x2
 		    		    		buffer.putFloat(currentY);										// y2
 		    		    		buffer.putFloat(currentTime - tms[index-8]);					// t	
-		    		    		buffer.putShort((short) type);											//type of ball
+		    		    		buffer.putShort((short) addBall.type);											//type of ball
 	    		    		}
 	    		    		
 	    		    		comm.sendData(buffer.array());
