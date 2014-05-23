@@ -71,7 +71,7 @@ public class MultiThreds {
 		
 		int i=0;
 		for(ClientThread thread : threads) {
-			if(thread != null && thread.getIsReady() == 1) {
+			if(thread != null && thread.getIsReady() == 1 && !deviceManager.isMiddle(thread.getIp()) ) {
 				System.out.println("ID: " + (short)thread.getIdentification());
 				dataBuffer.putShort((short)thread.getIdentification());
 				dataBuffer.putShort(colors[i]);
@@ -175,13 +175,13 @@ public class MultiThreds {
 								if(deviceManager.isMiddle(thread.getIp())) {
 									isStarted = true;
 									System.out.println("STARTED!!!!!!!!!!!!!!!!!!!!!!!!!!!");
-									//nPlayers --;
+									nPlayers --;
 								}
 							}
 						}
 		    		}
 		    		
-		    		if(nPlayers <= 1) { // Ty main-device är fortfarande spelare.
+		    		if(nPlayers <= 0) { // Ty main-device är fortfarande spelare.
 		    			isStarted = false;
 		    		}
 		    		
@@ -271,7 +271,7 @@ public class MultiThreds {
 	    					
 	    					short nScores = 0;
 	    					for(ClientThread thread : threads) {
-			    				if (thread != null) {
+			    				if (thread != null && !deviceManager.isMiddle(thread.getIp())) {
 			    					dataBuffer.putShort((short) thread.getIdentification());
 			    					dataBuffer.putInt(deviceManager.getScore(thread.getIp()));
 			    					nScores ++;

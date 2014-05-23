@@ -59,10 +59,10 @@ public class SharedVariables {
 	
 	private AtomicInteger gameTimeInSeconds = new AtomicInteger(120);
 
-	ConcurrentHashMap<Integer, Integer> idAndColors = new ConcurrentHashMap<Integer, Integer>();
-	ConcurrentHashMap<Integer, Integer> idAndPoints = new ConcurrentHashMap<Integer, Integer>();
-	ArrayList<ShortPair> finalScores = new ArrayList<ShortPair>();
-	AtomicInteger deviceId = new AtomicInteger(-2);
+	private ConcurrentHashMap<Integer, Integer> idAndColors = new ConcurrentHashMap<Integer, Integer>();
+	private ConcurrentHashMap<Integer, Integer> idAndPoints = new ConcurrentHashMap<Integer, Integer>();
+	private ArrayList<ShortPair> finalScores = new ArrayList<ShortPair>();
+	private AtomicInteger deviceId = new AtomicInteger();
 	
 	
 	private final int COLORS[] = {
@@ -196,7 +196,7 @@ public class SharedVariables {
 	
 	public int getMyColor() {
 		synchronized(idAndColors) {
-			return idAndColors.get(deviceId);	
+			return idAndColors.get(deviceId.get());	
 		}
 	}
 	
@@ -360,6 +360,7 @@ public class SharedVariables {
 	
 	
 	public int getDeviceId() {
+		Log.d("SOON", "Get my device id: " + deviceId.get());
 		return deviceId.get();
 	}
 	
@@ -486,9 +487,9 @@ public class SharedVariables {
 	}
 
 
-	public void setDeviceId(final short deviceId) {
-		Log.d("SOON", "My device id: " + deviceId);
-		this.deviceId.set(deviceId);
+	public void setDeviceId(final int setDeviceId) {
+		Log.d("SOON", "Set my device id: " + setDeviceId);
+		deviceId.set(setDeviceId);
 	}
 
 

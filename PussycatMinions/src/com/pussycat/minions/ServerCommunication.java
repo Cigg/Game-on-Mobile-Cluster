@@ -211,7 +211,7 @@ public class ServerCommunication extends Thread {
 		
 		final float angle = buffer.getFloat();
 		
-		Log.d("GOTANGLE", "GOTANGLE: " + angle);
+		//Log.d("GOTANGLE", "GOTANGLE: " + angle);
 		SharedVariables.getInstance().setMiddleAngle(angle);		
 	}
 
