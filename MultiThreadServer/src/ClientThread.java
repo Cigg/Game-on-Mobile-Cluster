@@ -251,7 +251,7 @@ public class ClientThread extends Thread {
 
 
 	public int getIdentification() {
-		return deviceManager.getDeviceThread(ip);
+		return this.id;
 	}
 	
 	/**
@@ -433,14 +433,14 @@ public class ClientThread extends Thread {
 								
 								
 								// Send response 
-								ByteBuffer sendBuffer = ByteBuffer.allocate(2*2);
-								sendBuffer.clear();
+								ByteBuffer sendBufferAdd = ByteBuffer.allocate(2 + 4);
 
 								final short sendState = (short) GLOBAL_STATE__.ADD_DEVICE.ordinal();
-								sendBuffer.putShort(sendState); 
-								sendBuffer.putShort((short) getIdentification());
+								sendBufferAdd.putShort(sendState); 
+								sendBufferAdd.putInt(id);
+								System.out.println("Send id: " + id);
 
-								sendData(buffer.array());
+								sendData(sendBufferAdd.array());
 								clientInfo.addSentPackageItem(GLOBAL_STATE__.values()[sendState] + "   Id: " + id);
 							}
 								break;

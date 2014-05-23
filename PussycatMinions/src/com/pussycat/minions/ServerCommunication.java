@@ -90,7 +90,7 @@ public class ServerCommunication extends Thread {
 						
 						case ADD_DEVICE: {
 							addDevice( incomingData );
-						}
+						} break;
 						
 		    			default:
 		    			break;
@@ -124,9 +124,9 @@ public class ServerCommunication extends Thread {
 	public void addDevice(DataPackage incomingData) {
 		ByteBuffer buffer = ByteBuffer.wrap(incomingData.getData());
 		final short state = buffer.getShort();
-		final short deviceId = buffer.getShort();
+		final int id = buffer.getInt();
 		
-		SharedVariables.getInstance().setDeviceId(deviceId);
+		SharedVariables.getInstance().setDeviceId(id);
 	}
 	
 	

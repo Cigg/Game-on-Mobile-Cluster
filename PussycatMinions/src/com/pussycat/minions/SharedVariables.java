@@ -185,6 +185,7 @@ public class SharedVariables {
 	}
 	
 	public int getColor(final int id) {
+		Log.d("DEVICEID", "GET COLOR: " + id);
 		synchronized(idAndColors) {
 			int color = idAndColors.get(id);
 			if(colorOk(color)) {
@@ -360,7 +361,7 @@ public class SharedVariables {
 	
 	
 	public int getDeviceId() {
-		Log.d("SOON", "Get my device id: " + deviceId.get());
+		Log.d("DEVICEID", "Get my device id: " + deviceId.get());
 		return deviceId.get();
 	}
 	
@@ -488,8 +489,9 @@ public class SharedVariables {
 
 
 	public void setDeviceId(final int setDeviceId) {
-		Log.d("SOON", "Set my device id: " + setDeviceId);
+		Log.d("DEVICEID", "Set my device id: " + setDeviceId);
 		deviceId.set(setDeviceId);
+		Log.d("DEVICEID", "Set my device id: " + setDeviceId + " &=& " + deviceId.get());
 	}
 
 
