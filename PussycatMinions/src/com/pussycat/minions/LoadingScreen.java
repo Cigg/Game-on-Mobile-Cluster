@@ -45,6 +45,9 @@ public class LoadingScreen extends Screen {
         Assets.splash = g.newImage("loadpage.png", ImageFormat.RGB565);
         Assets.splash = g.newScaledImage(Assets.splash, PussycatMinions.getScreenWidth());
         Assets.localBall = g.newImage("baby.png", ImageFormat.RGB565);
+        Assets.ball1 = g.newImage("Bug_1.png", ImageFormat.RGB565);
+        Assets.ball2 = g.newImage("Bug_2.png", ImageFormat.RGB565);
+        Assets.ball3 = g.newImage("Bug_3.png", ImageFormat.RGB565);
     
          
         Thread loadingThread = new Thread(new Runnable() {

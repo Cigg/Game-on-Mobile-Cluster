@@ -17,6 +17,8 @@ public abstract class Ball {
 	protected Image image;
 	protected int radius;
 	
+	protected int type;
+	
 	
 	public void update(final float timeStep) {
 	    this.x += this.vx * timeStep;
