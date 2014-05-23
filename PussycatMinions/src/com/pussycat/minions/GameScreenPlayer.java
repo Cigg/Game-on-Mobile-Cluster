@@ -10,6 +10,7 @@ import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
+import android.media.Image;
 import android.util.Log;
 
 import com.pussycat.framework.Game;
@@ -70,6 +71,8 @@ public class GameScreenPlayer extends Screen {
 	private PointsNotificationWidget pointsNotificationsWidget;
 	private RemapWidget remapWidget;
 	private CountDownWidget countDownWidget;
+	
+	private int currentBallType;
 	
 	private ArrayList<Widget> widgets = new ArrayList<Widget>();
 
@@ -261,13 +264,13 @@ public class GameScreenPlayer extends Screen {
     				case RUN_DEVICE:
     				{
     					Log.d("STATEZ", "PLAYER RUN_DEVICE");
-    					int type = ballsWidget.pop();
-    					if( type > 0) {
+    					currentBallType = ballsWidget.pop();
+    					if( currentBallType > 0) {
 	    					Log.d("AppStates", "RUN_DEVICE");
 	    					buffer = ByteBuffer.allocate(2*2 + 5*4);
 	    		    		buffer.clear();
 	    		    		
-	    		    		Log.d("Queue", "Got type: " + type);
+	    		    		Log.d("Queue", "Got type: " + currentBallType);
 	    		    		buffer.putShort((short) GLOBAL_STATE__.RUN_DEVICE.ordinal());	// State: RUN_DEVICE
 	    		    			
 	    		    		if(index < 8) {
@@ -276,14 +279,14 @@ public class GameScreenPlayer extends Screen {
 		    		    		buffer.putFloat(currentX);										// x2
 		    		    		buffer.putFloat(currentY);										// y2
 		    		    		buffer.putFloat(deltaTimeDragged);								// t	
-		    		    		buffer.putShort((short) type);											//type of ball
+		    		    		buffer.putShort((short) currentBallType);											//type of ball
 	    		    		} else {
 	    		    			buffer.putFloat(ptx[index-8]);									// x1
 		    		    		buffer.putFloat(pty[index-8]); 									// y1
 		    		    		buffer.putFloat(currentX);										// x2
 		    		    		buffer.putFloat(currentY);										// y2
 		    		    		buffer.putFloat(currentTime - tms[index-8]);					// t	
-		    		    		buffer.putShort((short) type);											//type of ball
+		    		    		buffer.putShort((short) currentBallType);											//type of ball
 	    		    		}
 	    		    		
 	    		    		comm.sendData(buffer.array());
@@ -731,16 +734,28 @@ public class GameScreenPlayer extends Screen {
         vz = vzb;
     	
         if( dragged ) {
-        	graphics.drawScaledImage(	Assets.ball, 
+        	com.pussycat.framework.Image currentBall;
+        	if(currentBallType == 1){
+        		currentBall = Assets.ball1; 
+        	} else if (currentBallType == 2) {
+        		currentBall = Assets.ball2;
+        	} else if (currentBallType == 3) {
+        		currentBall = Assets.ball3;
+        	} else {
+        		currentBall = Assets.ball;
+        	}
+        	
+        	graphics.drawCircle((int)(draggedX), (int)(draggedY), (float)(PussycatMinions.meters2Pixels(0.0075f)*0.95), Color.RED);
+        	graphics.drawScaledImage(	currentBall, 
 				 	(int)(draggedX - PussycatMinions.meters2Pixels(0.0075f)), 
 				 	(int)(draggedY - PussycatMinions.meters2Pixels(0.0075f)), 
 				 	(int)(PussycatMinions.meters2Pixels(0.0075f*2)), 
 				 	(int)(PussycatMinions.meters2Pixels(0.0075f*2)), 
 				 	0, 
 				 	0, 
-				 	Assets.ball.getWidth(), 
-				 	Assets.ball.getHeight(),
-				 	0.0f	);
+				 	currentBall.getWidth(), 
+				 	currentBall.getHeight(),
+				 	0.0f 	);
         }
         
         

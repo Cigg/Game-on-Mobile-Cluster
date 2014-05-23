@@ -14,7 +14,7 @@ public class BallRegular extends Ball {
 	private final int COLORS[] = {
 			Color.rgb(255, 0, 0),
 			Color.rgb(0, 255, 0),
-			Color.rgb(0, 255, 0),
+			Color.rgb(0, 0, 255),
 			Color.rgb((int)(Math.random()*255),(int)(Math.random()*255), (int)(Math.random()*255)),
 			Color.rgb((int)(Math.random()*255),(int)(Math.random()*255), (int)(Math.random()*255)),
 			Color.rgb((int)(Math.random()*255),(int)(Math.random()*255), (int)(Math.random()*255)),
@@ -24,7 +24,7 @@ public class BallRegular extends Ball {
 			Color.rgb((int)(Math.random()*255),(int)(Math.random()*255), (int)(Math.random()*255))
 	};
 	
-	public BallRegular (final int id, final int parent, final float x, final float y, final float vx, final float vy, final int type) {
+	public BallRegular (final int id, final int parent, final float x, final float y, final float vx, final float vy, final int type, final int radius) {
 		this.id = id;
 		this.parent = parent;
 		
@@ -37,7 +37,7 @@ public class BallRegular extends Ball {
 		this.type = type;
 		
 		Log.d("RADIUS_2", "PussycatMinions.meters2Pixels(0.0075f); = " + PussycatMinions.meters2Pixels(0.0075f));
-		this.radius = PussycatMinions.meters2Pixels(0.0075f);
+		this.radius = radius; //PussycatMinions.meters2Pixels(0.0075f);
 		
 		if(this.type == 1){
 			this.image = Assets.ball1;

@@ -15,7 +15,6 @@ public class BallsWidget implements Widget {
 	private AnimatedValue[] animatedYs = new AnimatedValue[maxNBalls];
 	private int activeBalls = maxNBalls;
 	
-	
 	private final float COOL_TIME = 1.0f; // seconds
 	private final float SHIFT_TIME = 1.0f; // seconds
 	private final float RADIUS = 0.0075f; // meters
@@ -42,7 +41,7 @@ public class BallsWidget implements Widget {
 		for(int i=0; i<activeBalls; i++) {
 			int type = rand.nextInt(3)+1;
 			Log.d("Queue", "New type1: " + type);
-			balls[i] = new BallRegular(i, SharedVariables.getInstance().getDeviceId(), x, OFFSET + maxY - i*dist, 0, 0,type);
+			balls[i] = new BallRegular(i, SharedVariables.getInstance().getDeviceId(), x, OFFSET + maxY - i*dist, 0, 0,type, PussycatMinions.meters2Pixels(0.0025f));
 			animatedYs[i] = new AnimatedValue(balls[i].getY());
 		}
 	}
@@ -101,7 +100,7 @@ public class BallsWidget implements Widget {
 			adder.setValue(0.0f);
 			int type = rand.nextInt(3)+1;
 			Log.d("Queue", "New type2: " + type);
-			addBall(new BallRegular(0, SharedVariables.getInstance().getDeviceId(), x, OFFSET + maxY - (maxNBalls-1) * dist, 0, 0,type));
+			addBall(new BallRegular(0, SharedVariables.getInstance().getDeviceId(), x, OFFSET + maxY - (maxNBalls-1) * dist, 0, 0,type, PussycatMinions.meters2Pixels(0.0025f)));
 			if(activeBalls < maxNBalls) {
 				adderAnimation.start();
 			}
