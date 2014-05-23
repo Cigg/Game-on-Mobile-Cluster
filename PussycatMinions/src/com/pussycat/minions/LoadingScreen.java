@@ -58,7 +58,7 @@ public class LoadingScreen extends Screen {
      	        Assets.mainMenuBackground = g.newScaledImage(Assets.mainMenuBackground, (int) (PussycatMinions.getScreenWidth()));
      	        Assets.octopus = g.newImage("Spider_target.png", ImageFormat.RGB565);
      	       
-     	        Assets.click = game.getAudio().createSound("explosion.ogg");
+     	        //Assets.click = game.getAudio().createSound("explosion.ogg");
     	        
     	        Assets.button = g.newImage("button.png", ImageFormat.RGB565);
     	        Assets.button_pressed = g.newImage("button_pressed.png", ImageFormat.RGB565);

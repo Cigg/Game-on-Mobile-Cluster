@@ -539,7 +539,7 @@ Graphics g = game.getGraphics();
  Graphics g = game.getGraphics();
  //TODO: create button on init. use drawButton here
 
- menuButton.drawButton(g);
+ //menuButton.drawButton(g);
  }
 //
 //

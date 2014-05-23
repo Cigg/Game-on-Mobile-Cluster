@@ -1,5 +1,7 @@
 package com.pussycat.minions;
 
+import android.util.Log;
+
 import com.pussycat.framework.Graphics;
 import com.pussycat.framework.Image;
 
@@ -61,7 +63,11 @@ public class CountDownWidget implements Widget {
 	
 	public void draw(Graphics graphics) {
 		if(isRunning) {
-			graphics.drawImage(image, screenWidth/2 - image.getWidth()/2, screenHeight/2 - image.getHeight()/2);
+			int targetWidth = (int)((float)screenWidth*0.5f);
+			int targetHeight = (int)(((float)targetWidth/(float)image.getWidth())*(float)image.getHeight());
+			Log.d("herregud", "targetWidth: " + targetWidth);
+			Log.d("herregud", "targetHeight: " + targetHeight);
+			graphics.drawScaledImage(image, screenWidth/2 - targetWidth/2, screenHeight/2 - targetHeight/2, targetWidth, targetHeight, 0, 0, image.getWidth(), image.getHeight(), 0);
 		}
 	}
 	
