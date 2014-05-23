@@ -18,6 +18,7 @@ public enum GLOBAL_STATE__ {
 	START_GAME, 
 	IS_READY,
 	MAP_ALL,
-	HAND_SHAKE
+	HAND_SHAKE, 
+	GAME_OVER
 }
 

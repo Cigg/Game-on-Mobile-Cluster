@@ -15,6 +15,7 @@ import java.awt.BorderLayout;
 import javax.swing.JLabel;
 import java.awt.Component;
 import javax.swing.SwingConstants;
+import javax.swing.JSplitPane;
 
 public class ServerBoard extends JFrame {
 	private MultiThreds server;
@@ -31,6 +32,12 @@ public class ServerBoard extends JFrame {
 	private JPanel panel_3;
 	private JLabel lblNumberOfSlots;
 	private JTextField nSlots;
+	private JLabel lblMin;
+	private JPanel panel_4;
+	private JTextField min;
+	private JLabel lblSec;
+	private JTextField sec;
+	private JPanel panel_6;
 
 	public ServerBoard() {
 		JPanel panel = new JPanel();
@@ -45,9 +52,11 @@ public class ServerBoard extends JFrame {
             	System.out.println("Server started");
             	btnStart.setEnabled(false);
             	
-               	server = new MultiThreds(serverName.getText(), nSlots.getText());
+               	server = new MultiThreds(serverName.getText(), nSlots.getText(), min.getText(), sec.getText());
                	serverName.setEditable(false);
                	nSlots.setEditable(false);
+               	min.setEditable(false);
+               	sec.setEditable(false);
                	
    				server.update.start();
    				server.deviceUpdate.start();
@@ -105,14 +114,36 @@ public class ServerBoard extends JFrame {
         
         panel_3 = new JPanel();
         panel2.add(panel_3);
-        panel_3.setLayout(new FlowLayout(FlowLayout.LEFT, 5, 5));
+        panel_3.setLayout(new BoxLayout(panel_3, BoxLayout.X_AXIS));
+        
+        panel_6 = new JPanel();
+        panel_3.add(panel_6);
+        panel_6.setLayout(new FlowLayout(FlowLayout.LEFT, 5, 5));
         
         lblNumberOfSlots = new JLabel("Number of slots:");
-        panel_3.add(lblNumberOfSlots);
+        panel_6.add(lblNumberOfSlots);
         
         nSlots = new JTextField();
+        panel_6.add(nSlots);
         nSlots.setColumns(2);
-        panel_3.add(nSlots);
+        
+        panel_4 = new JPanel();
+        panel_3.add(panel_4);
+        panel_4.setLayout(new FlowLayout(FlowLayout.LEFT, 5, 5));
+        
+        lblMin = new JLabel("Min:");
+        panel_4.add(lblMin);
+        
+        min = new JTextField();
+        min.setColumns(2);
+        panel_4.add(min);
+        
+        lblSec = new JLabel("Sec:");
+        panel_4.add(lblSec);
+        
+        sec = new JTextField();
+        sec.setColumns(2);
+        panel_4.add(sec);
         
         panel_2 = new JPanel();
         panel2.add(panel_2);
@@ -123,7 +154,7 @@ public class ServerBoard extends JFrame {
         
         lblBug = new JLabel(" Bug: 'Clear balls' f\u00F6re 'Clear devices'");
         panel_2.add(lblBug);
-        setSize(400,170);
+        setSize(370,160);
         setVisible(true);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         

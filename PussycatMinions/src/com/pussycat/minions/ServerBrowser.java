@@ -2,6 +2,7 @@ package com.pussycat.minions;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import com.pussycat.framework.Game;
 import com.pussycat.framework.Graphics;
@@ -14,17 +15,33 @@ import android.util.Log;
 
 public class ServerBrowser extends Screen {
 	
-	Button[] buttons;
-	Paint paint;
+	private Button[] buttons;
+	private Paint paint;
+	
+	private Button refreshButton;
+	
+	private final int WIDTH = PussycatMinions.getScreenWidth()/2 - Assets.button.getWidth()/2;
+	private final int OFFSET = PussycatMinions.meters2Pixels( 0.5f / 100.0f);
+	
+	private LoadingBar loadingbar; 
+	private AtomicBoolean doneScanning = new AtomicBoolean(true);
+	
+	private final int TEXT_X = PussycatMinions.getScreenWidth()/2;
+	private final int TEXT_Y = PussycatMinions.getScreenHeight()/2;
+	
 	
 	public ServerBrowser(Game game) {
         super(game);
         
 		paint = new Paint();
-		paint.setTextSize(40);
+		paint.setTypeface(Assets.menu_font);
+		paint.setTextSize(42);
 		paint.setTextAlign(Paint.Align.CENTER);
 		paint.setAntiAlias(true);
 		paint.setColor(Color.WHITE);
+		
+		refreshButton = new Button(Assets.button, Assets.button_pressed, WIDTH, PussycatMinions.getScreenHeight() - OFFSET - Assets.button.getHeight(), paint);
+		refreshButton.setText("Refresh");
 		
 		initializeServers();
 	}
@@ -33,21 +50,28 @@ public class ServerBrowser extends Screen {
 	public void initializeServers() {
 		ArrayList<Server> servers = SharedVariables.getInstance().getServers();
 		buttons = new Button[servers.size()];
-		
-		int width = PussycatMinions.getScreenWidth()/2 - Assets.button.getWidth()/2;
+	
 		for(int i=0; i<servers.size(); i++) {
 			Log.d("BROWSE", "ADDED BUTTON");
-			buttons[i] = new Button(Assets.button, Assets.button_pressed, width, PussycatMinions.getScreenHeight()/2 + 300, paint);
-			buttons[i].setText(servers.get(i).name);
+			buttons[i] = new Button(Assets.button, Assets.button_pressed, WIDTH, OFFSET*(i+1) + Assets.button.getHeight()*i, paint);
+			buttons[i].setText(servers.get(i).name + ",  " + servers.get(i).slotsTaken + "/" + servers.get(i).numberOfSlots);
 		}
 	}
 	
 	
 	public void refresh() {
-		ServerScanner scanner = new ServerScanner();
-		scanner.scanForServers();
-		
-		initializeServers();
+		if(doneScanning.get()) {
+			loadingbar = new LoadingBar();
+			doneScanning.set(false);
+			Thread scannerThread = new Thread(new Runnable() {
+				public void run() {	
+					ServerScanner scanner = new ServerScanner();
+					scanner.scanForServers();
+					doneScanning.set(true);
+				}
+			});
+			scannerThread.start();
+		}
 	}
 	
 	
@@ -66,24 +90,50 @@ public class ServerBrowser extends Screen {
             			buttons[j].setPressed(true);
        				}
             	}
+            	
+            	if(refreshButton.inBounds(event.x, event.y)){
+        			refreshButton.setPressed(true);
+        		}
    			} else if(event.type == TouchEvent.TOUCH_DRAGGED){
    				for(int j=0; j<buttons.length; j++) {
             		if(!buttons[j].inBounds(event.x, event.y)){
             			buttons[j].setPressed(false);
        				}
             	}
+   				
+   				if(!refreshButton.inBounds(event.x, event.y)){
+        			refreshButton.setPressed(false);
+        		}
    			} else if(event.type == TouchEvent.TOUCH_UP) {
    				for(int j=0; j<buttons.length; j++) {
-            		if(buttons[j].inBounds(event.x, event.y)){
+            		if(buttons[j].isPressed() && buttons[j].inBounds(event.x, event.y)){
             			ArrayList<Server> servers = SharedVariables.getInstance().getServers();
             			SharedVariables.getInstance().setServer(servers.get(j));
             			game.setScreen(new MainMenuScreen(game));
+            			buttons[j].setPressed(false);
        				}
-            		buttons[j].setPressed(false);
+            		
             	}
+   				
+   				if(refreshButton.isPressed() && refreshButton.inBounds(event.x, event.y)){
+   					refreshButton.setPressed(false);
+   					refresh();
+        		}
    			}
    		}
-		        
+        
+        if(doneScanning.get()) {
+        	if(loadingbar != null) {
+        		initializeServers();
+        		loadingbar.setFinished(true);
+        		loadingbar = null;
+        	}
+        } else {
+        	if(loadingbar != null) {
+	        	 AnimationHandler.getInstance().updateAnimations(System.nanoTime());
+	        	 loadingbar.update(System.nanoTime());
+        	}
+        }       
 	}
 
 	@Override
@@ -91,13 +141,27 @@ public class ServerBrowser extends Screen {
 		// TODO Auto-generated method stub
 
 		Graphics graphics = game.getGraphics();
+		//graphics.drawImage(Assets.splash, 0, 0);
+		// TODO: Fix ServerBrowser Screen
+		graphics.clearScreen(Color.WHITE);
 		
-		if(buttons != null) {
+		if(buttons != null && buttons.length != 0) {
 			for(int i=0; i<buttons.length; i++) {
-				//Log.d("BROWSE", "DRAW BUTTON");
 				buttons[i].drawButton(graphics);
 			}
-		}	
+		} else {
+			paint.setColor(Color.BLACK);
+			graphics.drawString("No servers available.", TEXT_X, TEXT_Y, paint);
+			paint.setColor(Color.WHITE);
+		}
+		
+		if(refreshButton != null) {
+			refreshButton.drawButton(graphics);
+		}
+		
+		if(loadingbar != null) {
+			loadingbar.draw(graphics);
+		}
 	}
 
 	@Override

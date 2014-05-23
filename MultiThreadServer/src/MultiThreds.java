@@ -11,7 +11,9 @@ import java.net.Socket;
 import java.net.SocketException;
 import java.net.UnknownHostException;
 import java.nio.ByteBuffer;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 
 import org.jbox2d.common.Vec2;
 
@@ -34,6 +36,7 @@ public class MultiThreds {
 	private String SERVER_NAME;
 	private int maxClientCount;
 	private static int slotsTaken = 0;
+	private int gameTimeInSeconds = 120;
 	
 	private ClientThread[] threads;
 	private int[] scores;
@@ -48,11 +51,48 @@ public class MultiThreds {
 	public Thread update;
 	public Thread deviceUpdate;
 	
+
+	private short[] colors = { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19 };
+	private float startTime;
+	
+
 	public static PhysicsWorld getPhysicsWorld() {
 			return physicsWorld;
 	}
 	
-	public MultiThreds(final String serverName, final String maxClient) {
+	
+	public void startGame(final short nPlayers) {
+		ByteBuffer dataBuffer = ByteBuffer.allocate(2*2 + nPlayers*2 + 0*4 + 2 + 2*nPlayers + 2);
+		dataBuffer.clear();
+		short sendState = (short) GLOBAL_STATE__.START_GAME.ordinal();
+		dataBuffer.putShort(sendState);
+		dataBuffer.putShort((short)gameTimeInSeconds);
+		dataBuffer.putShort(nPlayers);	
+		
+		int i=0;
+		for(ClientThread thread : threads) {
+			if(thread != null && thread.getIsReady() == 1) {
+				System.out.println("ID: " + (short)thread.getIdentification());
+				dataBuffer.putShort((short)thread.getIdentification());
+				dataBuffer.putShort(colors[i]);
+				i++;
+			}
+		}
+		
+		int position = dataBuffer.position();
+		byte[] sendBytes = new byte[position];
+		System.arraycopy( dataBuffer.array(), 0, sendBytes, 0, position);
+	
+		for(ClientThread thread : threads) {
+			if(thread != null && thread.getIsReady() == 1) {
+				thread.sendData(sendBytes);
+	    		thread.clientInfo.addSentPackageItem(GLOBAL_STATE__.values()[sendState] + "   " + nPlayers);
+			}
+		}
+	}
+	
+	
+	public MultiThreds(final String serverName, final String maxClient, final String min, final String sec) {
 		
 		try{
 			if(serverName.isEmpty()) {
@@ -66,13 +106,35 @@ public class MultiThreds {
 		
 		try{
 			maxClientCount = Integer.parseInt(maxClient);
-			if(maxClientCount <= 0) {
+			if(maxClientCount <= 1) {
 				maxClientCount = 10;
 			}
 		} catch(Exception e) {
 			maxClientCount = 10;
 		}
+		
+		int tempTime = 0;
+		try{
+			int minVal = Integer.parseInt(min);
+			if(minVal > 0) {
+				tempTime += minVal*60;
+			}
+		} catch(Exception e) {
+		}
+		
+		try{
+			int secVal = Integer.parseInt(sec);
+			if(secVal > 0) {
+				tempTime += secVal;
+			}
+		} catch(Exception e) {
+		}
+		
+		if(tempTime > 0) {
+			gameTimeInSeconds = tempTime;
+		}
 
+		System.out.println("Started new server: " + SERVER_NAME + ", " + maxClientCount + ", " + min + "." + sec);
 		threads = new ClientThread[maxClientCount];
 		scores = new int[maxClientCount];
 		updateLoop = new UpdateLoop(threads, maxClientCount);
@@ -99,31 +161,6 @@ public class MultiThreds {
 	   
 		update = new Thread() {
 		    public void run() {
-		    	/*
-		    	boolean allReady = false;
-		    	short nPlayers = 0;
-		    	while(!allReady) {
-		    		allReady = true;
-		    		for(ClientThread thread : threads) {
-						if (thread != null) {
-							nPlayers ++;
-							if(thread.getIsReady() != 1 && !deviceManager.isMiddle(thread.getIp())) {
-								allReady = false;
-							}
-						}
-		    		}
-		    		if(nPlayers <= 1 || !allReady) {
-		    			allReady = false;
-		    			nPlayers = 0;
-		    			
-		    			try {
-							Thread.currentThread().sleep(100);
-						} catch (InterruptedException e) {
-							e.printStackTrace();
-						}
-		    		}
-		    	}
-		    	*/
 		    	
 		    	short nPlayers = 0;
 		    	boolean isStarted = false;
@@ -144,7 +181,7 @@ public class MultiThreds {
 						}
 		    		}
 		    		
-		    		if(nPlayers <= 1) {
+		    		if(nPlayers <= 1) { // Ty main-device är fortfarande spelare.
 		    			isStarted = false;
 		    		}
 		    		
@@ -158,28 +195,13 @@ public class MultiThreds {
 	    		}
 		    	
 		    
+		    	startGame(nPlayers);
 		    	
-				for(ClientThread thread : threads) {
-					if (thread != null && thread.getIsReady() == 1) {
-						ByteBuffer dataBuffer = ByteBuffer.allocate(2*2 + 0*4);
-						dataBuffer.clear();
-	    				short sendState = (short) GLOBAL_STATE__.START_GAME.ordinal();
-						dataBuffer.putShort(sendState);
-						dataBuffer.putShort(nPlayers);	
-						
-			    		int position = dataBuffer.position();
-			    		byte[] sendBytes = new byte[position];
-						System.arraycopy( dataBuffer.array(), 0, sendBytes, 0, position);
-						
-			    		thread.sendData(sendBytes);
-			    		thread.clientInfo.addSentPackageItem(GLOBAL_STATE__.values()[sendState] + "   " + nPlayers);
-					}
-				}
-				System.out.println("DONE");
 				
-				
+				startTime = System.nanoTime();
+				final float endTime = startTime + (float)(gameTimeInSeconds * Math.pow(10,9)) + 3.5f * (float) Math.pow(10, 9);
 		    	float timeBegin, timeEnd = 0, timeDelta = 1 / tickRate, timeDelay;
-		    	while(true) {
+		    	while(endTime - System.nanoTime() > 0) {
 		    		//System.out.println("Update-----------------------------------------------");
 		    		//System.out.println("FPS: " + Math.pow(10, 9) / timeDelta);
 		    		timeBegin = System.nanoTime();
@@ -240,15 +262,17 @@ public class MultiThreds {
 		    			
 		    			
 		    			if(deviceManager.shouldUpdateScores()) {
-	    					ByteBuffer dataBuffer = ByteBuffer.allocate(2*2 + maxClientCount*4);
+	    					ByteBuffer dataBuffer = ByteBuffer.allocate(2*2 + nPlayers*(2+4));
 	    					dataBuffer.clear();
 	    					
-	    					dataBuffer.putShort((short) GLOBAL_STATE__.SET_POINTS.ordinal());
+	    					short sendState = (short) GLOBAL_STATE__.SET_POINTS.ordinal();
+	    					dataBuffer.putShort(sendState);
 	    					dataBuffer.putShort((short) 0);
 	    					
 	    					short nScores = 0;
 	    					for(ClientThread thread : threads) {
 			    				if (thread != null) {
+			    					dataBuffer.putShort((short) thread.getIdentification());
 			    					dataBuffer.putInt(deviceManager.getScore(thread.getIp()));
 			    					nScores ++;
 			    				}
@@ -264,6 +288,7 @@ public class MultiThreds {
 	    					for(ClientThread thread : threads) {
 			    				if (thread != null) {
 			    					thread.sendData(sendBytes);
+			    					thread.clientInfo.addSentPackageItem(GLOBAL_STATE__.values()[sendState] + "");
 			    				}
 	    					}	
 	    				}
@@ -283,8 +308,6 @@ public class MultiThreds {
 			    				buffer.putShort(sendState);	// State: Add balls
 			    				short nBalls = 0;
 			    				buffer.putShort(nBalls);										// nBalls, byte 2 och 3
-			    				
-			    				
 			    				
 			    				for(ClientThread.Ballz ball : thread.ballz) {
 			    			
@@ -420,124 +443,203 @@ public class MultiThreds {
 		    		timeEnd = System.nanoTime();
 		    		timeDelta = timeEnd - timeBegin;
 		    	}
+		    	
+		    
+		    	// Game over:
+		    	System.out.println("GAME OVER!!!!!");
+		    	
+				class Pair implements Comparable{
+					final short id;
+					final int points;
+					
+					private Pair(final short first, final int points) {
+						this.id = first;
+						this.points = points;
+	
+					}
+
+					public int compareTo(Object p2) {
+						if(this.points == ((Pair)(p2)).points) {
+							return 0;
+						} else if(this.points < ((Pair)(p2)).points) {
+							return 1;
+						} else {
+							return -1;
+						}
+					}
+				}
+				
+				ArrayList<Pair> finalScores = new ArrayList<Pair>();
+				for(ClientThread thread : threads) {
+    				if (thread != null) {
+    					finalScores.add(new Pair((short)thread.getIdentification(), deviceManager.getScore(thread.getIp())));
+    				}
+				}
+				
+				Collections.sort(finalScores);
+				
+				ByteBuffer dataBuffer = ByteBuffer.allocate(2*2 + nPlayers*(4+2));
+				dataBuffer.clear();
+				
+				dataBuffer.putShort((short) GLOBAL_STATE__.GAME_OVER.ordinal());
+				dataBuffer.putShort((short) finalScores.size());
+				
+				System.out.println("Final Scores: ");
+				for(Pair pair : finalScores) {
+					System.out.println("Score: " + pair.id + " = " + pair.points);
+					dataBuffer.putShort(pair.id);
+					dataBuffer.putInt(pair.points);
+				}
+				
+				final int position = dataBuffer.position();
+				dataBuffer.position(2);
+				dataBuffer.putShort((short) finalScores.size());
+				
+				byte[] sendBytes = new byte[position];
+				System.arraycopy( dataBuffer.array(), 0, sendBytes, 0, position);
+				
+				for(ClientThread thread : threads) {
+    				if (thread != null) {
+    					thread.sendData(sendBytes);
+    				}
+				}	
+		    	
+				
+		    	
 		    }
 		};
 		
 		deviceUpdate = new Thread(){ 
-			
-			
 			 public void run() {
 				 
 				 Thread t2 = new Thread(new Runnable() {
+					 
+					 class Sender implements Runnable {
+
+						 final DatagramPacket packet;
+						 MulticastSocket socket;
+						 
+						 Sender(MulticastSocket socket, final DatagramPacket packet) {
+							this.packet = packet; 
+							this.socket = socket;
+						 }
+								 
+						public void run() {
+							ByteBuffer buffer = ByteBuffer.wrap(packet.getData());
+						    
+						    final short state = buffer.getShort();
+							GLOBAL_STATE__ actualState;
+
+							try {
+								actualState = GLOBAL_STATE__.values()[state];
+							} catch (Exception e) { 
+								actualState = GLOBAL_STATE__.REG;
+							}
+							
+							boolean ok = false;
+							if(state == GLOBAL_STATE__.HAND_SHAKE.ordinal()) {
+								ok = true;
+								char[] key = {'Y', 'O', 'L', 'O'};
+								for(int i=0; i<key.length; i++) {
+									if(buffer.getChar() != key[i]) {
+										ok = false;
+										break;
+									}
+								}
+							}
+							
+							if(ok) {
+							   // String received = new String(packet.getData());
+							   // System.out.println("RECEIVED: " + received);
+								
+							    final short sendStatez = (short) GLOBAL_STATE__.HAND_SHAKE.ordinal();
+								final char[] serverName =  SERVER_NAME.toCharArray();
+								ByteBuffer bufferz = ByteBuffer.allocate(1024);
+								bufferz.putShort(sendStatez);
+								bufferz.putShort((short) serverName.length);
+								
+								for(int i=0; i< serverName.length; i++) {
+									bufferz.putChar(serverName[i]);
+								}
+								
+								bufferz.putInt(slotsTaken);
+								bufferz.putInt(maxClientCount);
+				
+								try {
+									System.out.println("SEND!");
+									socket.send(new DatagramPacket(bufferz.array(), bufferz.array().length, packet.getAddress(), packet.getPort()));
+								} catch (IOException e) {
+									System.out.println("ERROR SENDING DATAGRAM");
+									e.printStackTrace();
+								}				
+							} else {
+								System.out.println("NOT OK!");
+							}
+							 
+						}
+						 
+					 }
+					 
 						public void run() {
 							System.out.println("START BROADCAST");
 							
 							final int port = 4444;
 							final String broadcastIp = "237.0.0.1";
-							
-							MulticastSocket socket = null;
-							 
+						
 							try {
-								socket = new MulticastSocket(port);
+								MulticastSocket socket = new MulticastSocket(port);
+							
+								InetAddress group = null;
+								
+								try {
+									group = InetAddress.getByName(broadcastIp);
+								} catch (UnknownHostException e) {
+									System.out.println("ERROR GETTING IPGROUP");
+									e.printStackTrace();
+								}
+								
+								try {
+									socket.joinGroup(group);
+								} catch (IOException e) {
+									System.out.println("ERROR JOING IPGROUP");
+									e.printStackTrace();
+								}
+	
+								
+								boolean isRunning = true;
+								while(isRunning) {
+									System.out.println("LOOP BROADCAST");
+						
+									DatagramPacket packet;
+									
+								    byte[] incomingData = new byte[10];
+								    packet = new DatagramPacket(incomingData, incomingData.length);
+								    
+								    try {
+								    	System.out.println("WAITING");
+										socket.receive(packet);
+										System.out.println("GOT");
+									} catch (IOException e) {
+										System.out.println("ERROR RECIVING PACKET");
+										e.printStackTrace();
+									}
+								    Thread sender = new Thread(new Sender(socket, packet));
+								    sender.start();
+									
+								}
+								
+								try {
+									socket.leaveGroup(group);
+								} catch (IOException e) {
+									System.out.println("ERROR LEAVING IPGROUP");
+									e.printStackTrace();
+								}
+								socket.close();
+							
 							} catch (IOException e) {
 								System.out.println("ERROR CREATING MULTICAST SOCKET");
 								e.printStackTrace();
 							}
-							
-							InetAddress group = null;
-							
-							try {
-								group = InetAddress.getByName(broadcastIp);
-							} catch (UnknownHostException e) {
-								System.out.println("ERROR GETTING IPGROUP");
-								e.printStackTrace();
-							}
-							
-							try {
-								socket.joinGroup(group);
-							} catch (IOException e) {
-								System.out.println("ERROR JOING IPGROUP");
-								e.printStackTrace();
-							}
-
-							
-							boolean isRunning = true;
-							while(isRunning) {
-								System.out.println("LOOP BROADCAST");
-					
-								DatagramPacket packet;
-								
-							    byte[] incomingData = new byte[10];
-							    packet = new DatagramPacket(incomingData, incomingData.length);
-							    
-							    try {
-							    	System.out.println("WAITING");
-									socket.receive(packet);
-									System.out.println("GOT");
-								} catch (IOException e) {
-									System.out.println("ERROR RECIVING PACKET");
-									e.printStackTrace();
-								}
-							    
-							    ByteBuffer buffer = ByteBuffer.wrap(packet.getData());
-							    
-							    final short state = buffer.getShort();
-								GLOBAL_STATE__ actualState;
-
-								try {
-									actualState = GLOBAL_STATE__.values()[state];
-								} catch (Exception e) { 
-									actualState = GLOBAL_STATE__.REG;
-								}
-								
-								boolean ok = false;
-								if(state == GLOBAL_STATE__.HAND_SHAKE.ordinal()) {
-									ok = true;
-									char[] key = {'Y', 'O', 'L', 'O'};
-									for(int i=0; i<key.length; i++) {
-										if(buffer.getChar() != key[i]) {
-											ok = false;
-											break;
-										}
-									}
-								}
-								
-								if(ok) {
-								    String received = new String(packet.getData());
-								    System.out.println("RECEIVED: " + received);
-									
-								    final short sendStatez = (short) GLOBAL_STATE__.HAND_SHAKE.ordinal();
-									final char[] serverName =  SERVER_NAME.toCharArray();
-									ByteBuffer bufferz = ByteBuffer.allocate(1024);
-									bufferz.putShort(sendStatez);
-									bufferz.putShort((short) serverName.length);
-									
-									for(int i=0; i< serverName.length; i++) {
-										bufferz.putChar(serverName[i]);
-									}
-									
-									bufferz.putInt(slotsTaken);
-									bufferz.putInt(maxClientCount);
-					
-									try {
-										socket.send(new DatagramPacket(bufferz.array(), bufferz.array().length, packet.getAddress(), packet.getPort()));
-									} catch (IOException e) {
-										System.out.println("ERROR SENDING DATAGRAM");
-										e.printStackTrace();
-									}				
-								} else {
-									System.out.println("NOT OK!");
-								}
-								
-							}
-							
-							try {
-								socket.leaveGroup(group);
-							} catch (IOException e) {
-								System.out.println("ERROR LEAVING IPGROUP");
-								e.printStackTrace();
-							}
-							socket.close();
 							
 						}
 				 });
@@ -549,13 +651,13 @@ public class MultiThreds {
 						System.out.println("ACCEPTED");
 						int j = deviceManager.getDeviceThread(clientSocket.getInetAddress().toString());
 						if(j >= 0){
-							(threads[j] = new ClientThread(clientSocket.getInetAddress().toString(), clientSocket,threads,updateLoop, deviceManager)).start();
+							(threads[j] = new ClientThread(clientSocket.getInetAddress().toString(), clientSocket,threads,updateLoop, deviceManager, j)).start();
 						} else {
 							int i = 0;
 							for(i=0; i<maxClientCount; i++) {
 								if(threads[i] == null) {
 									slotsTaken++;
-									(threads[i] = new ClientThread(clientSocket.getInetAddress().toString(), clientSocket,threads,updateLoop, deviceManager)).start();
+									(threads[i] = new ClientThread(clientSocket.getInetAddress().toString(), clientSocket,threads,updateLoop, deviceManager, i)).start();
 									break;
 								}
 							}
