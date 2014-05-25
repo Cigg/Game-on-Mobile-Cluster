@@ -17,6 +17,8 @@ import java.util.Collections;
 
 import org.jbox2d.common.Vec2;
 
+import src.ClientThread.Ballz;
+
 
 
 /**
@@ -523,9 +525,13 @@ public class MultiThreds {
 				}	
 		    	
 				// Clean up
+				for(Ballz ball : ClientThread.ballz) {
+					physicsWorld.removeBall(ball.id);
+				}
+				
+				physicsWorld.update(timeDelta);
 				physicsWorld.bodies.clear();
-				//deviceManager = new DeviceManager();
-	    			    		
+				
 	    		for(ClientThread thread : threads) {
 	    			if(thread != null) {
 	    				thread.reset(deviceManager);
