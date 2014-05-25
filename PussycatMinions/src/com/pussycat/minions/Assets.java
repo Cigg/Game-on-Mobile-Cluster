@@ -29,4 +29,5 @@ public class Assets {
 	public static volatile Typeface menu_font;
 	public static volatile Image horizontal_line;
 	public static volatile Image vertical_line;
+	public static volatile Image loadImg;
 }

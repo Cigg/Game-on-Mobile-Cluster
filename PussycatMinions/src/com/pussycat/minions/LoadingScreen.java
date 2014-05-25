@@ -28,7 +28,7 @@ import com.pussycat.minions.Device.IndexPair;
 public class LoadingScreen extends Screen {
 	
 	private float startTime;
-	private float durationTime = (float) (1 * Math.pow(10, 9));
+	private float durationTime = (float) (2 * Math.pow(10, 9));
 	private LoadingBar loadingbar;
 	
 	private AtomicBoolean doneLoading = new AtomicBoolean(false);
@@ -41,12 +41,9 @@ public class LoadingScreen extends Screen {
         Graphics g = game.getGraphics();
 
         // Preload the Assets which are used by LoadingScreen
-        Assets.splash = g.newImage("mainpage.png", ImageFormat.RGB565);
+        Assets.splash = g.newImage("splash.png", ImageFormat.RGB565);
         Assets.splash = g.newScaledImage(Assets.splash, PussycatMinions.getScreenWidth(), PussycatMinions.getScreenHeight());
-        Assets.localBall = g.newImage("baby.png", ImageFormat.RGB565);
-        Assets.ball1 = g.newImage("Bug_1.png", ImageFormat.RGB565);
-        Assets.ball2 = g.newImage("Bug_2.png", ImageFormat.RGB565);
-        Assets.ball3 = g.newImage("Bug_3.png", ImageFormat.RGB565);
+        Assets.loadImg = g.newImage("loadImg.png", ImageFormat.RGB565);
          
         Thread loadingThread = new Thread(new Runnable() {
         	public void run() {
@@ -71,6 +68,10 @@ public class LoadingScreen extends Screen {
     	        Assets.countDownImage_3 = g.newImage("countDownImage_3.png", ImageFormat.RGB565);
     	        Assets.countDownImage_GO = g.newImage("countDownImage_GO.png", ImageFormat.RGB565);
     	        
+    	        Assets.ball1 = g.newImage("Bug_1.png", ImageFormat.RGB565);
+    	        Assets.ball2 = g.newImage("Bug_2.png", ImageFormat.RGB565);
+    	        Assets.ball3 = g.newImage("Bug_3.png", ImageFormat.RGB565);
+    	        
     	        Assets.horizontal_line = g.newImage("horizontalline.png" , ImageFormat.RGB565);
     	        Assets.vertical_line = g.newImage("verticalline.png" , ImageFormat.RGB565);
     	        
@@ -78,7 +79,8 @@ public class LoadingScreen extends Screen {
     	        
     	        AssetManager assets = AndroidGraphics.getAssets();
     	        Assets.menu_font = Typeface.createFromAsset(assets, "fonts" + File.separator + "angrybirds-regular.ttf");
-      	      
+    	       // Assets.localBall = g.newImage("baby.png", ImageFormat.RGB565);
+    	        
     	        doneLoading.set(true);
         	}
         });
