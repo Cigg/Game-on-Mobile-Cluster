@@ -234,7 +234,7 @@ private class Vertex {
 
 	public void update(float deltaTime) {
 		// Update Physics World
-		world.step(deltaTime, 8, 3); // vilka v�rden b�r de 2 sista
+		world.step(deltaTime, 90, 90); // vilka v�rden b�r de 2 sista
 									// parametrarna ha? - nu 8 3
 		if (toDestroy.size()>0){
 			System.out.println("Before: " + world.getBodyCount());
