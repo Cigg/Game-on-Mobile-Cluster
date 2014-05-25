@@ -96,6 +96,10 @@ public class PointsWidget implements Widget {
 				devicePoints = temp;
 			}
 			
+			if(!(points.size() > 1)){
+				return;
+			}
+			
 			Enumeration<Integer> enumKey = points.keys();
 			int p = 0;
 			while( enumKey.hasMoreElements() ) {

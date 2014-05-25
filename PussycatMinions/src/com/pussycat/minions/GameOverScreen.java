@@ -101,7 +101,7 @@ public class GameOverScreen extends Screen {
 		
 		paint.setTextSize(62);
 		
-		for(int i=0; i<finalScores.size(); i++) {
+		for(int i=0; i<finalScores.size() && i<3; i++) {
 			ShortPair score = finalScores.get(i);
 			paint.setColor(SharedVariables.getInstance().getColor(score.id));
 			graphics.drawString( (i+1) + "  :  " + score.second + "  :  " + score.second * 100, TEXT_X, TEXT_Y + i*100, paint);
