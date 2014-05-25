@@ -119,6 +119,17 @@ public abstract class AndroidGame extends Activity implements Game {
         this.screen = screen;
     }
     
+    
+    public void setAndKeepScreen(Screen screen) {
+        if (screen == null)
+            throw new IllegalArgumentException("Screen must not be null");
+
+        screen.resume();
+        screen.update(0);
+        this.screen = screen;
+    }
+    
+    
     public Screen getCurrentScreen() {
 
     	return screen;

@@ -108,7 +108,7 @@ public class LoadingScreen extends Screen {
         	loadingbar.setFinished(true);
         	//game.setScreen(new MainMenuScreen(game));
         	Assets.splash.dispose();
-        	game.setScreen(new ServerBrowser(game));
+        	game.setScreen(new ServerBrowserScreen(game));
         }
         AnimationHandler.getInstance().updateAnimations(System.nanoTime());
         loadingbar.update(System.nanoTime());

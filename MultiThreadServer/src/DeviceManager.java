@@ -22,6 +22,12 @@ public class DeviceManager {
 		shouldUpdateScores.set(upd);
 	}
 	
+	public void clearAllScores() {
+		for (Device device : this.devices) {
+			device.setScore(0);
+		}
+	}
+	
 	// Data type for a device.
 	// Only the DeviceManager should be able to modify this class.
 	private class Device {
@@ -73,6 +79,10 @@ public class DeviceManager {
 			return rotZ;
 		}
 		
+		public void setScore(final int score) {
+			this.score = score;
+		}
+		
 		public void incrementScore(){
 			setUpdateScores(true);
 			score++;
@@ -82,7 +92,7 @@ public class DeviceManager {
 	}
 	
 	// Container with all added devices.
-	public ArrayList<Device> devices;
+	public volatile ArrayList<Device> devices;
 	
 	// Temporary variables for point-mapping devices algorithm.
 	public float theta1;
@@ -203,10 +213,15 @@ public class DeviceManager {
 	
 	
 	public void addDevice(String ip, short type, int xDPI, int yDPI, int resX, int resY) {
-		if(deviceIsAdded(ip)) {	
-			System.out.println("Device is already addedd: " + ip +  " TYPE: " + type + " " + xDPI + " " + yDPI + " " + resX + " " +resY);
-			return;
+	
+		for (Device device : this.devices) {
+			  if (device.ip.equals(ip)) {
+				  System.out.println("ALREADY ADDED CHANGE TO NEW");
+				  device = new Device(ip, type, xDPI, yDPI, resX, resY);
+				  return;
+			  }
 		}
+		
 		
 		this.devices.add(new Device(ip, type, xDPI, yDPI, resX, resY));
 		System.out.println("Added device: " + ip + " TYPE: " + type + "  "+ xDPI + " " + yDPI + " " + resX + " " +resY );

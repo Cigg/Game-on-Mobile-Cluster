@@ -9,6 +9,7 @@ import android.graphics.Rect;
 import android.graphics.Typeface;
 import android.util.Log;
 
+import com.pussycat.framework.Game;
 import com.pussycat.framework.Graphics;
 import com.pussycat.framework.implementation.AndroidGraphics;
 
@@ -32,14 +33,25 @@ public class RemapWidget implements Widget {
 		Typeface typeface = Typeface.create("Helvetica", Typeface.BOLD);
 		//AssetManager assets = AndroidGraphics.getAssets();
 		//Typeface typeface = Typeface.createFromAsset(assets, "fonts" + File.separator + FONT);
-		
+		/*
 		paint = new Paint();
 		paint.setTypeface(typeface);
 		paint.setTextSize(SIZE);
 		bounds = new Rect();
 		paint.setColor(Color.RED);
 		paint.getTextBounds(text, 0, text.length(), bounds);
+		*/
 		
+
+		
+			paint = new Paint();
+			paint.setTypeface(Assets.menu_font);
+			paint.setTextSize(100);
+			paint.setTextAlign(Paint.Align.CENTER);
+			paint.setAntiAlias(true);
+			paint.setColor(Color.RED);
+			
+			
 		alpha = new AnimatedValue(0);
 		start();
 	}
@@ -62,7 +74,8 @@ public class RemapWidget implements Widget {
 		if(SharedVariables.getInstance().isRemapping()) {
 			Log.d("REM", "REMDRAW");
 			paint.setAlpha((int)alpha.getValue());
-			graphics.getCanvas().drawText(text, X_MARGIN - bounds.width()/2, Y_MARGIN - bounds.height()/2, paint);
+			graphics.drawString("Remap", X_MARGIN, Y_MARGIN, paint);
+			//graphics.getCanvas().drawText(text, X_MARGIN - bounds.width()/2, Y_MARGIN - bounds.height()/2, paint);
 		}
 	}
 

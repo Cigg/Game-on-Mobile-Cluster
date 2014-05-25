@@ -74,10 +74,14 @@ private BlinkWidget blinkWidget;
 private ArrayList<Widget> widgets = new ArrayList<Widget>();
 
 private AnimationHandler animationHandler = AnimationHandler.getInstance();	
+private Device device;
 
 // Constructor
     public GameScreenMiddle(Game game) {
         super(game);
+        
+        device = new Device();
+        device.setOnce();
 
 paint = new Paint();
 paint.setTextSize(40);
@@ -114,9 +118,6 @@ comm.start();
 ballHandler = new BallHandler(PussycatMinions.getScreenWidth(), PussycatMinions.getScreenHeight());
 ServerCommunication serverComm = new ServerCommunication(comm, ballHandler, middleTarget);
 serverComm.start();
-
-musicWidget = new MusicWidget(game.getAudio());
-remapWidget = new RemapWidget();
 
 if(!comm.isRunning()) {
 try {
@@ -166,24 +167,16 @@ addDevice();
     	 setIsReady();
      }
      
-   	     if (state != GameState.Running)
-   	    	 updateReady(touchEvents);
-   	    
-     // Thread.currentThread().setPriority(Thread.MAX_PRIORITY);
-     if(SharedVariables.getInstance().shouldStartGame()) {
-     SharedVariables.getInstance().setStartGame(false);
-     SharedVariables.getInstance().setIsRunning(true);
-     SharedVariables.getInstance().setInternalState(GLOBAL_STATE__.RUN_DEVICE);
-     musicWidget.play();
-     
-     state = GameState.Running;
+     if (state != GameState.Running) {
+    	 updateReady(touchEvents);
      }
-     
+
+   	     
      for(Widget widget : widgets) {
  		widget.update();
- 	}
+ 	  }
      
-  	if(animationHandler != null) {
+ 	if(animationHandler != null) {
 		animationHandler.updateAnimations(System.nanoTime());
 	}
 
@@ -191,19 +184,36 @@ addDevice();
      if(SharedVariables.getInstance().shouldStartGame()) {
  		SharedVariables.getInstance().setStartGame(false);
  		SharedVariables.getInstance().setIsRunning(true);
-
+ 		SharedVariables.getInstance().setInternalState(GLOBAL_STATE__.RUN_DEVICE);
+ 		
+ 		
  		musicWidget = new MusicWidget(game.getAudio());
  		remapWidget = new RemapWidget();
- 		countDownWidget = new CountDownWidget(musicWidget);
+ 		//countDownWidget = new CountDownWidget(musicWidget);
  		blinkWidget = new BlinkWidget();
  		
  		widgets.add(blinkWidget);
  		widgets.add(remapWidget);
- 		widgets.add(countDownWidget);
+ 		//widgets.add(countDownWidget);
  		
- 		SharedVariables.getInstance().setInternalState(GLOBAL_STATE__.REG);
+ 		 musicWidget.play();
+ 		
  		state = GameState.Running;
+ 	} else if(SharedVariables.getInstance().getGameOver()) {
+ 		Log.d("GAMEOVER", "GAMEOVER IN GAMESCREEN UPDATE");
+		SharedVariables.getInstance().setGameOver(false);
+		musicWidget.setLooping(false);
+		ballHandler.removeAllBalls();
+		SharedVariables.getInstance().setInternalState(GLOBAL_STATE__.MAP_DEVICE);
+		state = GameState.Mapping;
+		widgets.clear();
+		comm.incomingMessages.clear();
+ 		game.setAndKeepScreen(new GameOverScreen(game, this));
+ 		syncDevice();
+		addDevice();
+ 		return;
  	}
+     
     
      ballHandler.updateBalls(deltaTime);
      ballHandler.removeBallsNotWanted();
@@ -241,7 +251,7 @@ addDevice();
     
 case MAP_DEVICE:
 {
-	state = GameState.MappingDone;
+	//state = GameState.MappingDone;
 	Log.d("STATEZ", "MIDDLE MAP_DEVICE");
 	mapDevice(deltaTimeDragged, currentTime);
 	if(SharedVariables.getInstance().isRunning()) {
@@ -368,21 +378,21 @@ buffer.putFloat(currentTime - tms[index-8]);	// t
     comm.sendData(buffer.array());
       }
       
-      private void mapDevice(final float deltaTimeDragged, final float currentTime) {
-       ByteBuffer buffer;
-   buffer = ByteBuffer.allocate(1*2 + 6*4);
-   buffer.clear();
-  
-   buffer.putShort((short) GLOBAL_STATE__.MAP_DEVICE.ordinal());	// State: MAP_DEVICE
-   buffer.putFloat(downX);	// x1
-   buffer.putFloat(downY); // y1
-   buffer.putFloat(currentX);	// x2
-   buffer.putFloat(currentY);	// y2
-   buffer.putFloat(deltaTimeDragged); // t
-   buffer.putFloat(currentTime + SharedVariables.getInstance().getSendDelay());	
-
-   comm.sendData(buffer.array());
-      }
+private void mapDevice(final float deltaTimeDragged, final float currentTime) {
+	   ByteBuffer buffer;
+	   buffer = ByteBuffer.allocate(1*2 + 6*4);
+	   buffer.clear();
+	  
+	   buffer.putShort((short) GLOBAL_STATE__.MAP_DEVICE.ordinal());	// State: MAP_DEVICE
+	   buffer.putFloat(downX);	// x1
+	   buffer.putFloat(downY); // y1
+	   buffer.putFloat(currentX);	// x2
+	   buffer.putFloat(currentY);	// y2
+	   buffer.putFloat(deltaTimeDragged); // t
+	   buffer.putFloat(currentTime + SharedVariables.getInstance().getSendDelay());	
+	
+	   comm.sendData(buffer.array());
+}
     
     private void updatePaused(List<TouchEvent> touchEvents) {
         int len = touchEvents.size();
@@ -459,14 +469,12 @@ state = GameState.Running;
 // }
 
 
-  Device device = new Device();
+
  
  
     @Override
     public void paint(float deltaTime) {
-    
         Graphics graphics = game.getGraphics();
-        Canvas canvas = graphics.getCanvas();
         
         device.drawBackground(graphics);
         
@@ -481,6 +489,7 @@ state = GameState.Running;
         drawUI();
         
     }
+    
   private void drawUI() {
 Graphics g = game.getGraphics();
 

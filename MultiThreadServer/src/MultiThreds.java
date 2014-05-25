@@ -34,12 +34,12 @@ public class MultiThreds {
 	static PhysicsWorld physicsWorld;
 	
 	private String SERVER_NAME;
-	private int maxClientCount;
+	private volatile int maxClientCount;
 	private static int slotsTaken = 0;
-	private int gameTimeInSeconds = 120;
+	private int gameTimeInSeconds = 60;
 	
-	private ClientThread[] threads;
-	private int[] scores;
+	private volatile ClientThread[] threads;
+	private volatile int[] scores;
 	private UpdateLoop updateLoop;
 	
 	volatile static DeviceManager deviceManager;
@@ -162,6 +162,9 @@ public class MultiThreds {
 		update = new Thread() {
 		    public void run() {
 		    	
+		    	while(true) {
+		    		
+		    	System.out.println("NEW GAME______________");
 		    	short nPlayers = 0;
 		    	boolean isStarted = false;
 		    	
@@ -195,6 +198,7 @@ public class MultiThreds {
 	    		}
 		    	
 		    
+		   		System.out.println("START GAME______________");
 		    	startGame(nPlayers);
 		    	
 				
@@ -475,7 +479,7 @@ public class MultiThreds {
 				
 				ArrayList<Pair> finalScores = new ArrayList<Pair>();
 				for(ClientThread thread : threads) {
-    				if (thread != null) {
+    				if (thread != null && !deviceManager.isMiddle(thread.getIp())) {
     					finalScores.add(new Pair((short)thread.getIdentification(), deviceManager.getScore(thread.getIp())));
     				}
 				}
@@ -508,8 +512,37 @@ public class MultiThreds {
     				}
 				}	
 		    	
+				// Clean up
+				physicsWorld.bodies.clear();
+				//deviceManager = new DeviceManager();
+	    			    		
+	    		for(ClientThread thread : threads) {
+	    			if(thread != null) {
+	    				thread.reset(deviceManager);
+	    			}
+	    		}
+	    		
+	    		//deviceManager.devices.clear();
+	    		deviceManager.setMappingAtMainDevice();
+	    		deviceManager.setMappingAtAllDevices();
+	    		deviceManager.clearAllScores();
+	    		
+	 
+	    		physicsWorld = new PhysicsWorld();
+	    		physicsWorld.create(new Vec2(0.0f, 0.0f));
+	    		
+	    		//physicsWorld.clearForces();
+
+	    		
+				float l_midX = deviceManager.getMidX(deviceManager.getMiddleIp());
+				float l_midY = deviceManager.getMidY(deviceManager.getMiddleIp());
+
+				float g_midX = deviceManager.localToGlobalX(deviceManager.getMiddleIp(), l_midX, l_midY);
+				float g_midY = deviceManager.localToGlobalY(deviceManager.getMiddleIp(), l_midX, l_midY);
+			
+				ClientThread.targetJoint = physicsWorld.addTarget(g_midX, g_midY, 0);
 				
-		    	
+		    }
 		    }
 		};
 		
@@ -655,13 +688,28 @@ public class MultiThreds {
 						System.out.println("ACCEPTED");
 						int j = deviceManager.getDeviceThread(clientSocket.getInetAddress().toString());
 						if(j >= 0){
-							(threads[j] = new ClientThread(clientSocket.getInetAddress().toString(), clientSocket,threads,updateLoop, deviceManager, j)).start();
+							System.out.println("ALREADY in LIST");
+							//threads[j].setClientSocket(clientSocket);
+							//System.out.println("DONE ___________ ALREADY in LIST");
+							//threads[j].closeClientSocket();
+							//threads[j].setClientSocket(clientSocket);
+/*
+							try {
+								Thread.currentThread().sleep(100);
+							} catch (InterruptedException e) {
+								// TODO Auto-generated catch block
+								e.printStackTrace();
+							}
+			*/				
+							ClientInfo info = threads[j].getClientInfo();
+							(threads[j] = new ClientThread(clientSocket.getInetAddress().toString(), clientSocket,threads,updateLoop, deviceManager, j, info)).start();
 						} else {
 							int i = 0;
 							for(i=0; i<maxClientCount; i++) {
 								if(threads[i] == null) {
 									slotsTaken++;
-									(threads[i] = new ClientThread(clientSocket.getInetAddress().toString(), clientSocket,threads,updateLoop, deviceManager, i)).start();
+									threads[i] = new ClientThread(clientSocket.getInetAddress().toString(), clientSocket,threads,updateLoop, deviceManager, i);
+									threads[i].start();
 									break;
 								}
 							}
@@ -680,6 +728,10 @@ public class MultiThreds {
 				//t.join();
 			}
 		};
+		
+		update.start();
+		deviceUpdate.start();
+			
 	}//End of Main
 	
 	public void stopClientThreads(){

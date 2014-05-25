@@ -13,7 +13,7 @@ import android.graphics.Color;
 import android.graphics.Paint;
 import android.util.Log;
 
-public class ServerBrowser extends Screen {
+public class ServerBrowserScreen extends Screen {
 	
 	private Button[] buttons;
 	private Paint paint;
@@ -30,7 +30,7 @@ public class ServerBrowser extends Screen {
 	private final int TEXT_Y = PussycatMinions.getScreenHeight()/2;
 	
 	
-	public ServerBrowser(Game game) {
+	public ServerBrowserScreen(Game game) {
         super(game);
         
 		paint = new Paint();

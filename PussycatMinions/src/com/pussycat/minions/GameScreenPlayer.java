@@ -63,6 +63,8 @@ public class GameScreenPlayer extends Screen {
 	
 	private AnimationHandler animationHandler = AnimationHandler.getInstance();	
 	
+	private Device device;
+	
 	private TCPClient comm;
 	private BallHandler ballHandler;
 	private BallsWidget ballsWidget;
@@ -79,6 +81,9 @@ public class GameScreenPlayer extends Screen {
 	
     public GameScreenPlayer(Game game) {
         super(game);        
+        
+        device = new Device();
+        device.setOnce();
         
         Log.d("BROWSE", "AT GAMESCREEN");
         
@@ -150,21 +155,15 @@ public class GameScreenPlayer extends Screen {
     public void update(float deltaTime) {
         List<TouchEvent> touchEvents = game.getInput().getTouchEvents();
     	
-        /*
-        if(SharedVariables.getInstance().getInternalState() == GLOBAL_STATE__.IS_READY) {
-       	 	setIsReady();
-        }
-        */
-        
         if(state != GameState.Running) {
         	updateReady(touchEvents);
         }
 
     	if(SharedVariables.getInstance().shouldStartGame()) {
+    		SharedVariables.getInstance().setStartGame(false);
     		SharedVariables.getInstance().setInternalState(GLOBAL_STATE__.REG);
     		SharedVariables.getInstance().setIsRemapping(false);
     		
-    		SharedVariables.getInstance().setStartGame(false);
         	ballsWidget = new BallsWidget();
         	pointsNotificationsWidget = new PointsNotificationWidget(game.getAudio());
     		pointsWidget = new PointsWidget(pointsNotificationsWidget);
@@ -182,6 +181,19 @@ public class GameScreenPlayer extends Screen {
     		syncDevice();    
     		
     		state = GameState.Running;
+    	} else if(SharedVariables.getInstance().getGameOver()) {
+    		Log.d("GAMEOVER", "GAMEOVER IN GAMESCREEN UPDATE");
+    		SharedVariables.getInstance().setGameOver(false);
+    		setIsReady();
+    		ballHandler.removeAllBalls();
+    		SharedVariables.getInstance().setInternalState(GLOBAL_STATE__.MAP_DEVICE);
+    		state = GameState.Mapping;
+    		widgets.clear();
+    		comm.incomingMessages.clear();
+     		game.setAndKeepScreen(new GameOverScreen(game, this));
+     		syncDevice();
+    		addDevice();
+     		return;
     	}
 
     	ballHandler.updateBalls(deltaTime);
@@ -311,8 +323,16 @@ public class GameScreenPlayer extends Screen {
     			downX = currentX;
     			downY = currentY;
     			
-    			if(ballsWidget != null) {
-    				currentBallType = ballsWidget.pop();
+
+    			switch(SharedVariables.getInstance().getInternalState()) {
+
+					case RUN_DEVICE :
+					{
+							if(ballsWidget != null) {
+								currentBallType = ballsWidget.pop();
+							}
+					} break;
+    			
     			}
     			
     			if(index < ptx.length) {
@@ -465,7 +485,7 @@ public class GameScreenPlayer extends Screen {
 	
  	public int lastAlpha = 255;
  	
- 	Device device = new Device();
+
  	
  	
     @Override
@@ -738,31 +758,51 @@ public class GameScreenPlayer extends Screen {
         vz = vzb;
     	
         if( dragged ) {        	
-        	com.pussycat.framework.Image currentBall;
-        	if(currentBallType == 1){
-        		currentBall = Assets.ball1; 
-        	} else if (currentBallType == 2) {
-        		currentBall = Assets.ball2;
-        	} else if (currentBallType == 3) {
-        		currentBall = Assets.ball3;
-        	} else {
-        		currentBall = Assets.ball;
-        	}
-        	
         	if(state == GameState.Running) {
         		int deviceId = SharedVariables.getInstance().getDeviceId();
         		graphics.drawCircle((int)(draggedX), (int)(draggedY), (float)(PussycatMinions.meters2Pixels(0.0075f)*0.87),SharedVariables.getInstance().getColor(deviceId));
         	}
-        	graphics.drawScaledImage(	currentBall, 
-				 	(int)(draggedX - PussycatMinions.meters2Pixels(0.0075f)), 
-				 	(int)(draggedY - PussycatMinions.meters2Pixels(0.0075f)), 
-				 	(int)(PussycatMinions.meters2Pixels(0.0075f*2)), 
-				 	(int)(PussycatMinions.meters2Pixels(0.0075f*2)), 
-				 	0, 
-				 	0, 
-				 	currentBall.getWidth(), 
-				 	currentBall.getHeight(),
-				 	0.0f 	);
+        	
+        	com.pussycat.framework.Image currentBall;
+        	if(currentBallType == 1){
+        		currentBall = Assets.ball1; 
+            	graphics.drawScaledImage(	currentBall, 
+    				 	(int)(draggedX - PussycatMinions.meters2Pixels(0.0075f)), 
+    				 	(int)(draggedY - PussycatMinions.meters2Pixels(0.0075f)), 
+    				 	(int)(PussycatMinions.meters2Pixels(0.0075f*2)), 
+    				 	(int)(PussycatMinions.meters2Pixels(0.0075f*2)), 
+    				 	0, 
+    				 	0, 
+    				 	currentBall.getWidth(), 
+    				 	currentBall.getHeight(),
+    				 	0.0f 	);
+        	} else if (currentBallType == 2) {
+        		currentBall = Assets.ball2;
+        		graphics.drawScaledImage(	currentBall, 
+    				 	(int)(draggedX - PussycatMinions.meters2Pixels(0.0075f)), 
+    				 	(int)(draggedY - PussycatMinions.meters2Pixels(0.0075f)), 
+    				 	(int)(PussycatMinions.meters2Pixels(0.0075f*2)), 
+    				 	(int)(PussycatMinions.meters2Pixels(0.0075f*2)), 
+    				 	0, 
+    				 	0, 
+    				 	currentBall.getWidth(), 
+    				 	currentBall.getHeight(),
+    				 	0.0f 	);
+        	} else if (currentBallType == 3) {
+        		currentBall = Assets.ball3;
+        		graphics.drawScaledImage(	currentBall, 
+    				 	(int)(draggedX - PussycatMinions.meters2Pixels(0.0075f)), 
+    				 	(int)(draggedY - PussycatMinions.meters2Pixels(0.0075f)), 
+    				 	(int)(PussycatMinions.meters2Pixels(0.0075f*2)), 
+    				 	(int)(PussycatMinions.meters2Pixels(0.0075f*2)), 
+    				 	0, 
+    				 	0, 
+    				 	currentBall.getWidth(), 
+    				 	currentBall.getHeight(),
+    				 	0.0f 	);
+        	} 
+        	
+
         }
         
         

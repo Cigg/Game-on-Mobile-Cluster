@@ -17,7 +17,7 @@ public class BlinkWidget implements Widget {
 	private Paint paint;
 	
 	private ConcurrentHashMap<Integer, Integer> lastPoints;
-	private AnimatedValue alpha = new AnimatedValue(100);
+	private AnimatedValue alpha = new AnimatedValue(0);
 	
 	public Bitmap bitmap = null;
 	public Canvas bitmapCanvas = null;	 
@@ -25,6 +25,7 @@ public class BlinkWidget implements Widget {
 	public BlinkWidget() {
 		
 		Log.d("BLINK", "new BlinkWidget");
+		Log.d("DEVICEID", "new BlinkWidget");
 		
 		paint = new Paint();
 		paint.setAlpha(100);
@@ -44,7 +45,7 @@ public class BlinkWidget implements Widget {
 	
 	
 	public void update() {
-		Log.d("BLINK", "update");
+		
 		if( SharedVariables.getInstance().pointsIsUpdated() ) {
 			Log.d("BLINK", "pointsIsUpdated");
 			ConcurrentHashMap<Integer, Integer> points = SharedVariables.getInstance().getPoints();
@@ -57,7 +58,7 @@ public class BlinkWidget implements Widget {
 			    Integer pointsLast = lastPoints.get(key);		 
 			    
 			    if(pointsNow != pointsLast) {
-			    	AnimationHandler.getInstance().addAnimation(new Animation(alpha, 100, 0, System.nanoTime(), 0.5f, Animation.INTERPOLATION.COSINE, Animation.TYPE.POINT_TO_POINT));
+			    	AnimationHandler.getInstance().addAnimation(new Animation(alpha, 100, 0, System.nanoTime(), 1, Animation.INTERPOLATION.COSINE, Animation.TYPE.POINT_TO_POINT));
 			    	paint.setColor(SharedVariables.getInstance().getColor(key));
 			    	Log.d("BLINK", "BLINKA");
 			    	break;
@@ -73,8 +74,9 @@ public class BlinkWidget implements Widget {
 
 	public void draw(Graphics graphics) {
 		if(alpha.getValue() != 0) {
+			Log.d("BLINK", "DRAWA!!");
 			paint.setAlpha((int) alpha.getValue());
-			bitmap = Bitmap.createBitmap(PussycatMinions.getScreenWidth(), PussycatMinions.getScreenHeight(), Bitmap.Config.ARGB_8888);
+			bitmapCanvas.drawColor(paint.getColor());
 			graphics.getCanvas().drawBitmap(bitmap, 0, 0, paint);
 		}
 	}

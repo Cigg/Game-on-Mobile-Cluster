@@ -144,6 +144,9 @@ public class ServerCommunication extends Thread {
 		}
 		
 		SharedVariables.getInstance().setIsRunning(false);
+		SharedVariables.getInstance().setGameOver(true);
+		
+		Log.d("GAMEOVER", "GOT GAMEOVER");
 	}
 	
 	private void shakeHands(DataPackage incomingData) {

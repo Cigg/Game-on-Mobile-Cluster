@@ -21,5 +21,9 @@ public class MusicWidget {
 	public void stop() {
 		music.stop();
 	}
+	
+	public void setLooping(final boolean looping) {
+		music.setLooping(looping);
+	}
 
 }

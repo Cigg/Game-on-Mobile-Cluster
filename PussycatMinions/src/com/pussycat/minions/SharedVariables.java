@@ -54,16 +54,17 @@ public class SharedVariables {
 	private AtomicBoolean startGame;
 	private AtomicInteger numberOfPlayers;
 	
-	private ArrayList<Server> servers = new ArrayList<Server>();
-	private Server server = null;
+	private ArrayList<Server> servers;
+	private Server server;
 	
-	private AtomicInteger gameTimeInSeconds = new AtomicInteger(120);
+	private AtomicInteger gameTimeInSeconds;
 
-	private ConcurrentHashMap<Integer, Integer> idAndColors = new ConcurrentHashMap<Integer, Integer>();
-	private ConcurrentHashMap<Integer, Integer> idAndPoints = new ConcurrentHashMap<Integer, Integer>();
-	private ArrayList<ShortPair> finalScores = new ArrayList<ShortPair>();
-	private AtomicInteger deviceId = new AtomicInteger();
+	private ConcurrentHashMap<Integer, Integer> idAndColors;
+	private ConcurrentHashMap<Integer, Integer> idAndPoints;
+	private ArrayList<ShortPair> finalScores;
+	private AtomicInteger deviceId;
 	
+	private AtomicBoolean gameOver;
 	
 	private final int COLORS[] = {
 			Color.rgb(233, 137, 21), // Orange
@@ -92,13 +93,32 @@ public class SharedVariables {
 		return theOnlyInstance;
 	}
 	
+	public void release() {
+		synchronized( theOnlyInstanceMutex ) {
+			theOnlyInstance = null;
+		}
+	}
 	
 	private SharedVariables() {
+		Log.d("GAMEOVER", "NEW SHAREDVARIABLES!!!");
 		initialize();
 	}
 	
 	
 	public void initialize() {
+		servers = new ArrayList<Server>();
+		server = null;
+		
+		gameTimeInSeconds = new AtomicInteger(120);
+
+		idAndColors = new ConcurrentHashMap<Integer, Integer>();
+		idAndPoints = new ConcurrentHashMap<Integer, Integer>();
+		finalScores = new ArrayList<ShortPair>();
+		deviceId = new AtomicInteger();
+		
+		gameOver = new AtomicBoolean(false);
+		
+		
 		setInternalState(GLOBAL_STATE__.START);
 
 		setRecivieDelay(0.0f);
@@ -147,6 +167,12 @@ public class SharedVariables {
 			}
 		}
 		return -1;
+	}
+	
+	public  ArrayList<ShortPair> getFinalScores() {
+		synchronized(finalScores) {
+			return finalScores;
+		}
 	}
 	
 	
@@ -245,9 +271,19 @@ public class SharedVariables {
 	}
 	
 	
+	public boolean getGameOver() {
+		return gameOver.get();
+	}
+
+	
+	public void setGameOver(final boolean gameOver) {
+		this.gameOver.set(gameOver);
+	}
+	
 	// =========================================
 	// Get methods
 	// =========================================
+	
 	
 	public boolean isRunning() {
 		return isRunning.get();

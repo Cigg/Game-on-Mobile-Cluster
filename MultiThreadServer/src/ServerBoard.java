@@ -57,9 +57,6 @@ public class ServerBoard extends JFrame {
                	nSlots.setEditable(false);
                	min.setEditable(false);
                	sec.setEditable(false);
-               	
-   				server.update.start();
-   				server.deviceUpdate.start();
             }
         });
         

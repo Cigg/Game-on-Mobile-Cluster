@@ -153,6 +153,7 @@ private class Vertex {
 		//joint.initialize(body2, body, new Vec2(xPos, yPos));
 		//joint.initialize(body2, body, new Vec2(originX,originY));
 		RevoluteJoint the_joint = (RevoluteJoint) world.createJoint(joint);
+
 		return the_joint;
 		//the_joint.getJointAngle();
 		
@@ -162,6 +163,10 @@ private class Vertex {
 			 // process c 
 		} */
 				
+	}
+	
+	public void clearForces() {
+		world.clearForces();
 	}
 	
 	//TODO: make sure it works to check collision between pivot and ball

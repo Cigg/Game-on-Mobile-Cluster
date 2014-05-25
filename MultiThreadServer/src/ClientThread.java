@@ -10,6 +10,7 @@ import java.util.ArrayList;
 import java.util.Hashtable;
 import java.util.Random;
 import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 
 
@@ -32,7 +33,7 @@ public class ClientThread extends Thread {
 	private Socket clientSocket = null;
 	private final ClientThread[] threads;
 	private int maxClientCount;
-	private boolean isRunning = false;
+	private AtomicBoolean isRunning = new AtomicBoolean(true);
 
 	private float posX = 0;
 	private float posY = 0;
@@ -198,6 +199,15 @@ public class ClientThread extends Thread {
 	 * Get the ip of the client
 	 * 
 	 */
+	
+	public static RevoluteJoint getTargetJoint() {
+		return targetJoint;
+	}
+	
+	public void clearAllOwnBallz() {
+		ownBallz.clear();
+	}
+	
 	public String getIp() {
 		return this.ip;
 	}
@@ -230,6 +240,7 @@ public class ClientThread extends Thread {
 	public ClientThread(String ip, Socket clientSocket, ClientThread[] threads,
 			UpdateLoop updateLoop, DeviceManager deviceManager, final int id) {
 
+		System.out.println("NEW CLIENTTHREAD!");
 		this.id = id;
 		
 		this.deviceManager = deviceManager;
@@ -245,8 +256,44 @@ public class ClientThread extends Thread {
 		
 		clientInfo = new ClientInfo(ip);
 		clientInfo.createWindow();
-		
+		isReady.set(0);
 	
+	}
+	
+	public ClientThread(String ip, Socket clientSocket, ClientThread[] threads,
+			UpdateLoop updateLoop, DeviceManager deviceManager, final int id, final ClientInfo info) {
+
+		System.out.println("NEW CLIENTTHREAD!");
+		this.id = id;
+		
+		this.deviceManager = deviceManager;
+		this.clientSocket = clientSocket;
+		
+		this.threads = threads;
+		this.updateLoop = updateLoop;
+		maxClientCount = threads.length;
+		ballCount = MultiThreds.getPhysicsWorld().bodies.size();
+		this.ip = ip;
+		internalState = LOCAL_STATE__.MAPPING_STEP1;
+		//System.out.println("Ballz size is: " + ballz.size());
+		
+		//clientInfo = new ClientInfo(ip);
+		//clientInfo.createWindow();
+		clientInfo = info;
+		isReady.set(0);
+	
+	}
+	
+	public void reset(DeviceManager deviceManager) {
+		this.deviceManager = deviceManager;
+		internalState = LOCAL_STATE__.MAPPING_STEP1;
+		isReady.set(0);
+		clearAllOwnBallz();
+		clearBalls();
+	}
+	
+	public void setClientSocket(Socket clientSocket) {
+		this.clientSocket = clientSocket;
 	}
 
 
@@ -296,12 +343,19 @@ public class ClientThread extends Thread {
 			}
 		}
 	}
-
+	
+	public ClientInfo getClientInfo() {
+		return clientInfo;
+	}
+	
+	public void getIsRunning() {
+		this.isRunning.get();
+	}
 	/**
 	 * Starts the thread and reads new data from device
 	 */
 	public void run() {
-		isRunning = true;
+		isRunning.set(true);
 		int maxClientsCount = this.maxClientCount;
 		thread = this.threads;
 		
@@ -311,42 +365,22 @@ public class ClientThread extends Thread {
 			dout = clientSocket.getOutputStream();
 			clientSocket.setTcpNoDelay(true);
 			
-			/*
-			if(first) {
-	
+			while( isRunning.get() ) {
 				
-				final short sendStatez = (short) GLOBAL_STATE__.HAND_SHAKE.ordinal();
-				String name = "Jockes Server";
-				//final char[] serverName =  name.toCharArray();
-				final char[] serverName = {'J', 'o', 'c', 'k', 'e'};
-				//ByteBuffer bufferz = ByteBuffer.allocate(2*2 + serverName.length*2);
-				ByteBuffer bufferz = ByteBuffer.allocate(24);
-				bufferz.putShort(sendStatez);
-				System.out.println(" serverName.length* = " +  serverName.length);
-				bufferz.putShort((short) serverName.length);
-				
-				for(int i=0; i< serverName.length; i++) {
-					bufferz.putChar(serverName[i]);
-				}
-				sendData(bufferz.array());
-			
-				clientInfo.addSentPackageItem(GLOBAL_STATE__.values()[sendStatez] + "   " + String.valueOf(serverName));
-			}*/
-			
-			
-			while( isRunning ) {
-
-					if (!clientSocket.isClosed()) {
+					try{ 
 
 						byte[] headerBuffer = new byte[8];
 						
-						try{
+					//	try{
+							//System.out.println("Before read: " + id);
 							clientSocket.getInputStream().read(headerBuffer);
-						} catch (Exception e){
+				/*		} catch (Exception e){
 							clientSocket.close();
-							return;
-						}
+							System.out.println("CLOED AND RETURN!!!!!!!!!!!!");
+							this.isRunning.set(false);
+						}*/
 						
+						//System.out.println("After read: " + id);
 						float reciveTime = System.nanoTime();
 
 						ByteBuffer header = ByteBuffer.wrap(headerBuffer);
@@ -426,7 +460,7 @@ public class ClientThread extends Thread {
 								clientInfo.setMidX(g_midX * 2.5f);
 								clientInfo.setMidY(g_midY * 2.5f);
 								
-								if(type == 0) {
+								if(type == 0 && targetJoint == null) {
 									targetJoint = MultiThreds.getPhysicsWorld().addTarget(g_midX, g_midY, 0);
 								}
 								
@@ -639,15 +673,23 @@ public class ClientThread extends Thread {
 								break;
 							}
 						}
-
+					} catch (Exception e) {
+						System.out.println("FAILED READING ETC");
+		                clientSocket.close();
+		                isRunning.set(false);
+		                break;
 					}
 			}
 			clientSocket.close();
+			
+			System.out.println("CLOSED!!!!!!!!!!!!!!!!!!!!!!!!");
 		} catch (Exception e) {
 			System.out.println("Error");
+			System.out.println("DISCONNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNECT");
 			e.printStackTrace();
 		}
 	}
+	
 	public void closeClientSocket(){
 		try {
 			clientSocket.close();

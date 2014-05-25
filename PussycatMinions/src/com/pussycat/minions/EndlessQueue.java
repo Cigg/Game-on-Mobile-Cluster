@@ -114,4 +114,10 @@ public class EndlessQueue<T> {
 	}
 	
 	
+	public void clear() {
+		begin = 0;
+		next = begin;
+	}
+	
+	
 }
