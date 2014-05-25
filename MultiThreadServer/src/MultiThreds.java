@@ -92,6 +92,15 @@ public class MultiThreds {
 	}
 	
 	
+	private float midAngleFreezeTime = 0;
+	public void midAngleSetFrozen(final float time) {
+		midAngleFreezeTime = System.nanoTime() + time;
+	}
+	
+	public boolean midAngleNotFrozen() {
+		return midAngleFreezeTime - System.nanoTime() < 0;
+	}
+	
 	public MultiThreds(final String serverName, final String maxClient, final String min, final String sec) {
 		
 		try{
@@ -242,7 +251,7 @@ public class MultiThreds {
 			    				}
 			    				
 			    				// Send middleAngle to middle
-			    				if(deviceManager.isMiddle(thread.getIp())) {
+			    				if(deviceManager.isMiddle(thread.getIp()) && midAngleNotFrozen()) {
 			    					ByteBuffer dataBuffer = ByteBuffer.allocate(1*2 + 1*4);
 			    					dataBuffer.clear();
 			    		    		
@@ -259,6 +268,7 @@ public class MultiThreds {
 				    	    		byte[] sendBytes = new byte[position];
 				    				System.arraycopy( dataBuffer.array(), 0, sendBytes, 0, position);
 			    		    		thread.sendData(sendBytes);
+			    		    		midAngleSetFrozen((1/60.0f) * (float)Math.pow(10, 9));
 			    				}
 			    				
 		    				}
