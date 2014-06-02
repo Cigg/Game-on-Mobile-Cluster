@@ -24,7 +24,7 @@
            android:icon="@drawable/icon"
            android:name="com.pussycat.minions.PussycatMinions"
            android:configChanges="keyboard|keyboardHidden|orientation"
-           android:label="Ladykiller"
+           android:label="Ladybug"
            android:screenOrientation="portrait" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
