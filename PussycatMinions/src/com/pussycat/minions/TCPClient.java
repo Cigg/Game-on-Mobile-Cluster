@@ -51,43 +51,10 @@ public class TCPClient extends Thread {
 	}
 	
 	
-	public static class Executor implements Runnable {
-
-		final int begin;
-		final int end;
-		
-		public Executor(final int begin, final int end) {
-			//Log.d("BROAD", "BEG = " + begin + ", END = " + end);
-			this.begin = begin;
-			this.end = end;
-		}
-		
-		public void run() {
-
-			for(int i=begin; i<end; i++) {
-				for(int j=0; j<256; j++) {
-					Log.d("BROAD", "loop: " + i + "." + j);
-					try{
-						String ip = "192.168".concat("." + i + "." + j);
-						Socket trySocket = new Socket();
-						trySocket.connect(new InetSocketAddress(ip, 4444), 10);
-						if (trySocket.isConnected()) {
-							Log.d("BROAD", "Found: " + ip);
-						//	SERVER_IP = ip;
-							return;	
-						}
-						trySocket.close();
-					} catch (Exception e) {
-					} 
-				}
-			}
-			
-		}
-	}
-	
 	public boolean isRunning() {
 		return isRunning.get();
 	}
+	
 	
 	public synchronized void sendData(final byte[] buffer) {
 		if( isValid(buffer) ) {	
