@@ -19,7 +19,7 @@
        android:targetSdkVersion="19" />
 
     <application
-       android:label="Ladykiller" >
+       android:label="Ladybug" >
         <activity
            android:icon="@drawable/icon"
            android:name="com.pussycat.minions.PussycatMinions"
