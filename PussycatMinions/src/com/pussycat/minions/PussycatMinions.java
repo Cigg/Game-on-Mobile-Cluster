@@ -1,5 +1,7 @@
 package com.pussycat.minions;
 
+import android.content.Context;
+import android.net.wifi.WifiManager;
 import android.util.DisplayMetrics;
 
 import com.pussycat.framework.Screen;
@@ -13,10 +15,13 @@ public class PussycatMinions extends AndroidGame {
 	private static int densityDpi;
 	private static int density;
 	private static int xdpi, ydpi;
+	
+	public static Settings settings;
+	private static WifiManager wifi;
     
 	@Override
     public Screen getInitScreen() {
-    	
+		
     	DisplayMetrics metrics = getResources().getDisplayMetrics();
     	width = metrics.widthPixels;
     	height = metrics.heightPixels;
@@ -26,7 +31,8 @@ public class PussycatMinions extends AndroidGame {
 		density = (int) metrics.density;
 		xdpi = (int) metrics.xdpi;
 		ydpi = (int) metrics.ydpi;
-        
+		
+		settings = new Settings();
     	
     	//TO-DO: calculate the correct height of display
     	/*
@@ -35,10 +41,18 @@ public class PussycatMinions extends AndroidGame {
             height += getResources().getDimensionPixelSize(resourceId);
         }
         */
-    	
+	
+		wifi = (WifiManager) getSystemService(Context.WIFI_SERVICE);
+		
         return new LoadingScreen(this);
     }
+	
+
+	public static WifiManager getWifiManger() {
+		return  wifi;
+	}
     
+	
     public static int getScreenWidth(){
     	return width;
     }
@@ -65,6 +79,10 @@ public class PussycatMinions extends AndroidGame {
     
     public static int getXDPI() {
     	return xdpi;
+    }
+    
+    public static int meters2Pixels(float meters) {
+		return (int) (meters * xdpi * 100 / 2.54);
     }
     
 }

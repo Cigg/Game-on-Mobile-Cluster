@@ -6,7 +6,7 @@ import com.pussycat.framework.Image;
 import com.pussycat.framework.Graphics.ImageFormat;
 
 public class AndroidImage implements Image {
-    Bitmap bitmap;
+    public Bitmap bitmap;
     ImageFormat format;
     
     public AndroidImage(Bitmap bitmap, ImageFormat format) {

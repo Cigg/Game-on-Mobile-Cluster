@@ -1,188 +1,164 @@
 package com.pussycat.minions;
 
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
 import java.io.IOException;
-import java.io.InputStreamReader;
+import java.io.InputStream;
 import java.io.OutputStream;
-import java.io.OutputStreamWriter;
-import java.io.PrintWriter;
+import java.net.DatagramPacket;
+import java.net.DatagramSocket;
 import java.net.InetAddress;
+import java.net.InetSocketAddress;
 import java.net.Socket;
+import java.net.SocketAddress;
+import java.net.SocketException;
 import java.nio.ByteBuffer;
-import java.util.concurrent.LinkedBlockingQueue;
+import java.util.ArrayList;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+import java.util.concurrent.atomic.AtomicBoolean;
 
+import com.pussycat.minions.Device.IndexPair;
 
+import android.graphics.Bitmap;
 import android.util.Log;
 
-public class TCPClient {
-	private String serverMessage;
-	public static String SERVERIP = "192.168.43.213";
-	public static final int SERVERPORT = 4444;
-	private boolean mRun = false;
-	private OnMessageReceived messageListner = null;
+public class TCPClient extends Thread {
 	
-	PrintWriter out;
-	BufferedReader in;
-	OutputStream dout;
-	BufferedWriter buffw;
+
+	//private final String SERVER_IP = "192.168.43.122";
+	private String SERVER_IP;
 	
-	LOCAL_STATE__ internalState;
-	//public volatile LinkedBlockingQueue<DataPackage> messages = new LinkedBlockingQueue <DataPackage>();
-	public DataPackage dataPackage = null;
+	//private final static int SERVER_PORT = 4444;
+	private int SERVER_PORT;
+
+	private final int NUMBER_OF_INCOMING_MESSAGES = 32; 
+	final static int TIME_OUT = 200;
 	
+	private AtomicBoolean isRunning = new AtomicBoolean(false);
+	private OutputStream outputStream;
+	private InputStream inputStream;
+	private Socket socket;
 	
-	public TCPClient(OnMessageReceived listner){
-		messageListner = listner;
-	}
+	public EndlessQueue<DataPackage> incomingMessages = new EndlessQueue<DataPackage>(new DataPackage[NUMBER_OF_INCOMING_MESSAGES]);
+	
 	
 	public TCPClient() {
-		
+		Server server = SharedVariables.getInstance().getServer();
+		SERVER_IP = server.ip;
+		SERVER_PORT = server.port;
 	}
 	
-	public void sendMessage(String message) {
-		if(out != null && !out.checkError()) {
-			out.println(message);
-			out.flush();
-		}
+	
+	public boolean isRunning() {
+		return isRunning.get();
 	}
 	
-	public void sendData(byte[] buffer) {
-		if(buffer.length > 0) {	
+	
+	public synchronized void sendData(final byte[] buffer) {
+		if( isValid(buffer) ) {	
 			try {
-				/*
-				Log.d("AppWrite", "Writes: " + buffer.toString());
-				byte[] arr = new byte[500];
-				ByteBuffer bf = ByteBuffer.wrap(arr);
-				bf.putShort((short)16);
-				bf.putFloat((float) 17.17);
-				bf.putFloat((float) 18.18);
-				bf.putFloat((float) 19.19);
-				bf.putFloat((float) 2000.20);
-				dout.write(bf.array());
-				*/
-				ByteBuffer bufferLength = ByteBuffer.allocate(4);
-				bufferLength.putInt(buffer.length);
-				
-				dout.write(bufferLength.array());
-				dout.write(buffer);
-				dout.flush();
-				
-
+				Header header = new Header(buffer.length, System.nanoTime());
+				tcpWrite(header.getBuffer(), buffer);	
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
 		}
 	}
 	
-	public void getData(){
-		if(out !=null && !out.checkError()) {
-			out.println("");
-			out.flush();
-		}
+	
+	public static boolean isValid(final byte[] buffer) {
+		return buffer.length > 0;
 	}
 	
-	public void stopClient() {
-		mRun = false;
+	
+	public void tcpWrite(final byte[] header, final byte[] buffer) throws IOException {
+		if( outputStream != null ) {
+			outputStream.write(header);
+			outputStream.write(buffer);
+			outputStream.flush();
+		}	
 	}
+	
 	
 	public void run() {
-		mRun = true;
-		
 		try {
-			InetAddress serverAddr = InetAddress.getByName(SERVERIP);
-			Socket socket = new Socket(serverAddr, SERVERPORT);
+			socket = setUpAndGetSocket();
+			setUpStreams(socket);
+			setUpRunningThread();
 			
-			try {
-			/*	out = 	new PrintWriter(
-						new BufferedWriter(
-						new OutputStreamWriter(socket.getOutputStream())), true);
-			*/
-				dout = socket.getOutputStream();
-				
-			/*	in = 	new BufferedReader(
-						new InputStreamReader(socket.getInputStream()));
-						*/
-
-				while(mRun) {
-					/*
-					serverMessage = in.readLine();
-					if(serverMessage != null && messageListner != null) {
-						messageListner.messageReceived(serverMessage);
-					}
-					serverMessage = null;
-					*/
-					
-					/*
-					int length = socket.getInputStream().available();					
-					Log.d("DATAP", "DATAP available: " + socket.getInputStream().available());
-					
-					if(length > 0) {
-						length = Math.min(1024, length);
-						byte[] bytes = new byte[length];
-						socket.getInputStream().read(bytes);
-			     		messages.add(new DataPackage(bytes, socket.getInetAddress().toString(), socket.getPort()));
-					}
-					*/
-					byte[] bytesLength = new byte[4];
-					socket.getInputStream().read(bytesLength);	
-					ByteBuffer bufferLength = ByteBuffer.wrap(bytesLength);
-					
-					int length = bufferLength.getInt();
-				    length = Math.max(0, length);
-
-					if(length > 0) {
-						byte[] bytes = new byte[length];
-						socket.getInputStream().read(bytes);
-						dataPackage = new DataPackage(bytes, socket.getInetAddress().toString(), socket.getPort());
-						//messages.add(new DataPackage(bytes, socket.getInetAddress().toString(), socket.getPort()));
-					}
-
-					
-		     		/*
-					short state = buffer.getShort();
-					GLOBAL_STATE__ actualState;
-					
-					try {
-						actualState = GLOBAL_STATE__.values()[state];
-					} catch(Exception e) {
-						actualState = GLOBAL_STATE__.ADD_BALL;
-					}
-					
-	        		String ip = socket.getInetAddress().toString();
-
-	        		switch(actualState) {
-	        			case ADD_BALL:
-		        			float xPos = buffer.getInt();
-				        	float yPos = buffer.getInt();	
-		        			float xVel = buffer.getFloat();	
-		        			float yVel = buffer.getFloat();		
-		        			Log.d("GOT", "GOT from " + ip + "  :   " + xPos + ", " + yPos + "   " + xVel + ", " + yVel);
-	        			break;
-	        			
-	        			case SET_STATE:
-	        				short newState = buffer.getShort();
-	        				Log.d("GOT", "NEW STATE: " + newState);
-	        			break;
-	        			
-	        			default:
-	        			break;
-	        		}
-	        		*/
-				}
-			} catch (Exception e) {
-				Log.e("Android", "ERROR", e);
-			} finally {
-				socket.close();
+			while( isRunning.get() ) {
+				Header header = new Header(inputStream);
+				if( header.isValid() ) {
+					DataPackage dataPackageToAdd = readDataPackage(header);
+					addIncomingMessage(dataPackageToAdd);
+		        }
 			}
-		} catch (Exception e) {
+		} catch ( Exception e ) {
 			Log.e("Android", "ERROR", e);
+		} finally {
+			cleanUpRunningThread();
+		}
+	}
+			
+	
+	private void setUpRunningThread() {
+		setIsRunning(true);
+		Thread.currentThread().setName("TCPClient");
+	}
+	
+	
+	public void setIsRunning(final boolean isRunning) {
+		this.isRunning.set(isRunning);
+		synchronized(this) {
+			if(isRunning) {
+				this.notifyAll();
+			}
+		}
+
+	}
+	
+	
+	private Socket setUpAndGetSocket() throws IOException {
+		InetAddress serverAddress = InetAddress.getByName(SERVER_IP);
+		Socket socket = new Socket(serverAddress, SERVER_PORT);
+		socket.setTcpNoDelay(true);
+		return socket;
+	}
+	
+	
+	private void setUpStreams(final Socket socket) throws IOException {
+		outputStream = socket.getOutputStream();
+		inputStream = socket.getInputStream();
+	}
+	
+	
+	private DataPackage readDataPackage(final Header header) throws IOException {
+		byte[] dataPackageBytes = new byte[header.getDataPackageLength()];
+		inputStream.read(dataPackageBytes);
+		return new DataPackage(dataPackageBytes, socket.getInetAddress().toString(), socket.getPort(), header.getDataPackageSendTime(), header.getDataPackageReciveTime());
+	}
+	
+	
+	private void addIncomingMessage(final DataPackage dataPackageToAdd) {
+		incomingMessages.add(dataPackageToAdd);
+		synchronized( incomingMessages ) {
+			incomingMessages.notify();
+		};
+	}
+	
+	
+	private void cleanUpRunningThread() {
+		setIsRunning(false);
+		if( socket != null ) {
+			try {
+				socket.close();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
 		}
 	}
 	
-	public interface OnMessageReceived {
-		public void messageReceived(String message);
-	}
-	
-}//End of TCPClient
+}
 

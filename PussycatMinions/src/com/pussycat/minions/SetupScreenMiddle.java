@@ -9,7 +9,7 @@ import com.pussycat.framework.Game;
 import com.pussycat.framework.Graphics;
 import com.pussycat.framework.Input.TouchEvent;
 import com.pussycat.framework.Screen;
-import com.pussycat.minions.GameScreen.GameState;
+import com.pussycat.minions.GameScreenPlayer.GameState;
 
 public class SetupScreenMiddle extends Screen {
     enum GameState {
@@ -31,7 +31,8 @@ public class SetupScreenMiddle extends Screen {
 		paint.setAntiAlias(true);
 		paint.setColor(Color.WHITE);
 		
-		skipButton = new Button(Assets.button_skip, Assets.button_skip_pressed, PussycatMinions.getScreenWidth()/2 - Assets.button_skip.getWidth()/2, PussycatMinions.getScreenHeight() - 2*Assets.button_skip.getHeight());
+		skipButton = new Button(Assets.button, Assets.button_pressed, PussycatMinions.getScreenWidth()/2 - Assets.button.getWidth()/2, PussycatMinions.getScreenHeight() - 2*Assets.button.getHeight(), paint);
+		skipButton.setText("SKIP");
     }
     
     @Override

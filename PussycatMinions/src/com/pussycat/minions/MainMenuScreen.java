@@ -16,6 +16,8 @@ public class MainMenuScreen extends Screen {
 	
 	Button playerButton;
 	Button middleButton;
+	Button aboutButton;
+	
 	Paint paint;
 	
     public MainMenuScreen(Game game) {
@@ -23,14 +25,29 @@ public class MainMenuScreen extends Screen {
         
         // Defining a paint object
 		paint = new Paint();
-		paint.setTextSize(30);
+		paint.setTypeface(Assets.menu_font);
+		paint.setTextSize(42);
 		paint.setTextAlign(Paint.Align.CENTER);
 		paint.setAntiAlias(true);
 		paint.setColor(Color.WHITE);
 		
-		playerButton = new Button(Assets.button_player, Assets.button_player_pressed, PussycatMinions.getScreenWidth()/2 - Assets.button_middle.getWidth()/2, PussycatMinions.getScreenHeight()/2-100);
-		middleButton = new Button(Assets.button_middle, Assets.button_middle_pressed, PussycatMinions.getScreenWidth()/2 - Assets.button_middle.getWidth()/2, PussycatMinions.getScreenHeight()/2+100);
-        
+		Graphics g = game.getGraphics();
+		
+		playerButton = new Button(Assets.button, Assets.button_pressed, PussycatMinions.getScreenWidth()/2 - Assets.button.getWidth()/2, (int) (PussycatMinions.getScreenHeight()*0.58f), paint);
+		playerButton.setText("PLAYER");
+		playerButton.scaleButton(g, (int)(PussycatMinions.getScreenWidth()*0.45));
+		playerButton.setX(PussycatMinions.getScreenWidth()/2 - playerButton.getWidth()/2);
+		playerButton.setTextSize(playerButton.getHeight()/3);
+		middleButton = new Button(Assets.button, Assets.button_pressed, PussycatMinions.getScreenWidth()/2 - Assets.button.getWidth()/2, (int) (PussycatMinions.getScreenHeight()*0.7f), paint);
+		middleButton.setText("MIDDLE");
+		middleButton.scaleButton(g, (int)(PussycatMinions.getScreenWidth()*0.45));
+		middleButton.setX(PussycatMinions.getScreenWidth()/2 - playerButton.getWidth()/2);
+		middleButton.setTextSize(middleButton.getHeight()/3);
+        aboutButton = new Button(Assets.button, Assets.button_pressed, PussycatMinions.getScreenWidth()/2 - Assets.button.getWidth()/2,  (int) (PussycatMinions.getScreenHeight()*0.82f), paint);
+        aboutButton.setText("ABOUT");
+        aboutButton.scaleButton(g, (int)(PussycatMinions.getScreenWidth()*0.45));
+        aboutButton.setX(PussycatMinions.getScreenWidth()/2 - playerButton.getWidth()/2);
+        aboutButton.setTextSize(aboutButton.getHeight()/3);
     }
     
     @Override
@@ -48,6 +65,9 @@ public class MainMenuScreen extends Screen {
             	if(middleButton.inBounds(event.x, event.y)){
             		middleButton.setPressed(true);
             	}
+            	if(aboutButton.inBounds(event.x, event.y)){
+            		aboutButton.setPressed(true);
+            	}
             }
             
             if(event.type == TouchEvent.TOUCH_DRAGGED){
@@ -57,23 +77,24 @@ public class MainMenuScreen extends Screen {
             	if(!middleButton.inBounds(event.x, event.y)){
             		middleButton.setPressed(false);
             	}
+            	if(!aboutButton.inBounds(event.x, event.y)){
+            		aboutButton.setPressed(false);
+            	}
             }
             
             if (event.type == TouchEvent.TOUCH_UP) {
-            	playerButton.setPressed(false);
-            	middleButton.setPressed(false);
-            	
-            	if(playerButton.inBounds(event.x, event.y)){
-            		game.setScreen(new SetupScreen(game));
-            	}
-            	if(middleButton.inBounds(event.x, event.y)){
-            		game.setScreen(new SetupScreenMiddle(game));
-            	}
-            	//START GAME
-//            	if(inBounds(event, 0,0, PussycatMinions.getScreenWidth(), PussycatMinions.getScreenHeight()/2))
-//            		game.setScreen(new GameScreen(game));
-//            	if(inBounds(event, 0,PussycatMinions.getScreenHeight()/2, PussycatMinions.getScreenWidth(), PussycatMinions.getScreenHeight()))
-//            		game.setScreen(new GameScreenMiddle(game));
+            	// TODO: Should go to SetupScreen instead
+            	if(playerButton.isPressed() && playerButton.inBounds(event.x, event.y)){
+            		game.setScreen(new GameScreenPlayer(game));
+            		playerButton.setPressed(false);
+            	} else if(middleButton.isPressed() && middleButton.inBounds(event.x, event.y)){
+            		game.setScreen(new GameScreenMiddle(game));
+            		middleButton.setPressed(false);
+            	} else if(aboutButton.isPressed() && aboutButton.inBounds(event.x, event.y)){
+            		game.setScreen(new GameScreenMiddle(game));
+            		aboutButton.setPressed(false);
+            	} 
+
             }
         }
     }
@@ -88,9 +109,11 @@ public class MainMenuScreen extends Screen {
     
     private void drawUI() {
         Graphics g = game.getGraphics();
-        
+        //g.drawScaledImage(Assets.mainMenuBackground, 0, 0, PussycatMinions.getScreenWidth(), PussycatMinions.getScreenHeight(), 0, 0, Assets.mainMenuBackground.getWidth(), Assets.mainMenuBackground.getHeight(), 0);
+        g.drawImage(Assets.mainMenuBackground, 0, 0);
         playerButton.drawButton(g);
         middleButton.drawButton(g);
+        aboutButton.drawButton(g);
     }
 
 

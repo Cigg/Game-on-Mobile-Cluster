@@ -1,126 +1,67 @@
 package com.pussycat.minions;
 
-import android.graphics.PointF;
-import android.util.Log;
+import android.graphics.Color;
 
+import com.pussycat.framework.Graphics;
 import com.pussycat.framework.Image;
 
-public class Ball {
+public abstract class Ball {
 
-	Image image;
-	private int id;
-	private PointF pos;
-	private float speedX, speedY, diameter;
-	//private boolean visible;
-	private boolean locked;
-	private int color;
+	protected int id;
+	protected int parent;
+	protected int type;
+	
+	protected float x;
+	protected float y;
+	
+	protected float vx;
+	protected float vy;
+	
+	protected Image image;
+	protected int radius;
 	
 	
-	public Ball(float startX, float startY, float diameter){
-		image = Assets.ball;
-		pos = new PointF(startX, startY);
-		speedX = 0;
-		speedY = 0;
-		this.diameter = diameter;
-		locked = true;
+	public void update(final float timeStep) {
+	    this.x += this.vx * timeStep;
+	    this.y += this.vy * timeStep;  
 	}
 	
-	public Ball(float startX, float startY, float diameter, float speedX, float speedY){
-		image = Assets.ball;
-		pos = new PointF(startX, startY);
-		(this).speedX = speedX;
-		(this).speedY = speedY;
-		this.diameter = diameter;
-		locked = false;
+	
+	public int getRadius() {
+		return this.radius;
 	}
 	
-	public Ball(int id, float startX, float startY, float diameter, float speedX, float speedY){
-		image = Assets.ball;
-		this.id = id;
-		pos = new PointF(startX, startY);
-		(this).speedX = speedX;
-		(this).speedY = speedY;
-		this.diameter = diameter;
-		locked = false;
+	
+	public void draw(Graphics graphics) {
+		
+	    graphics.drawScaledImage(	this.image, 
+			    				 	(int)this.x - this.radius, 
+			    				 	(int)this.y - this.radius, 
+			    				 	this.radius * 2, 
+			    				 	this.radius * 2, 
+			    				 	0, 
+			    				 	0, 
+			    				 	this.image.getWidth(), 
+			    				 	this.image.getHeight(), 0.0f	);		
 	}
 	
-	public void update(){
-		//if(!locked){
-			pos.x += speedX;
-			pos.y += speedY;
-			//Log.d("UPDATE", pos.x + " " + pos.y + " " + speedX + " " + speedY + " ");
-		//}
-	}
-
-	public Image getImage(){
-		return image;
-	}
-	
-	public PointF getPoint(){
-		return pos;
-	}
 	
 	public float getX() {
-		return pos.x;
+		return x;
 	}
-
+	
+	
 	public float getY() {
-		return pos.y;
+		return y;
 	}
 	
-	public float getDiameter(){
-		return diameter;
+	
+	public void setX(final float x) {
+		this.x = x;
 	}
 	
-	public float getRadius(){
-		return diameter/2;
-	}
-
-	public float getSpeedX() {
-		return speedX;
-	}
-
-	/*
-	public boolean isVisible() {
-		return visible;
-	}
-	*/
-
-	public void setX(float x) {
-		this.pos.x = x;
-	}
-
-	public void setY(float y) {
-		this.pos.y = y;
-	}
-
-	public void setSpeedX(int speedX) {
-		this.speedX = speedX;
-	}
-
-	public void setLocked(boolean locked) {
-		this.locked = locked;
-	}
 	
-
-	public void setPos(float x, float y) {
-		this.pos.x = x;
-		this.pos.y = y;
+	public void setY(final float y) {
+		this.y = y;
 	}
-
-	public void updateBall(int posX, int posY, float speedX, float speedY){
-		this.pos.x = posX;
-		this.pos.y = posY;
-		this.speedX = speedX;
-		this.speedY = speedY;
-	}
-	
-	public int getId() {
-		return id; 
-	}
-	/*
-	public void setVisible(boolean visible) {
-		this.visible = visible;
-	}
-	*/
 }

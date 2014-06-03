@@ -1,5 +1,7 @@
 package com.pussycat.framework.implementation;
 
+import java.nio.ByteBuffer;
+
 import android.app.Activity;
 import android.content.Context;
 import android.content.res.Configuration;
@@ -17,6 +19,8 @@ import com.pussycat.framework.Game;
 import com.pussycat.framework.Graphics;
 import com.pussycat.framework.Input;
 import com.pussycat.framework.Screen;
+import com.pussycat.minions.GLOBAL_STATE__;
+import com.pussycat.minions.GameScreenPlayer;
 
 public abstract class AndroidGame extends Activity implements Game {
     AndroidFastRenderView renderView;

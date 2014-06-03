@@ -15,20 +15,26 @@ import android.graphics.Matrix;
 import android.graphics.Paint;
 import android.graphics.Paint.Style;
 import android.graphics.Rect;
+import android.graphics.RectF;
+import android.util.Log;
 
 import com.pussycat.framework.Graphics;
 import com.pussycat.framework.Image;
+import com.pussycat.framework.Graphics.ImageFormat;
 import com.pussycat.minions.PussycatMinions;
 
 public class AndroidGraphics implements Graphics {
-    AssetManager assets;
+    static AssetManager assets;
     Bitmap frameBuffer;
     Canvas canvas;
     Paint paint;
     Rect srcRect = new Rect();
     Rect dstRect = new Rect();
+    RectF srcRectF = new RectF();
+    RectF dstRectF = new RectF();
+    Matrix matrix = new Matrix();
     Bitmap bitmap;
-
+    
     public AndroidGraphics(AssetManager assets, Bitmap frameBuffer) {
         this.assets = assets;
         this.frameBuffer = frameBuffer;
@@ -36,6 +42,14 @@ public class AndroidGraphics implements Graphics {
         this.paint = new Paint();
     }
 
+    public Bitmap getFrameBuffer() {
+    	return this.frameBuffer;
+    }
+    
+    public static AssetManager getAssets() {
+    	return assets;
+    }
+    
     @Override
     public Image newImage(String fileName, ImageFormat format) {
         Config config = null;
@@ -150,6 +164,41 @@ public class AndroidGraphics implements Graphics {
         return new AndroidImage(bitmap, format);
     }
     
+    public Image newScaledImage(Image image, int pixelWidth) {
+		ImageFormat format;
+        if (((AndroidImage)image).bitmap.getConfig() == Config.RGB_565)
+            format = ImageFormat.RGB565;
+        else if (((AndroidImage)image).bitmap.getConfig() == Config.ARGB_4444)
+        	format = ImageFormat.ARGB4444;
+        else
+            format = ImageFormat.ARGB8888;
+        
+        int newWidth = pixelWidth;
+        int newHeight = (int)(((float)newWidth/(float)image.getWidth())*(float)image.getHeight());
+        
+        Bitmap resizedBitmap = Bitmap.createScaledBitmap(((AndroidImage)image).bitmap, newWidth, newHeight, false);
+		
+		return new AndroidImage(resizedBitmap, format);
+    }
+    
+    public Image newScaledImage(Image image, int pixelWidth, int pixelHeight) {
+		ImageFormat format;
+        if (((AndroidImage)image).bitmap.getConfig() == Config.RGB_565)
+            format = ImageFormat.RGB565;
+        else if (((AndroidImage)image).bitmap.getConfig() == Config.ARGB_4444)
+        	format = ImageFormat.ARGB4444;
+        else
+            format = ImageFormat.ARGB8888;
+        
+        int newWidth = pixelWidth;
+        int newHeight = pixelHeight;
+        
+        Bitmap resizedBitmap = Bitmap.createScaledBitmap(((AndroidImage)image).bitmap, newWidth, newHeight, false);
+		
+		return new AndroidImage(resizedBitmap, format);
+    }
+    
+    
     @Override
     public void clearScreen(int color) {
         canvas.drawRGB((color & 0xff0000) >> 16, (color & 0xff00) >> 8,
@@ -171,6 +220,13 @@ public class AndroidGraphics implements Graphics {
     }
     
     @Override
+    public void drawCircle(int x, int y, float r, int color){
+    	paint.setColor(color);
+    	paint.setStyle(Style.FILL);
+    	canvas.drawCircle(x, y, r, paint);
+    }
+    
+    @Override
     public void drawARGB(int a, int r, int g, int b) {
         paint.setStyle(Style.FILL);
        canvas.drawARGB(a, r, g, b);
@@ -184,8 +240,7 @@ public class AndroidGraphics implements Graphics {
     }
     
 
-    public void drawImage(Image Image, int x, int y, int srcX, int srcY,
-            int srcWidth, int srcHeight) {
+    public void drawImage(Image Image, int x, int y, int srcX, int srcY, int srcWidth, int srcHeight) {
         srcRect.left = srcX;
         srcRect.top = srcY;
         srcRect.right = srcX + srcWidth;
@@ -206,32 +261,31 @@ public class AndroidGraphics implements Graphics {
         canvas.drawBitmap(((AndroidImage)Image).bitmap, x, y, null);
     }
     
-    public void drawScaledImage(Image Image, int x, int y, int width, int height, int srcX, int srcY, int srcWidth, int srcHeight){
-    	
-   	 	srcRect.left = srcX;
-        srcRect.top = srcY;
-        srcRect.right = srcX + srcWidth;
-        srcRect.bottom = srcY + srcHeight;
-        
-        
-        dstRect.left = x;
-        dstRect.top = y;
-        dstRect.right = x + width;
-        dstRect.bottom = y + height;
-        
-        bitmap = ((AndroidImage) Image).bitmap;
-        
-        /**
-         * Improves resizing quality of bitmaps a lot, but possibly much heavier to calculate
-         */
-        Paint paint = new Paint();
-        paint.setAntiAlias(true);
-        paint.setFilterBitmap(true);
-        paint.setDither(true);
-        
-        canvas.drawBitmap(bitmap, srcRect, dstRect, paint);
-        
-    }
+    public void drawScaledImage(Image Image, int x, int y, int width, int height, int srcX, int srcY, int srcWidth, int srcHeight, float angle){
+	    	
+		bitmap = ((AndroidImage) Image).bitmap;
+		 
+	    // calculate the scale
+	    float scaleWidth = ((float) width) / srcWidth;
+	    float scaleHeight = ((float) height) / srcHeight;
+	   
+	    // create a matrix for the manipulation
+	    matrix.reset();
+	    // resize the Bitmap
+	    matrix.postScale(scaleWidth, scaleHeight);
+	    // rotate the Bitmap
+	    float angleInDegrees = angle*(180.0f/3.14f);
+	    matrix.postRotate(angleInDegrees);
+	
+	    // recreate the new Bitmap
+	    Bitmap resizedBitmap = Bitmap.createBitmap(bitmap, srcX, srcY,
+	                      srcWidth, srcHeight, matrix, true);
+	    
+	    // x and y are top left coordinates
+	    // x and y must be calculated if the image isn't square
+	    // Question: should x and y be center of image instead?
+	    canvas.drawBitmap(resizedBitmap, x, y, paint);
+	}
    
     @Override
     public int getWidth() {
@@ -241,5 +295,15 @@ public class AndroidGraphics implements Graphics {
     @Override
     public int getHeight() {
         return frameBuffer.getHeight();
+    }
+    
+    @Override
+    public Canvas getCanvas() {
+    	return this.canvas;
+    }
+    
+    @Override
+    public Paint getPaint() {
+    	return this.paint;
     }
 }

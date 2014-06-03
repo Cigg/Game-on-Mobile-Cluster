@@ -1,7 +1,13 @@
 package com.pussycat.minions;
 
+import android.graphics.Paint;
+import android.graphics.Bitmap.Config;
+import android.util.Log;
+
 import com.pussycat.framework.Graphics;
 import com.pussycat.framework.Image;
+import com.pussycat.framework.Graphics.ImageFormat;
+import com.pussycat.framework.implementation.AndroidImage;
 
 public class Button {
 
@@ -12,10 +18,16 @@ public class Button {
 	private boolean visible;
 	private boolean enabled;
 	private boolean pressed;
+	private String string;
 	
-	public Button(Image imageNormal, Image imagePressed,int posX, int posY){
+	private Paint paint;
+	private float textHeight;
+	
+	public Button(Image imageNormal, Image imagePressed, int posX, int posY, Paint paint){
 		this.imageNormal = imageNormal;
 		this.imagePressed = imagePressed;
+		
+		this.paint = paint;
 		
 		this.posX = posX;
 		this.posY = posY;
@@ -24,10 +36,14 @@ public class Button {
 		this.visible = true;
 		this.enabled = true;
 		this.pressed = false;
+		this.string = "";
+		this.textHeight = paint.getTextSize()/2;
 	}
 	
 	public void drawButton(Graphics g){
+		//Log.d("Debug Pussycat", "paint: " + paint.getTextSize());
 		g.drawImage(getButtonImage(), posX, posY);
+		g.drawString(string, posX + width/2, (int)(posY + height/2 + textHeight/2), paint);
 	}
 
 	private Image getButtonImage(){
@@ -35,6 +51,18 @@ public class Button {
 			return imagePressed;
 		else
 			return imageNormal;
+	}
+	
+	/**
+	 * Scale button to input width
+	 * @param width Button width in pixels
+	 */
+	public void scaleButton(Graphics g, int pixelWidth) {
+		imageNormal = g.newScaledImage(imageNormal, pixelWidth);
+		imagePressed = g.newScaledImage(imagePressed, pixelWidth);
+		
+		this.width = imageNormal.getWidth();
+		this.height = imageNormal.getHeight();
 	}
 	
 	public int getX() {
@@ -77,11 +105,24 @@ public class Button {
 		this.pressed = pressed;
 	}
 	
+	public boolean isPressed() {
+		return this.pressed;
+	}
+	
 	public void setVisible(boolean visible) {
 		this.visible = visible;
 	}
 
 	public void setEnabled(boolean enabled) {
 		this.enabled = enabled;
+	}
+	
+	public void setText(String string) {
+		this.string = string;
+	}
+	
+	public void setTextSize(float textSize) {
+		paint.setTextSize(textSize);
+		this.textHeight = paint.getTextSize()/2;
 	}
 }
