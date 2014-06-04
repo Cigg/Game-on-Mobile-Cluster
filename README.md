@@ -1,7 +1,7 @@
 Game-on-Mobile-Cluster
 ======================
 
-## Description
+## Introduction
 
 Game-on-Mobile-Cluster is an application allowing multiple Android devices to create a shared global coordinate system.
 The project has been done while enrolled in the course TNM094 Media Technology Bachelors Thesis at Linköping University.
