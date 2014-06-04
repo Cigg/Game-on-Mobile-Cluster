@@ -1,7 +1,7 @@
 Game-on-Mobile-Cluster
 ======================
 
-## Descriptions
+## Description
 
 Game-on-Mobile-Cluster is an application allowing multiple Android devices to create a shared global coordinate system.
 The project has been done while enrolled in the course TNM094 Media Technology Bachelors Thesis at Linköping University.
@@ -14,12 +14,12 @@ The project has been done while enrolled in the course TNM094 Media Technology B
 * Teodor Vik
 
 
-## Try the software
+## Trying the software
 
 ### Requirements
 * Eclipse with Android SDK
 * Minimum of two Android devices
-* An additional mobile device that can set up a wi-fi hotspot
+* Access to a personal wi-fi (e.g. at home, or a hotspot set up by a mobile device)
 
 We highly encourage you to download the project and try it out.
 
@@ -35,7 +35,7 @@ We highly encourage you to download the project and try it out.
 7. Choose the server you want to join
 8. Follow the instructions
 
-## Edit the software
+## Editing the software
 
 This section is under construction.
 
